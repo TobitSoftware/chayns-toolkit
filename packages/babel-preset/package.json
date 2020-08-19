@@ -1,0 +1,16 @@
+{
+	"name": "@chayns-scripts/babel-preset",
+	"version": "0.0.0",
+	"private": false,
+	"description": "The sharable babel preset for chayns-developers. Used in chayns-scripts.",
+	"license": "MIT",
+	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
+	"main": "index.js",
+	"dependencies": {
+		"@babel/plugin-transform-react-constant-elements": "^7.10.4",
+		"@babel/preset-env": "^7.11.0",
+		"@babel/preset-react": "^7.10.4",
+		"babel-plugin-transform-imports": "^2.0.0",
+		"babel-plugin-transform-react-remove-prop-types": "^0.4.24"
+	}
+}

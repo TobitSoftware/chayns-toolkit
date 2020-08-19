@@ -1,0 +1,18 @@
+{
+	"name": "@chayns-scripts/eslint-config",
+	"version": "0.0.0",
+	"description": "The sharable eslint-config for chayns-developers. Used in chayns-scripts.",
+	"homepage": "",
+	"license": "MIT",
+	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
+	"main": "index.js",
+	"peerDependencies": {
+		"eslint": "7",
+		"eslint-config-airbnb": "18",
+		"eslint-config-prettier": "6",
+		"eslint-plugin-import": "2",
+		"eslint-plugin-jsx-a11y": "6",
+		"eslint-plugin-react": "7",
+		"eslint-plugin-react-hooks": "4"
+	}
+}

@@ -1,0 +1,32 @@
+{
+	"name": "example-project",
+	"version": "0.0.0",
+	"private": true,
+	"license": "MIT",
+	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
+	"source": "src/index.html",
+	"scripts": {
+		"build": "chayns-scripts build",
+		"dev": "chayns-scripts dev",
+		"lint": "chayns-scripts lint"
+	},
+	"babel": {
+		"presets": [
+			"@chayns-scripts"
+		]
+	},
+	"eslintConfig": {
+		"extends": "@chayns-scripts"
+	},
+	"dependencies": {
+		"chayns-components": "^4.17.6",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1"
+	},
+	"devDependencies": {
+		"chayns-scripts": "*"
+	},
+	"chayns": {
+		"https": {}
+	}
+}

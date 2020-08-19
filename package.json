@@ -1,0 +1,16 @@
+{
+	"name": "root",
+	"private": true,
+	"workspaces": [
+		"packages/**"
+	],
+	"scripts": {
+		"bootstrap": "lerna bootstrap",
+		"format": "prettier . --write"
+	},
+	"devDependencies": {
+		"lerna": "^3.22.1",
+		"prettier": "^2.0.5",
+		"prettier-plugin-packagejson": "^2.2.5"
+	}
+}
