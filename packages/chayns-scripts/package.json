@@ -1,7 +1,7 @@
 {
 	"name": "chayns-scripts",
 	"version": "0.0.0",
-	"description": "A zero-config tool for chayns-developers.",
+	"description": "A zero-config toolchain for chayns-developers.",
 	"homepage": "",
 	"license": "MIT",
 	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",

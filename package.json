@@ -1,6 +1,7 @@
 {
 	"name": "root",
 	"private": true,
+	"description": "A zero-config toolchain for chayns-developers.",
 	"workspaces": [
 		"packages/**"
 	],
