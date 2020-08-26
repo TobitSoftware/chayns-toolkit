@@ -24,6 +24,7 @@ module.exports = () => {
 			],
 			isProduction && "@babel/plugin-transform-react-constant-elements",
 			isProduction && "transform-react-remove-prop-types",
+			!isProduction && "react-refresh/babel",
 		].filter(Boolean),
 	}
 }
