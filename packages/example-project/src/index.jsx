@@ -1,10 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import DummyComponent from "./DummyComponent"
-
-function App() {
-	return <DummyComponent />
-}
+import App from "./App"
 
 chayns.ready.then(() => {
 	ReactDOM.render(<App />, document.querySelector("#app"))
