@@ -1,40 +1,47 @@
-import defaultConfigContents from "@parcel/config-default"
-import Parcel from "@parcel/core"
 import { Text } from "ink"
 import path from "path"
 import React, { useEffect } from "react"
+import webpack from "webpack"
+import WebpackDevServer from "webpack-dev-server"
+import { createConfig } from "../webpack/config"
 
 const packageFile = require(path.resolve(process.cwd(), "package.json"))
 
 export default function Dev() {
 	useEffect(() => {
-		const bundler = new Parcel({
-			entries: path.resolve(process.cwd(), "./src/index.html"),
-			defaultConfig: {
-				...defaultConfigContents,
-				filePath: require.resolve("@parcel/config-default"),
-			},
-			env: "development",
-			disableCache: true,
-			minify: false,
-			distDir: "build",
-			sourceMaps: true,
-			hot: true,
-			serve: {
-				host: "0.0.0.0",
-				port: 1234,
-				https: packageFile.chayns.https,
-			},
-			defaultEngines: {
-				browsers: [
-					"latest 1 chrome version",
-					"latest 1 firefox version",
-					"latest 1 safari version",
-				],
-			},
-		})
+		const certs = packageFile.chayns?.https
+		const hasHttpsCertificates = Boolean(certs?.cert && certs?.key)
 
-		bundler.watch()
+		const devServer = new WebpackDevServer(
+			webpack(createConfig({ mode: "development" })),
+			{
+				historyApiFallback: true,
+				compress: true,
+				disableHostCheck: true,
+				// @ts-expect-error
+				cert: hasHttpsCertificates ? certs.cert : undefined,
+				key: hasHttpsCertificates ? certs.key : undefined,
+				https: hasHttpsCertificates,
+				hot: true,
+				headers: {
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods":
+						"GET, POST, PUT, DELETE, PATCH, OPTIONS",
+					"Access-Control-Allow-Headers":
+						"X-Requested-With, content-type, Authorization",
+				},
+			}
+		)
+
+		devServer.listen(
+			1234,
+			hasHttpsCertificates ? "0.0.0.0" : "localhost",
+			(err) => {
+				if (err) {
+					console.error(err)
+				}
+			}
+		)
 	}, [])
 
 	return <Text>Dev running.</Text>
