@@ -1,6 +1,5 @@
-import { Text } from "ink"
 import path from "path"
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import webpack from "webpack"
 import WebpackDevServer from "webpack-dev-server"
 import { createConfig } from "../webpack/config"
@@ -44,5 +43,5 @@ export default function Dev() {
 		)
 	}, [])
 
-	return <Text>Dev running.</Text>
+	return null
 }
