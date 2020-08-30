@@ -1,4 +1,5 @@
 import { Text } from "ink"
+import { ParsedArgs } from "minimist"
 import React from "react"
 import Card from "./components/Card"
 import Build from "./scripts/Build"
@@ -6,17 +7,18 @@ import Dev from "./scripts/Dev"
 import Lint from "./scripts/Lint"
 
 interface AppProps {
-	command?: string
+	command: string
+	args: ParsedArgs
 }
 
-export default function App({ command }: AppProps): JSX.Element {
+export default function App({ command, args }: AppProps): JSX.Element {
 	switch (command) {
 		case "build":
-			return <Build />
+			return <Build args={args} />
 		case "dev":
-			return <Dev />
+			return <Dev args={args} />
 		case "lint":
-			return <Lint />
+			return <Lint args={args} />
 	}
 
 	return (

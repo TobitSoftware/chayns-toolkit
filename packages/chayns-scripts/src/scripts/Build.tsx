@@ -8,12 +8,15 @@ import Card from "../components/Card"
 import Column from "../components/grid/Column"
 import GridItem from "../components/grid/GridItem"
 import { createWebpackCompiler } from "../util/createWebpackCompiler"
+import { CommandProps } from "./props"
 
-export default function Build() {
+export default function Build({ args }: CommandProps) {
 	const [buildResults, setBuildResults] = useState<Stats>()
 
+	const analyze = Boolean(args.a || args.analyze)
+
 	useEffect(() => {
-		const compiler = createWebpackCompiler({ mode: "production" })
+		const compiler = createWebpackCompiler({ mode: "production", analyze })
 
 		compiler.run((err, stats) => {
 			setBuildResults(stats)

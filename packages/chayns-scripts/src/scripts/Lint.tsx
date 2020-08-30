@@ -3,8 +3,9 @@ import { Box, Text } from "ink"
 import Spinner from "ink-spinner"
 import React, { useEffect, useState } from "react"
 import Card from "../components/Card"
+import { CommandProps } from "./props"
 
-export default function Lint() {
+export default function Lint({}: CommandProps) {
 	const [lintResults, setLintResults] = useState<string>()
 	const [lintError, setLintError] = useState()
 	const [success, setSuccess] = useState(false)

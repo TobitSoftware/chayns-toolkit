@@ -6,14 +6,19 @@ import path from "path"
 // @ts-expect-error
 import postcssPresetEnv from "postcss-preset-env"
 import webpack, { Compiler, Configuration, Plugin } from "webpack"
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 
 type Mode = "development" | "production"
 
 interface CreateConfigOptions {
 	mode: Mode
+	analyze?: boolean
 }
 
-export function createWebpackCompiler({ mode }: CreateConfigOptions): Compiler {
+export function createWebpackCompiler({
+	mode,
+	analyze = false,
+}: CreateConfigOptions): Compiler {
 	let devtool: Configuration["devtool"]
 
 	const plugins: Plugin[] = [
@@ -21,6 +26,10 @@ export function createWebpackCompiler({ mode }: CreateConfigOptions): Compiler {
 			template: path.resolve(process.cwd(), "src/index.html"),
 		}),
 	]
+
+	if (analyze) {
+		plugins.push(new BundleAnalyzerPlugin({}))
+	}
 
 	switch (mode) {
 		case "development":
