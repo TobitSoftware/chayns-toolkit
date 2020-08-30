@@ -90,6 +90,23 @@ export function createConfig({ mode }: CreateConfigOptions): Configuration {
 						"sass-loader",
 					],
 				},
+				{
+					test: /\.(png|jpe?g|gif)$/i,
+					use: {
+						loader: "url-loader",
+						options: {
+							limit: 8192,
+							fallback: {
+								loader: "file-loader",
+								options: { name: "[contenthash:12].[ext]" },
+							},
+						},
+					},
+				},
+				{
+					test: /\.svg$/,
+					use: "@svgr/webpack",
+				},
 			],
 		},
 		plugins,
