@@ -19,7 +19,7 @@
 		"extends": "@chayns-scripts"
 	},
 	"dependencies": {
-		"chayns-components": "^4.18.0",
+		"chayns-components": "^4.18.2",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1"
 	},

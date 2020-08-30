@@ -12,7 +12,7 @@
 		"@babel/preset-react": "^7.10.4",
 		"babel-plugin-transform-imports": "^2.0.0",
 		"babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-		"chayns-components": "^4.18.0",
+		"chayns-components": "^4.18.2",
 		"react-refresh": "^0.8.3"
 	}
 }
