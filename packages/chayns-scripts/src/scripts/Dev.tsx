@@ -1,10 +1,9 @@
 import { Text } from "ink"
 import React, { useEffect, useState } from "react"
-import webpack from "webpack"
 import WebpackDevServer from "webpack-dev-server"
 import Card from "../components/Card"
+import { createWebpackCompiler } from "../util/createWebpackCompiler"
 import { loadConfig } from "../util/loadConfig"
-import { createConfig } from "../webpack/config"
 
 export default function Dev() {
 	const [configError, setConfigError] = useState<Error>()
@@ -19,7 +18,7 @@ export default function Dev() {
 				)
 
 				const devServer = new WebpackDevServer(
-					webpack(createConfig({ mode: "development" })),
+					createWebpackCompiler({ mode: "development" }),
 					{
 						historyApiFallback: true,
 						compress: true,

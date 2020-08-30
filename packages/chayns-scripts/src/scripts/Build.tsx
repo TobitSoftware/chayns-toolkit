@@ -1,19 +1,19 @@
 import { Box, Text } from "ink"
 import Spinner from "ink-spinner"
 import React, { useEffect, useState } from "react"
-import webpack, { Stats } from "webpack"
+import { Stats } from "webpack"
 import AssetSize from "../components/build/AssetSize"
 import SizeIndicator from "../components/build/SizeIndicator"
 import Card from "../components/Card"
 import Column from "../components/grid/Column"
 import GridItem from "../components/grid/GridItem"
-import { createConfig } from "../webpack/config"
+import { createWebpackCompiler } from "../util/createWebpackCompiler"
 
 export default function Build() {
 	const [buildResults, setBuildResults] = useState<Stats>()
 
 	useEffect(() => {
-		const compiler = webpack(createConfig({ mode: "production" }))
+		const compiler = createWebpackCompiler({ mode: "production" })
 
 		compiler.run((err, stats) => {
 			setBuildResults(stats)

@@ -5,7 +5,7 @@ import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
 import path from "path"
 // @ts-expect-error
 import postcssPresetEnv from "postcss-preset-env"
-import { Configuration, Plugin } from "webpack"
+import webpack, { Compiler, Configuration, Plugin } from "webpack"
 
 type Mode = "development" | "production"
 
@@ -13,7 +13,7 @@ interface CreateConfigOptions {
 	mode: Mode
 }
 
-export function createConfig({ mode }: CreateConfigOptions): Configuration {
+export function createWebpackCompiler({ mode }: CreateConfigOptions): Compiler {
 	let devtool: Configuration["devtool"]
 
 	const plugins: Plugin[] = [
@@ -47,7 +47,7 @@ export function createConfig({ mode }: CreateConfigOptions): Configuration {
 			break
 	}
 
-	return {
+	return webpack({
 		entry: path.resolve(process.cwd(), "src/index"),
 		mode,
 		devtool,
@@ -110,5 +110,5 @@ export function createConfig({ mode }: CreateConfigOptions): Configuration {
 			],
 		},
 		plugins,
-	}
+	})
 }
