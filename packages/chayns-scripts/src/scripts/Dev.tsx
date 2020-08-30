@@ -1,47 +1,69 @@
-import path from "path"
-import { useEffect } from "react"
+import { Text } from "ink"
+import React, { useEffect, useState } from "react"
 import webpack from "webpack"
 import WebpackDevServer from "webpack-dev-server"
+import Card from "../components/Card"
+import { loadConfig } from "../util/loadConfig"
 import { createConfig } from "../webpack/config"
 
-const packageFile = require(path.resolve(process.cwd(), "package.json"))
-
 export default function Dev() {
+	const [configError, setConfigError] = useState<Error>()
+
 	useEffect(() => {
-		const certs = packageFile.chayns?.https
-		const hasHttpsCertificates = Boolean(certs?.cert && certs?.key)
+		;(async () => {
+			try {
+				const config = await loadConfig()
 
-		const devServer = new WebpackDevServer(
-			webpack(createConfig({ mode: "development" })),
-			{
-				historyApiFallback: true,
-				compress: true,
-				disableHostCheck: true,
-				// @ts-expect-error
-				cert: hasHttpsCertificates ? certs.cert : undefined,
-				key: hasHttpsCertificates ? certs.key : undefined,
-				https: hasHttpsCertificates,
-				hot: true,
-				headers: {
-					"Access-Control-Allow-Origin": "*",
-					"Access-Control-Allow-Methods":
-						"GET, POST, PUT, DELETE, PATCH, OPTIONS",
-					"Access-Control-Allow-Headers":
-						"X-Requested-With, content-type, Authorization",
-				},
-			}
-		)
+				const hasHttpsCertificates = Boolean(
+					config.https?.cert && config.https?.key
+				)
 
-		devServer.listen(
-			1234,
-			hasHttpsCertificates ? "0.0.0.0" : "localhost",
-			(err) => {
-				if (err) {
-					console.error(err)
-				}
+				const devServer = new WebpackDevServer(
+					webpack(createConfig({ mode: "development" })),
+					{
+						historyApiFallback: true,
+						compress: true,
+						disableHostCheck: true,
+						// @ts-expect-error
+						cert: hasHttpsCertificates ? config.https?.cert : undefined,
+						key: hasHttpsCertificates ? config.https?.key : undefined,
+						https: hasHttpsCertificates,
+						hot: true,
+						headers: {
+							"Access-Control-Allow-Origin": "*",
+							"Access-Control-Allow-Methods":
+								"GET, POST, PUT, DELETE, PATCH, OPTIONS",
+							"Access-Control-Allow-Headers":
+								"X-Requested-With, content-type, Authorization",
+						},
+					}
+				)
+
+				devServer.listen(
+					config.port || DEFAULT_PORT,
+					config.host ||
+						(hasHttpsCertificates ? DEFAULT_HTTPS_HOSTNAME : DEFAULT_HOSTNAME),
+					(err) => {
+						if (err) console.error(err)
+					}
+				)
+			} catch (e) {
+				setConfigError(e)
 			}
-		)
+		})()
 	}, [])
+
+	if (configError) {
+		return (
+			<Card icon="!" color="redBright">
+				<Text>{configError.message}</Text>
+			</Card>
+		)
+	}
 
 	return null
 }
+
+const DEFAULT_PORT = 1234
+const DEFAULT_HOSTNAME = "localhost"
+const DEFAULT_HTTPS_HOSTNAME = "0.0.0.0"
