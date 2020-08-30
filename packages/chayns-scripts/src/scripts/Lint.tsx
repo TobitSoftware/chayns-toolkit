@@ -7,13 +7,16 @@ import { CommandProps } from "./props"
 
 export default function Lint({}: CommandProps) {
 	const [lintResults, setLintResults] = useState<string>()
-	const [lintError, setLintError] = useState()
+	const [lintError, setLintError] = useState<Error>()
 	const [success, setSuccess] = useState(false)
 
 	useEffect(() => {
 		;(async () => {
 			try {
-				const eslint = new ESLint({ fix: true, extensions: ["js", "jsx"] })
+				const eslint = new ESLint({
+					fix: true,
+					extensions: ["js", "jsx", "ts", "tsx"],
+				})
 
 				const results = await eslint.lintFiles(["./src"])
 
@@ -39,7 +42,7 @@ export default function Lint({}: CommandProps) {
 	}, [])
 
 	if (lintError) {
-		return <Text color="redBright">{lintError}</Text>
+		return <Text color="redBright">{lintError.toString()}</Text>
 	}
 
 	if (success) {
