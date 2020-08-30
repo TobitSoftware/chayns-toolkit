@@ -21,8 +21,8 @@ export default function Build({ args }: CommandProps) {
 		compiler.run((err, stats) => {
 			setBuildResults(stats)
 
-			if (err || stats.hasErrors()) {
-				console.error(err || stats)
+			if (err) {
+				throw err
 			}
 		})
 	}, [])
@@ -35,6 +35,23 @@ export default function Build({ args }: CommandProps) {
 				</Text>{" "}
 				<Text>{"I'm bundling your code..."}</Text>
 			</Text>
+		)
+	}
+
+	const hasErrors = buildResults.hasErrors()
+
+	if (hasErrors) {
+		return (
+			<Box flexDirection="column">
+				<Card color="redBright" icon="!">
+					<Text>I encountered some errors while compiling your app!</Text>
+				</Card>
+				<Box marginY={1} flexDirection="column">
+					{buildResults.compilation.errors.map((e, i) => (
+						<Text key={i}>{e.error.toString()}</Text>
+					))}
+				</Box>
+			</Box>
 		)
 	}
 
