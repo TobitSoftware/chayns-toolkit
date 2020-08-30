@@ -26,7 +26,8 @@ module.exports = () => {
 					},
 				},
 			],
-
+			"@babel/plugin-proposal-optional-chaining",
+			"@babel/plugin-proposal-nullish-coalescing-operator",
 			isProduction && "@babel/plugin-transform-react-constant-elements",
 			isProduction && "transform-react-remove-prop-types",
 			!isProduction && "react-refresh/babel",
