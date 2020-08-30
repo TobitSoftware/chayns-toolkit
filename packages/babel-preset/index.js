@@ -11,7 +11,11 @@ module.exports = () => {
 	}
 
 	return {
-		presets: [["@babel/preset-env", { modules: false }], "@babel/preset-react"],
+		presets: [
+			["@babel/preset-env", { modules: false }],
+			"@babel/preset-react",
+			"@babel/preset-typescript",
+		],
 		plugins: [
 			[
 				"transform-imports",
@@ -22,9 +26,19 @@ module.exports = () => {
 					},
 				},
 			],
+
 			isProduction && "@babel/plugin-transform-react-constant-elements",
 			isProduction && "transform-react-remove-prop-types",
 			!isProduction && "react-refresh/babel",
 		].filter(Boolean),
+		overrides: [
+			{
+				test: /\.tsx?$/,
+				plugins: [
+					["@babel/plugin-proposal-decorators", { legacy: true }],
+					["@babel/plugin-proposal-class-properties", { loose: true }],
+				],
+			},
+		],
 	}
 }

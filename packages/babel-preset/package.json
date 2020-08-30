@@ -7,9 +7,12 @@
 	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
 	"main": "index.js",
 	"dependencies": {
+		"@babel/plugin-proposal-class-properties": "^7.10.4",
+		"@babel/plugin-proposal-decorators": "^7.10.5",
 		"@babel/plugin-transform-react-constant-elements": "^7.10.4",
 		"@babel/preset-env": "^7.11.0",
 		"@babel/preset-react": "^7.10.4",
+		"@babel/preset-typescript": "^7.10.4",
 		"babel-plugin-transform-imports": "^2.0.0",
 		"babel-plugin-transform-react-remove-prop-types": "^0.4.24",
 		"chayns-components": "^4.18.2",
