@@ -1,7 +1,7 @@
-<center>
+<div align="center">
     <h1><img src="assets/logo.png" width="500px" alt="chayns-scripts" /></h1>
     <p>A zero-config toolchain for developing chayns apps.</p>
-</center>
+</div>
 
 The toolchain contains commands for developing and building your app, aswell as
 quality assurance in the form of linting and testing _(soon to come)_.
