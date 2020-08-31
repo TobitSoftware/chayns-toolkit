@@ -1,10 +1,28 @@
 {
 	"name": "@chayns-scripts/eslint-config",
 	"version": "0.0.0",
-	"description": "The sharable eslint-config for chayns-developers. Used in chayns-scripts.",
-	"homepage": "",
+	"description": "The sharable eslint-config for developing chayns® apps. Used in chayns-scripts.",
+	"keywords": [
+		"chayns",
+		"react",
+		"chayns-components",
+		"eslint",
+		"eslint-config"
+	],
+	"homepage": "https://github.com/leodr/chayns-scripts#readme",
+	"bugs": {
+		"url": "https://github.com/leodr/chayns-scripts/issues",
+		"email": "leonhard.driesch@tobit.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/leodr/chayns-scripts.git"
+	},
 	"license": "MIT",
-	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
+	"author": {
+		"name": "Leonhard Driesch",
+		"email": "leonhard.driesch@tobit.com"
+	},
 	"main": "index.js",
 	"dependencies": {
 		"@typescript-eslint/eslint-plugin": "^3.10.1",
@@ -18,5 +36,8 @@
 	},
 	"peerDependencies": {
 		"eslint": "7"
+	},
+	"engines": {
+		"node": ">=12.10.0"
 	}
 }

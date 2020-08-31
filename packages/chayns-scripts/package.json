@@ -1,16 +1,37 @@
 {
 	"name": "chayns-scripts",
 	"version": "0.0.0",
-	"description": "A zero-config toolchain for chayns-developers.",
-	"homepage": "",
+	"description": "A zero-config toolchain for developing chayns® apps.",
+	"keywords": [
+		"chayns",
+		"react",
+		"chayns-components",
+		"webpack"
+	],
+	"homepage": "https://github.com/leodr/chayns-scripts#readme",
+	"bugs": {
+		"url": "https://github.com/leodr/chayns-scripts/issues",
+		"email": "leonhard.driesch@tobit.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/leodr/chayns-scripts.git"
+	},
 	"license": "MIT",
-	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
+	"author": {
+		"name": "Leonhard Driesch",
+		"email": "leonhard.driesch@tobit.com"
+	},
 	"bin": {
 		"chayns-scripts": "./lib/cli.js"
 	},
+	"files": [
+		"lib/*"
+	],
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsc --watch --incremental"
+		"dev": "tsc --watch --incremental",
+		"prepare": "yarn build"
 	},
 	"eslintConfig": {
 		"extends": "@chayns-scripts"
@@ -58,5 +79,8 @@
 		"@types/webpack-dev-server": "^3.11.0",
 		"@types/yup": "^0.29.6",
 		"typescript": "^4.0.2"
+	},
+	"engines": {
+		"node": ">=12.10.0"
 	}
 }

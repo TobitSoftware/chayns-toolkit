@@ -2,9 +2,28 @@
 	"name": "@chayns-scripts/babel-preset",
 	"version": "0.0.0",
 	"private": false,
-	"description": "The sharable babel preset for chayns-developers. Used in chayns-scripts.",
+	"description": "The sharable babel-preset for developing chayns® apps. Used in chayns-scripts.",
+	"keywords": [
+		"chayns",
+		"react",
+		"chayns-components",
+		"babel",
+		"babel-preset"
+	],
+	"homepage": "https://github.com/leodr/chayns-scripts#readme",
+	"bugs": {
+		"url": "https://github.com/leodr/chayns-scripts/issues",
+		"email": "leonhard.driesch@tobit.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/leodr/chayns-scripts.git"
+	},
 	"license": "MIT",
-	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
+	"author": {
+		"name": "Leonhard Driesch",
+		"email": "leonhard.driesch@tobit.com"
+	},
 	"main": "index.js",
 	"dependencies": {
 		"@babel/plugin-proposal-class-properties": "^7.10.4",
@@ -19,5 +38,8 @@
 		"babel-plugin-transform-react-remove-prop-types": "^0.4.24",
 		"chayns-components": "^4.18.3",
 		"react-refresh": "^0.8.3"
+	},
+	"engines": {
+		"node": ">=12.10.0"
 	}
 }
