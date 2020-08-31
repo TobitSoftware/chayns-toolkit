@@ -88,6 +88,9 @@ So your general directory structure should look something like this:
 └── .gitignore
 ```
 
+An example project can be found
+[here](https://github.com/leodr/chayns-scripts/tree/master/packages/example-project).
+
 ### Linting
 
 We also provide an [ESLint](https://eslint.org/)-configuration for JavaScript
