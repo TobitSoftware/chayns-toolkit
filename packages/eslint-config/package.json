@@ -8,8 +8,6 @@
 	"main": "index.js",
 	"dependencies": {
 		"@typescript-eslint/eslint-plugin": "^3.10.1",
-		"babel-eslint": "^10.1.0",
-		"eslint": "^7.7.0",
 		"eslint-config-airbnb": "^18.2.0",
 		"eslint-config-airbnb-typescript": "^9.0.0",
 		"eslint-config-prettier": "^6.11.0",
@@ -17,5 +15,8 @@
 		"eslint-plugin-jsx-a11y": "^6.3.1",
 		"eslint-plugin-react": "^7.20.6",
 		"eslint-plugin-react-hooks": "^4.1.0"
+	},
+	"peerDependencies": {
+		"eslint": "7"
 	}
 }
