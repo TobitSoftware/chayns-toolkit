@@ -2,8 +2,8 @@ import { Box, Text } from "ink"
 import Spinner from "ink-spinner"
 import React, { useEffect, useState } from "react"
 import { Stats } from "webpack"
-import AssetSize from "../components/build/AssetSize"
-import SizeIndicator from "../components/build/SizeIndicator"
+import AssetSize from "../components/buildScript/AssetSize"
+import SizeIndicator from "../components/buildScript/SizeIndicator"
 import Card from "../components/Card"
 import Column from "../components/grid/Column"
 import GridItem from "../components/grid/GridItem"
@@ -33,7 +33,7 @@ export default function Build({ args }: CommandProps) {
 				<Text color="greenBright">
 					<Spinner type="dots" />
 				</Text>{" "}
-				<Text>{"I'm bundling your code..."}</Text>
+				<Text>I'm bundling your code...</Text>
 			</Text>
 		)
 	}
@@ -55,7 +55,7 @@ export default function Build({ args }: CommandProps) {
 		)
 	}
 
-	const assets = buildResults.toJson().assets
+	const { assets } = buildResults.toJson()
 
 	return (
 		<Box flexDirection="column" alignItems="flex-start">
@@ -77,7 +77,7 @@ export default function Build({ args }: CommandProps) {
 				</Column>
 				<Column alignment="end">
 					{assets?.map((asset, index) => (
-						<AssetSize key={index} asset={asset}></AssetSize>
+						<AssetSize key={index} asset={asset} />
 					))}
 				</Column>
 			</Box>
