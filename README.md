@@ -1,7 +1,15 @@
 <div align="center">
     <h1><img src="assets/logo.png" width="500px" alt="chayns-scripts" /></h1>
     <p>A zero-config toolchain for developing chayns® apps.</p>
+    <div>
+        <img src="https://img.shields.io/github/license/leodr/chayns-scripts?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/npm/v/chayns-scripts?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/github/last-commit/leodr/chayns-scripts?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/github/issues-raw/leodr/chayns-scripts?style=for-the-badge" alt="" />
+    </div>
 </div>
+
+---
 
 **chayns-scripts** contains pre-configured tools for the development, publishing
 and testing of your app. It was created to simplify the development experience
