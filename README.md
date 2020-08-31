@@ -49,7 +49,7 @@ This will make the `chayns-scripts dev`, `chayns-scripts build` and
 
 We recommend adding your these scripts to your package.json:
 
-```json
+```js
 {
 	...
 	"scripts": {
@@ -105,7 +105,7 @@ npm i eslint -D
 
 Then add a `eslintConfig` key to your `package.json` like that:
 
-```json
+```js
 {
     ...
     "eslintConfig": {
@@ -131,14 +131,14 @@ provide one.
 You can configure the host, port and SSL settings in a `chayns-scripts.json`
 configuration file:
 
-```json
+```js
 {
-	"host": "123.0.0.1",
-	"port": 1337,
-	"https": {
-		"cert": "path-to-cert",
-		"key": "path-to-key"
-	}
+  "host": "123.0.0.1",
+  "port": 1337,
+  "https": {
+    "cert": "path-to-cert",
+    "key": "path-to-key"
+  }
 }
 ```
 
@@ -210,7 +210,7 @@ or `.module.scss` will be treated as a module:
 import styles from "styles.css"
 
 export function MyComponent() {
-	return <div className={styles.box}>I am styled with CSS modules!</div>
+  return <div className={styles.box}>I am styled with CSS modules!</div>
 }
 ```
 
@@ -225,7 +225,7 @@ components. The default export from an image module will be it's url.
 import imgSrc from "./my-image.png"
 
 export function MyImage() {
-	return <img src={imgSrc} alt="" />
+  return <img src={imgSrc} alt="" />
 }
 ```
 
@@ -237,7 +237,7 @@ Importing `.svg` files will make them available as React components.
 import Icon from "./my-icon.svg"
 
 export function MyIcon() {
-	return <Icon />
+  return <Icon />
 }
 ```
 
@@ -280,14 +280,14 @@ configuration file for the scripts.
 
 Example file:
 
-```json
+```js
 {
-	"host": "123.0.0.1",
-	"port": 1337,
-	"https": {
-		"cert": "path-to-cert",
-		"key": "path-to-key"
-	}
+  "host": "123.0.0.1",
+  "port": 1337,
+  "https": {
+    "cert": "path-to-cert",
+    "key": "path-to-key"
+  }
 }
 ```
 
