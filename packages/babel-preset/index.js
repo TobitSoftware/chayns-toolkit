@@ -28,6 +28,7 @@ module.exports = () => {
 			],
 			"@babel/plugin-proposal-optional-chaining",
 			"@babel/plugin-proposal-nullish-coalescing-operator",
+			["@babel/plugin-proposal-class-properties", { loose: true }],
 			isProduction && "@babel/plugin-transform-react-constant-elements",
 			isProduction && "transform-react-remove-prop-types",
 			!isProduction && "react-refresh/babel",
@@ -35,10 +36,7 @@ module.exports = () => {
 		overrides: [
 			{
 				test: /\.tsx?$/,
-				plugins: [
-					["@babel/plugin-proposal-decorators", { legacy: true }],
-					["@babel/plugin-proposal-class-properties", { loose: true }],
-				],
+				plugins: [["@babel/plugin-proposal-decorators", { legacy: true }]],
 			},
 		],
 	}
