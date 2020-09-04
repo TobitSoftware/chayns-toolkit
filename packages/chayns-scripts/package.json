@@ -31,7 +31,7 @@
 	"scripts": {
 		"build": "tsc",
 		"dev": "tsc --watch --incremental",
-		"prepare": "yarn build"
+		"prepublishOnly": "yarn build"
 	},
 	"eslintConfig": {
 		"extends": "@chayns-scripts"
