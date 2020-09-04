@@ -24,6 +24,21 @@ export function createWebpackCompiler({
 	const plugins: Plugin[] = [
 		new HtmlWebpackPlugin({
 			template: path.resolve(process.cwd(), "src/index.html"),
+			minify:
+				mode === "production"
+					? {
+							removeComments: true,
+							collapseWhitespace: true,
+							removeRedundantAttributes: true,
+							useShortDoctype: true,
+							removeEmptyAttributes: true,
+							removeStyleLinkTypeAttributes: true,
+							keepClosingSlash: true,
+							minifyJS: true,
+							minifyCSS: true,
+							minifyURLs: true,
+					  }
+					: undefined,
 		}),
 	]
 
@@ -128,11 +143,11 @@ export function createWebpackCompiler({
 		},
 		plugins,
 		optimization: {
-			runtimeChunk: "single",
 			splitChunks: {
 				chunks: "all",
 				name: false,
 			},
 		},
+		performance: false,
 	})
 }
