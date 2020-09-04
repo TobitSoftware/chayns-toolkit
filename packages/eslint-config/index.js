@@ -29,6 +29,12 @@ module.exports = {
 	extends: ["airbnb", "airbnb/hooks", "prettier", "prettier/react"],
 	globals: { chayns: true },
 	rules,
+	parser: "babel-eslint",
+	parserOptions: {
+		babelOptions: {
+			extends: "@chayns-scripts",
+		},
+	},
 	settings: {
 		"import/resolver": {
 			node: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
