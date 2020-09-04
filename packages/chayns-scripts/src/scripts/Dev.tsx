@@ -24,6 +24,7 @@ export default function Dev({}: CommandProps) {
 						historyApiFallback: true,
 						compress: true,
 						disableHostCheck: true,
+						clientLogLevel: "none",
 						// @ts-expect-error
 						cert: hasHttpsCertificates ? config.https?.cert : undefined,
 						key: hasHttpsCertificates ? config.https?.key : undefined,
