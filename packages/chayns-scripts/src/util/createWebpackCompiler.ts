@@ -48,8 +48,8 @@ export function createWebpackCompiler({
 
 			plugins.push(
 				new MiniCssExtractPlugin({
-					filename: "[name].[contenthash].css",
-					chunkFilename: "[id].[chunkhash].css",
+					filename: "static/css/[name].[contenthash].css",
+					chunkFilename: "static/css/[name].[chunkhash].chunk.css",
 				})
 			)
 			plugins.push(new OptimizeCssAssetsPlugin())
@@ -65,7 +65,9 @@ export function createWebpackCompiler({
 			path: path.resolve(process.cwd(), "build"),
 			hashDigestLength: 12,
 			filename:
-				mode === "development" ? "[name].js" : "[name].[contenthash].js",
+				mode === "development"
+					? "static/js/bundle.js"
+					: "static/js/[name].[contenthash].js",
 		},
 		resolve: {
 			extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -107,7 +109,7 @@ export function createWebpackCompiler({
 							limit: 8192,
 							fallback: {
 								loader: "file-loader",
-								options: { name: "[contenthash:12].[ext]" },
+								options: { name: "static/media/[contenthash:12].[ext]" },
 							},
 						},
 					},
