@@ -106,7 +106,7 @@ export function createWebpackCompiler({
 					use: {
 						loader: "url-loader",
 						options: {
-							limit: 8192,
+							limit: 10000,
 							fallback: {
 								loader: "file-loader",
 								options: { name: "static/media/[contenthash:12].[ext]" },
@@ -122,14 +122,10 @@ export function createWebpackCompiler({
 		},
 		plugins,
 		optimization: {
+			runtimeChunk: "single",
 			splitChunks: {
-				cacheGroups: {
-					commons: {
-						test: /[\\/]node_modules[\\/]/,
-						name: "vendors",
-						chunks: "all",
-					},
-				},
+				chunks: "all",
+				name: false,
 			},
 		},
 	})
