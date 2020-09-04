@@ -3,7 +3,7 @@ import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
 import path from "path"
-// @ts-expect-error
+import postcssFlexbugsFixes from "postcss-flexbugs-fixes"
 import postcssPresetEnv from "postcss-preset-env"
 import webpack, { Compiler, Configuration, Plugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
@@ -95,7 +95,13 @@ export function createWebpackCompiler({
 							loader: "postcss-loader",
 							options: {
 								sourceMap: true,
-								plugins: [postcssPresetEnv()],
+								plugins: [
+									postcssPresetEnv({
+										autoprefixer: { flexbox: "no-2009" },
+										stage: 2,
+									}),
+									postcssFlexbugsFixes(),
+								],
 							},
 						},
 						"sass-loader",
