@@ -16,6 +16,9 @@ export default function Build({ args }: CommandProps) {
 	const analyze = Boolean(args.a || args.analyze)
 
 	useEffect(() => {
+		process.env.BABEL_ENV = "production"
+		process.env.NODE_ENV = "production"
+
 		const compiler = createWebpackCompiler({ mode: "production", analyze })
 
 		compiler.run((err, stats) => {

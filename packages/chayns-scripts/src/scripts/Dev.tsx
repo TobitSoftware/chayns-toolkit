@@ -10,6 +10,8 @@ export default function Dev({}: CommandProps) {
 	const [configError, setConfigError] = useState<Error>()
 
 	useEffect(() => {
+		process.env.BABEL_ENV = "development"
+		process.env.NODE_ENV = "development"
 		;(async () => {
 			try {
 				const config = await loadConfig()
