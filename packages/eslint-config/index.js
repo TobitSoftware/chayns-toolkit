@@ -18,7 +18,10 @@ const rules = {
 			name: "chayns-components/lib",
 		},
 	],
-	"no-use-before-define": ["error", "nofunc"],
+	"no-use-before-define": [
+		"error",
+		{ functions: false, classes: false, variables: false },
+	],
 }
 
 module.exports = {
@@ -56,6 +59,19 @@ module.exports = {
 			rules,
 			parserOptions: {
 				project: "./tsconfig.json",
+			},
+		},
+		{
+			files: ["**/*.@(test|spec).@(j|t)s?(x)"],
+			env: { "jest/globals": true },
+			plugins: ["jest"],
+			rules: {
+				...rules,
+				"jest/no-disabled-tests": "warn",
+				"jest/no-focused-tests": "error",
+				"jest/no-identical-title": "error",
+				"jest/prefer-to-have-length": "warn",
+				"jest/valid-expect": "error",
 			},
 		},
 	],
