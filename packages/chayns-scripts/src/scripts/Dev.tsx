@@ -12,10 +12,9 @@ export default function Dev({}: CommandProps) {
 	useEffect(() => {
 		process.env.BABEL_ENV = "development"
 		process.env.NODE_ENV = "development"
-		;(async () => {
-			try {
-				const config = await loadConfig()
 
+		loadConfig()
+			.then((config) => {
 				const hasHttpsCertificates = Boolean(
 					config.https?.cert && config.https?.key
 				)
@@ -50,10 +49,8 @@ export default function Dev({}: CommandProps) {
 						if (err) console.error(err)
 					}
 				)
-			} catch (e) {
-				setConfigError(e)
-			}
-		})()
+			})
+			.catch((e) => setConfigError(e))
 	}, [])
 
 	if (configError) {
