@@ -1,17 +1,8 @@
 const resolveAbsoluteImport = require("chayns-components/lib/utils/babel/resolveAbsoluteImport")
-const path = require("path")
 
 module.exports = () => {
 	const isProduction = process.env.NODE_ENV === "production"
 	const isTest = process.env.NODE_ENV === "test"
-
-	// eslint-disable-next-line
-	const { dependencies } = require(path.resolve(
-		process.cwd(),
-		"./package.json"
-	))
-
-	const usesRecharts = Boolean(dependencies && dependencies.recharts)
 
 	if (isTest) {
 		return {
@@ -35,7 +26,6 @@ module.exports = () => {
 					},
 				},
 			],
-			usesRecharts && "babel-plugin-recharts",
 			"macros",
 			"@babel/plugin-proposal-optional-chaining",
 			"@babel/plugin-proposal-nullish-coalescing-operator",
