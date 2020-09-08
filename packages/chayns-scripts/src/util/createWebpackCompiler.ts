@@ -110,13 +110,15 @@ export function createWebpackCompiler({
 							loader: "postcss-loader",
 							options: {
 								sourceMap: true,
-								plugins: [
-									postcssPresetEnv({
-										autoprefixer: { flexbox: "no-2009" },
-										stage: 2,
-									}),
-									postcssFlexbugsFixes(),
-								],
+								postcssOptions: {
+									plugins: [
+										postcssPresetEnv({
+											autoprefixer: { flexbox: "no-2009" },
+											stage: 2,
+										}),
+										postcssFlexbugsFixes(),
+									],
+								},
 							},
 						},
 						"sass-loader",
