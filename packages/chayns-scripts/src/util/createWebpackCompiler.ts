@@ -125,7 +125,7 @@ export function createWebpackCompiler({
 					],
 				},
 				{
-					test: /\.(png|jpe?g|gif)$/i,
+					test: /\.(png|jpe?g|gif|webp)$/i,
 					use: {
 						loader: "url-loader",
 						options: {
