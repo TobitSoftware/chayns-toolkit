@@ -5,7 +5,7 @@ import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
 import path from "path"
 import postcssFlexbugsFixes from "postcss-flexbugs-fixes"
 import postcssPresetEnv from "postcss-preset-env"
-import webpack, { Compiler, Configuration, Plugin } from "webpack"
+import webpack, { Compiler, Plugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 
 type Mode = "development" | "production"
@@ -19,8 +19,6 @@ export function createWebpackCompiler({
 	mode,
 	analyze = false,
 }: CreateConfigOptions): Compiler {
-	let devtool: Configuration["devtool"]
-
 	const plugins: Plugin[] = [
 		new HtmlWebpackPlugin({
 			template: path.resolve(process.cwd(), "src/index.html"),
@@ -48,7 +46,6 @@ export function createWebpackCompiler({
 
 	switch (mode) {
 		case "development":
-			devtool = "cheap-module-eval-source-map"
 			process.env.BROWSERSLIST = [
 				"last 1 chrome version",
 				"last 1 firefox version",
@@ -58,7 +55,6 @@ export function createWebpackCompiler({
 			plugins.push(new ReactRefreshWebpackPlugin())
 			break
 		case "production":
-			devtool = "nosources-source-map"
 			process.env.BROWSERSLIST = [">0.5%", "not dead", "not op_mini all"].join()
 
 			plugins.push(
@@ -69,12 +65,15 @@ export function createWebpackCompiler({
 			)
 			plugins.push(new OptimizeCssAssetsPlugin())
 			break
+		default:
 	}
+
+	const shouldUseSourceMaps = mode !== "production"
 
 	return webpack({
 		entry: path.resolve(process.cwd(), "src/index"),
 		mode,
-		devtool,
+		devtool: shouldUseSourceMaps ? "cheap-module-eval-source-map" : false,
 		context: process.cwd(),
 		output: {
 			path: path.resolve(process.cwd(), "build"),
@@ -95,6 +94,9 @@ export function createWebpackCompiler({
 						loader: "babel-loader",
 						options: {
 							presets: ["@chayns-scripts"],
+							babelrc: false,
+							configFile: false,
+							compact: mode === "production",
 						},
 					},
 					exclude: /node_modules/,
@@ -109,7 +111,6 @@ export function createWebpackCompiler({
 						{
 							loader: "postcss-loader",
 							options: {
-								sourceMap: true,
 								postcssOptions: {
 									plugins: [
 										postcssPresetEnv({
