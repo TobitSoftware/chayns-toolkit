@@ -1,7 +1,7 @@
 import { Box, Text } from "ink"
 import Spinner from "ink-spinner"
 import React, { useEffect, useState } from "react"
-import { Stats } from "webpack"
+import type { Stats } from "webpack"
 import AssetSize from "../components/buildScript/AssetSize"
 import SizeIndicator from "../components/buildScript/SizeIndicator"
 import Card from "../components/Card"
@@ -10,8 +10,9 @@ import GridItem from "../components/grid/GridItem"
 import { createWebpackCompiler } from "../util/createWebpackCompiler"
 import { CommandProps } from "./props"
 
-export default function Build({ args }: CommandProps) {
+export default function Build({ args }: CommandProps): JSX.Element {
 	const [buildResults, setBuildResults] = useState<Stats>()
+	const [buildTime, setBuildTime] = useState<number>()
 
 	const analyze = Boolean(args.a || args.analyze)
 
@@ -21,13 +22,17 @@ export default function Build({ args }: CommandProps) {
 
 		const compiler = createWebpackCompiler({ mode: "production", analyze })
 
+		const startTime = Date.now()
+
 		compiler.run((err, stats) => {
 			setBuildResults(stats)
+			setBuildTime((Date.now() - startTime) / 1000)
 
 			if (err) {
 				throw err
 			}
 		})
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	if (!buildResults) {
@@ -62,6 +67,13 @@ export default function Build({ args }: CommandProps) {
 
 	return (
 		<Box flexDirection="column" alignItems="flex-start">
+			{buildTime && (
+				<Box>
+					<Text>
+						The build took <Text color="blueBright">{buildTime}</Text> seconds.
+					</Text>
+				</Box>
+			)}
 			<Card color="greenBright" icon="✓">
 				<Text>Got it! These are your output files:</Text>
 			</Card>
