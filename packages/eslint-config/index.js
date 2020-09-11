@@ -1,36 +1,6 @@
-const rules = {
-	"import/extensions": [
-		"error",
-		"always",
-		{ js: "never", jsx: "never", ts: "never", tsx: "never" },
-	],
-	"import/no-unresolved": ["error", { ignore: ["chayns-components"] }],
-	"import/prefer-default-export": "off",
-	"no-console": ["warn", { allow: ["warn", "error"] }],
-	"no-param-reassign": [
-		"error",
-		{ ignorePropertyModificationsFor: ["draft"], props: true },
-	],
-	"no-restricted-imports": [
-		"error",
-		{
-			message: "Use 'chayns-components' instead to enable tree-shaking.",
-			name: "chayns-components/lib",
-		},
-	],
-	"no-use-before-define": [
-		"error",
-		{ functions: false, classes: false, variables: false },
-	],
-	"no-plusplus": "off",
-	"jsx-a11y/no-noninteractive-element-interactions": "off",
-	"jsx-a11y/no-static-element-interactions": "off",
-	"jsx-a11y/click-events-have-key-events": "off",
-	"jsx-a11y/heading-has-content": "off",
-	"jsx-a11y/anchor-has-content": "off",
-	"jsx-a11y/anchor-is-valid": "off",
-	"jsx-a11y/href-no-hash": "off",
-}
+const javascriptRules = require("./rules/javascriptRules")
+const sharedRules = require("./rules/sharedRules")
+const typescriptRules = require("./rules/typescriptRules")
 
 module.exports = {
 	env: {
@@ -39,7 +9,7 @@ module.exports = {
 	},
 	extends: ["airbnb", "airbnb/hooks", "prettier", "prettier/react"],
 	globals: { chayns: true },
-	rules,
+	rules: { ...sharedRules, ...javascriptRules },
 	parser: "babel-eslint",
 	parserOptions: {
 		babelOptions: {
@@ -65,8 +35,8 @@ module.exports = {
 				"prettier/react",
 			],
 			rules: {
-				...rules,
-				"no-use-before-define": "off",
+				...sharedRules,
+				...typescriptRules,
 			},
 			parserOptions: {
 				project: "./tsconfig.json",
