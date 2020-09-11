@@ -1,6 +1,6 @@
 {
 	"name": "example-project",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"private": true,
 	"license": "MIT",
 	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
@@ -24,6 +24,6 @@
 		"react-dom": "^16.13.1"
 	},
 	"devDependencies": {
-		"chayns-scripts": "^0.0.13"
+		"chayns-scripts": "^0.0.14"
 	}
 }
