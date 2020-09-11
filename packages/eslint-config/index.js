@@ -64,7 +64,10 @@ module.exports = {
 				"prettier/@typescript-eslint",
 				"prettier/react",
 			],
-			rules,
+			rules: {
+				...rules,
+				"no-use-before-define": "off",
+			},
 			parserOptions: {
 				project: "./tsconfig.json",
 			},
