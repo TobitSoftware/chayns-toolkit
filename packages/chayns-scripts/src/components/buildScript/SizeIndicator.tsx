@@ -6,7 +6,9 @@ interface SizeIndicatorProps {
 	asset: Asset
 }
 
-export default function SizeIndicator({ asset }: SizeIndicatorProps) {
+export default function SizeIndicator({
+	asset,
+}: SizeIndicatorProps): JSX.Element {
 	let symbol = " "
 	let color = "yellow"
 

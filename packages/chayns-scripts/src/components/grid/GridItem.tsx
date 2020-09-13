@@ -1,6 +1,10 @@
 import { Box } from "ink"
 import React, { ReactNode } from "react"
 
-export default function GridItem({ children }: { children: ReactNode }) {
-	return <Box marginBottom={1}>{children}</Box>
+interface GridItemProps {
+	children: ReactNode
+}
+
+export default function GridItem({ children }: GridItemProps): JSX.Element {
+	return <Box>{children}</Box>
 }

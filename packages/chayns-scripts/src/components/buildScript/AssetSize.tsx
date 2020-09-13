@@ -6,15 +6,15 @@ interface AssetSizeProps {
 	asset: Asset
 }
 
-export default function AssetSize({ asset }: AssetSizeProps) {
-	let unit = "By"
+export default function AssetSize({ asset }: AssetSizeProps): JSX.Element {
+	let unit = "B"
 	let amount = asset.size
 
 	if (asset.size > 1_000_000) {
-		unit = "MB"
+		unit = "mB"
 		amount = asset.size / 1_000_000
 	} else if (asset.size > 1_000) {
-		unit = "KB"
+		unit = "kB"
 		amount = asset.size / 1_000
 	}
 

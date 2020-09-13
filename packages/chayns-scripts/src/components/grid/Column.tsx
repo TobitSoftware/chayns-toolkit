@@ -6,16 +6,16 @@ interface ColumnProps {
 	alignment?: "start" | "end"
 }
 
-export default function Column({ children, alignment = "start" }: ColumnProps) {
-	let boxAlignment: "flex-start" | "flex-end"
+export default function Column({
+	children,
+	alignment = "start",
+}: ColumnProps): JSX.Element {
+	let boxAlignment: "flex-start" | "flex-end" = "flex-start"
 
-	switch (alignment) {
-		case "start":
-			boxAlignment = "flex-start"
-			break
-		case "end":
-			boxAlignment = "flex-end"
-			break
+	if (alignment === "start") {
+		boxAlignment = "flex-start"
+	} else if (alignment === "end") {
+		boxAlignment = "flex-end"
 	}
 
 	return (

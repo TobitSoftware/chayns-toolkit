@@ -2,9 +2,9 @@ import { Box, Text } from "ink"
 import Spinner from "ink-spinner"
 import React, { useEffect, useState } from "react"
 import type { Stats } from "webpack"
+import Badge from "../components/Badge"
 import AssetSize from "../components/buildScript/AssetSize"
 import SizeIndicator from "../components/buildScript/SizeIndicator"
-import Card from "../components/Card"
 import Column from "../components/grid/Column"
 import GridItem from "../components/grid/GridItem"
 import { createWebpackCompiler } from "../util/createWebpackCompiler"
@@ -38,12 +38,14 @@ export default function Build({ analyze }: BuildProps): JSX.Element {
 
 	if (!buildResults) {
 		return (
-			<Text>
-				<Text color="greenBright">
-					<Spinner type="dots" />
-				</Text>{" "}
-				<Text>I'm bundling your code...</Text>
-			</Text>
+			<Box marginBottom={1}>
+				<Box marginRight={3}>
+					<Text color="greenBright">
+						<Spinner type="dots" />
+					</Text>
+				</Box>
+				<Text>Bundling your code...</Text>
+			</Box>
 		)
 	}
 
@@ -51,39 +53,42 @@ export default function Build({ analyze }: BuildProps): JSX.Element {
 
 	if (hasErrors) {
 		return (
-			<Box flexDirection="column">
-				<Card color="redBright" icon="!">
-					<Text>I encountered some errors while compiling your app!</Text>
-				</Card>
-				<Box marginY={1} flexDirection="column">
-					{buildResults.compilation.errors.map((e, i) => (
-						<Text key={i}>{e.error.toString()}</Text>
-					))}
+			<>
+				<Box marginBottom={1} flexDirection="row">
+					<Box marginRight={1}>
+						<Badge color="red">Error</Badge>
+					</Box>
+					<Text>Compilation failed.</Text>
 				</Box>
-			</Box>
+
+				<Box flexDirection="column" marginBottom={1}>
+					{buildResults.compilation.errors.map((e, i) => {
+						return <Text key={i}>{e.error.toString()}</Text>
+					})}
+				</Box>
+			</>
 		)
 	}
 
 	const { assets } = buildResults.toJson()
 
 	return (
-		<Box flexDirection="column" alignItems="flex-start">
-			{buildTime && (
-				<Box>
-					<Text>
-						The build took <Text color="blueBright">{buildTime}</Text> seconds.
-					</Text>
+		<>
+			<Box marginBottom={1} flexDirection="row">
+				<Box marginRight={1}>
+					<Badge color="green">Success</Badge>
 				</Box>
-			)}
-			<Card color="greenBright" icon="✓">
-				<Text>Got it! These are your output files:</Text>
-			</Card>
+				<Box flexDirection="row" marginRight={3}>
+					<Text>Finished build in </Text>
+					<Text color="blueBright">{buildTime}</Text>
+					<Text> seconds.</Text>
+				</Box>
+			</Box>
+
 			<Box marginBottom={1}>
-				<Column>
-					{assets?.map((asset, index) => (
-						<SizeIndicator key={index} asset={asset} />
-					))}
-				</Column>
+				<Text>Outputted these files:</Text>
+			</Box>
+			<Box marginBottom={1}>
 				<Column>
 					{assets?.map((asset, index) => (
 						<GridItem key={index}>
@@ -96,7 +101,12 @@ export default function Build({ analyze }: BuildProps): JSX.Element {
 						<AssetSize key={index} asset={asset} />
 					))}
 				</Column>
+				<Column>
+					{assets?.map((asset, index) => (
+						<SizeIndicator key={index} asset={asset} />
+					))}
+				</Column>
 			</Box>
-		</Box>
+		</>
 	)
 }

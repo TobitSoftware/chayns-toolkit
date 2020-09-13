@@ -3,9 +3,9 @@ import { Command } from "commander"
 import { render } from "ink"
 import * as path from "path"
 import React from "react"
-import Build from "./scripts/Build"
-import Dev from "./scripts/Dev"
-import Lint from "./scripts/Lint"
+import Build from "./commands/Build"
+import Dev from "./commands/Dev"
+import Lint from "./commands/Lint"
 import { checkForTsconfig } from "./util/checkForTsconfig"
 
 const program = new Command()
