@@ -43,7 +43,7 @@
 		"react-refresh": "^0.8.3"
 	},
 	"peerDependencies": {
-		"chayns-components": "4"
+		"chayns-components": ">=4"
 	},
 	"engines": {
 		"node": ">=12.10.0"

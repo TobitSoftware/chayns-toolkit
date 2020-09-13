@@ -31,13 +31,13 @@
 		"eslint-config-airbnb-typescript": "^10.0.0",
 		"eslint-config-prettier": "^6.11.0",
 		"eslint-plugin-import": "^2.22.0",
-		"eslint-plugin-jest": "^24.0.0",
+		"eslint-plugin-jest": "^24.0.1",
 		"eslint-plugin-jsx-a11y": "^6.3.1",
 		"eslint-plugin-react": "^7.20.6",
-		"eslint-plugin-react-hooks": "^4.1.0"
+		"eslint-plugin-react-hooks": "^4.1.2"
 	},
 	"peerDependencies": {
-		"eslint": "7"
+		"eslint": ">=7"
 	},
 	"engines": {
 		"node": ">=12.10.0"
