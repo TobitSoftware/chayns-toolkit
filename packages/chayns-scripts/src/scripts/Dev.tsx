@@ -4,9 +4,8 @@ import WebpackDevServer from "webpack-dev-server"
 import Card from "../components/Card"
 import { createWebpackCompiler } from "../util/createWebpackCompiler"
 import { loadConfig } from "../util/loadConfig"
-import { CommandProps } from "./props"
 
-export default function Dev({}: CommandProps) {
+export default function Dev() {
 	const [configError, setConfigError] = useState<Error>()
 
 	useEffect(() => {

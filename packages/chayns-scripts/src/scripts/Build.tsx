@@ -8,13 +8,14 @@ import Card from "../components/Card"
 import Column from "../components/grid/Column"
 import GridItem from "../components/grid/GridItem"
 import { createWebpackCompiler } from "../util/createWebpackCompiler"
-import { CommandProps } from "./props"
 
-export default function Build({ args }: CommandProps): JSX.Element {
+interface BuildProps {
+	analyze: boolean
+}
+
+export default function Build({ analyze }: BuildProps): JSX.Element {
 	const [buildResults, setBuildResults] = useState<Stats>()
 	const [buildTime, setBuildTime] = useState<number>()
-
-	const analyze = Boolean(args.a || args.analyze)
 
 	useEffect(() => {
 		process.env.BABEL_ENV = "production"

@@ -1,18 +1,42 @@
 #!/usr/bin/env node
+import { Command } from "commander"
 import { render } from "ink"
-import minimist from "minimist"
+import * as path from "path"
 import React from "react"
-import App from "./App"
+import Build from "./scripts/Build"
+import Dev from "./scripts/Dev"
+import Lint from "./scripts/Lint"
 import { checkForTsconfig } from "./util/checkForTsconfig"
 
-const command = process.argv[2]
-const args = minimist(process.argv.slice(3))
+const program = new Command()
+program.version(
+	// eslint-disable-next-line
+	require(path.join(__dirname, "../package.json")).version,
+	"-v, --version",
+	"output the version number"
+)
 
-async function start() {
-	await checkForTsconfig()
+program
+	.command("dev")
+	.description("start up a development server with hot module replacement")
+	.action(() => {
+		checkForTsconfig()
+		render(<Dev />)
+	})
 
-	render(<App command={command} args={args} />)
-}
+program
+	.command("build")
+	.description("bundles your code for production")
+	.option("-a, --analyze", "analyze your bundle size", false)
+	.action((options: { analyze: boolean }) => {
+		render(<Build analyze={options.analyze} />)
+	})
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
-start()
+program
+	.command("lint")
+	.description("lints your code for possible errors")
+	.action(() => {
+		render(<Lint />)
+	})
+
+program.parse(process.argv)
