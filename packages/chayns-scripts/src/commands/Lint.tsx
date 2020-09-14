@@ -1,7 +1,8 @@
 import { Box, Text } from "ink"
-import Spinner from "ink-spinner"
 import React, { useEffect, useState } from "react"
 import Badge from "../components/Badge"
+import LoadingMessage from "../components/LoadingMessage"
+import StatusMessage from "../components/StatusMessage"
 import {
 	collectLintingResults,
 	LintingResults,
@@ -32,37 +33,22 @@ export default function Lint(): JSX.Element {
 	}
 
 	if (!lintResults) {
-		return (
-			<Box marginBottom={1}>
-				<Box marginRight={3}>
-					<Text color="greenBright">
-						<Spinner type="dots" />
-					</Text>
-				</Box>
-				<Text>Linting your code...</Text>
-			</Box>
-		)
+		return <LoadingMessage>Linting your code...</LoadingMessage>
 	}
 
 	const { warningCount, errorCount, formattedResults } = lintResults
 
 	if (errorCount === 0 && warningCount === 0) {
 		return (
-			<Box marginBottom={1}>
-				<Box marginRight={1}>
-					<Badge color="green">Success</Badge>
-				</Box>
-				<Text>No linting errors were found.</Text>
-			</Box>
+			<StatusMessage badge={<Badge color="green">Success</Badge>}>
+				No linting errors were found.
+			</StatusMessage>
 		)
 	}
 
 	return (
 		<>
-			<Box marginBottom={1}>
-				<Box marginRight={1}>
-					<Badge color="yellowBright">Warning</Badge>
-				</Box>
+			<StatusMessage badge={<Badge color="yellowBright">Warning</Badge>}>
 				<Text color="redBright" bold>
 					{errorCount} errors
 				</Text>
@@ -71,7 +57,7 @@ export default function Lint(): JSX.Element {
 					{warningCount} warnings
 				</Text>
 				<Text> found.</Text>
-			</Box>
+			</StatusMessage>
 			<Box marginBottom={1}>
 				<Text>{formattedResults}</Text>
 			</Box>

@@ -1,5 +1,4 @@
 import { Box, Text } from "ink"
-import Spinner from "ink-spinner"
 import React, { useEffect, useState } from "react"
 import type { Stats } from "webpack"
 import Badge from "../components/Badge"
@@ -7,6 +6,8 @@ import AssetSize from "../components/buildScript/AssetSize"
 import SizeIndicator from "../components/buildScript/SizeIndicator"
 import Column from "../components/grid/Column"
 import GridItem from "../components/grid/GridItem"
+import LoadingMessage from "../components/LoadingMessage"
+import StatusMessage from "../components/StatusMessage"
 import { createWebpackCompiler } from "../util/createWebpackCompiler"
 
 interface BuildProps {
@@ -37,16 +38,7 @@ export default function Build({ analyze }: BuildProps): JSX.Element {
 	}, [])
 
 	if (!buildResults) {
-		return (
-			<Box marginBottom={1}>
-				<Box marginRight={3}>
-					<Text color="greenBright">
-						<Spinner type="dots" />
-					</Text>
-				</Box>
-				<Text>Bundling your code...</Text>
-			</Box>
-		)
+		return <LoadingMessage>Bundling your code...</LoadingMessage>
 	}
 
 	const hasErrors = buildResults.hasErrors()
@@ -54,12 +46,9 @@ export default function Build({ analyze }: BuildProps): JSX.Element {
 	if (hasErrors) {
 		return (
 			<>
-				<Box marginBottom={1} flexDirection="row">
-					<Box marginRight={1}>
-						<Badge color="red">Error</Badge>
-					</Box>
-					<Text>Compilation failed.</Text>
-				</Box>
+				<StatusMessage badge={<Badge color="red">Error</Badge>}>
+					Compilation failed.
+				</StatusMessage>
 
 				<Box flexDirection="column" marginBottom={1}>
 					{buildResults.compilation.errors.map((e, i) => {
@@ -74,16 +63,11 @@ export default function Build({ analyze }: BuildProps): JSX.Element {
 
 	return (
 		<>
-			<Box marginBottom={1} flexDirection="row">
-				<Box marginRight={1}>
-					<Badge color="green">Success</Badge>
-				</Box>
-				<Box flexDirection="row" marginRight={3}>
-					<Text>Finished build in </Text>
-					<Text color="blueBright">{buildTime}</Text>
-					<Text> seconds.</Text>
-				</Box>
-			</Box>
+			<StatusMessage badge={<Badge color="green">Success</Badge>}>
+				<Text>Finished build in </Text>
+				<Text color="blueBright">{buildTime}</Text>
+				<Text> seconds.</Text>
+			</StatusMessage>
 
 			<Box marginBottom={1}>
 				<Text>Outputted these files:</Text>
