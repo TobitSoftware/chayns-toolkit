@@ -2,54 +2,74 @@ import { Box, Text } from "ink"
 import React, { useEffect, useState } from "react"
 import WebpackDevServer from "webpack-dev-server"
 import Badge from "../components/Badge"
+import LoadingMessage from "../components/LoadingMessage"
+import StatusMessage from "../components/StatusMessage"
+import { CONFIG_FILE_NAME } from "../features/config/loadConfig"
+import { useConfig } from "../features/config/useConfig"
 import { createWebpackCompiler } from "../util/createWebpackCompiler"
 import { getDevServerOptions } from "../util/getDevServerOptions"
-import { loadConfig } from "../util/loadConfig"
 
 export default function Dev(): JSX.Element {
 	const [errorMessage, setErrorMessage] = useState<string>()
+	const [config, configError] = useConfig()
 
-	useEffect(() => {
-		process.env.BABEL_ENV = "development"
-		process.env.NODE_ENV = "development"
+	useEffect(
+		function startWebpackDevServer() {
+			if (config) {
+				process.env.BABEL_ENV = "development"
+				process.env.NODE_ENV = "development"
 
-		loadConfig()
-			.then((config) => {
 				const hasHttpsCertificates = Boolean(
-					config.https?.cert && config.https?.key
+					config.development?.cert && config.development?.key
 				)
 
 				const host =
-					config.host ||
+					config.development?.host ||
 					(hasHttpsCertificates ? DEFAULT_HTTPS_HOSTNAME : DEFAULT_HOSTNAME)
-				const port = config.port || DEFAULT_PORT
+				const port = config.development?.port || DEFAULT_PORT
 
 				const devServer = new WebpackDevServer(
 					createWebpackCompiler({ mode: "development" }),
 					getDevServerOptions({
 						host,
 						port,
-						cert: config.https?.key,
-						key: config.https?.key,
+						cert: config.development?.key,
+						key: config.development?.key,
 					})
 				)
 
 				devServer.listen(port, host, (err) => {
 					if (err) setErrorMessage(err.message)
 				})
-			})
-			.catch((e: Error) => setErrorMessage(e.message))
-	}, [])
+			}
+		},
+		[config]
+	)
+
+	if (configError) {
+		return (
+			<>
+				<StatusMessage badge={<Badge color="redBright">Error</Badge>}>
+					Invalid configuration file detected.
+				</StatusMessage>
+				<Box marginBottom={1}>
+					<Text>{configError.message}</Text>
+				</Box>
+				<Box marginBottom={1}>
+					<Text color="blueBright">
+						Check your \`${CONFIG_FILE_NAME}\` file.
+					</Text>
+				</Box>
+			</>
+		)
+	}
 
 	if (errorMessage) {
 		return (
 			<>
-				<Box marginBottom={1}>
-					<Box marginRight={1}>
-						<Badge color="green">Error</Badge>
-					</Box>
-					<Text>Failed to start development server.</Text>
-				</Box>
+				<StatusMessage badge={<Badge color="redBright">Error</Badge>}>
+					Failed to start development server.
+				</StatusMessage>
 				<Box marginBottom={1}>
 					<Text>{errorMessage}</Text>
 				</Box>
@@ -57,7 +77,7 @@ export default function Dev(): JSX.Element {
 		)
 	}
 
-	return <></>
+	return <LoadingMessage>Loading configuration file...</LoadingMessage>
 }
 
 const DEFAULT_PORT = 1234

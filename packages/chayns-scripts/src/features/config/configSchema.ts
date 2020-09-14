@@ -1,8 +1,7 @@
 import * as yup from "yup"
 
 export const configSchema = yup
-	.object()
-	.shape({
+	.object({
 		development: yup.object().shape({
 			host: yup.string().max(255),
 			port: yup.number().positive().max(65535),
@@ -14,6 +13,7 @@ export const configSchema = yup
 			filename: yup.string(),
 		}),
 	})
+	.defined()
 	.noUnknown()
 	.strict(true)
 
