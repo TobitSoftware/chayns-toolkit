@@ -38,9 +38,16 @@ module.exports = () => {
 			"macros",
 			[
 				"@babel/plugin-transform-runtime",
-				// eslint-disable-next-line global-require
-				{ version: require("@babel/runtime/package.json").version },
+				{
+					// eslint-disable-next-line global-require
+					version: require("@babel/runtime/package.json").version,
+					corejs: false,
+					regenerator: true,
+				},
 			],
+			// This is included in preset-env, but we always want to compile it
+			// since the resulting numbers are smaller.
+			"@babel/plugin-proposal-numeric-separator",
 			"@babel/plugin-proposal-optional-chaining",
 			"@babel/plugin-proposal-nullish-coalescing-operator",
 			["@babel/plugin-proposal-class-properties", { loose: true }],

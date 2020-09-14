@@ -1,5 +1,6 @@
 import React from "react"
 import styles from "./app.module.css"
+import CorejsTest from "./components/corejs-test/CorejsTest"
 import CssModules from "./components/css-modules/CssModules"
 import FileLoaderTest from "./components/file-loader-test/FileLoaderTest"
 import HmrTest from "./components/hmr-test/HmrTest"
@@ -16,6 +17,7 @@ export default function App() {
 			<UrlLoaderTest />
 			<SvgTest />
 			<TsTest />
+			<CorejsTest />
 		</div>
 	)
 }
