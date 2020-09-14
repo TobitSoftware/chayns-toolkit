@@ -1,6 +1,6 @@
 import * as fs from "fs"
 import * as path from "path"
-import { defaultTsconfig } from "./defaultTsconfig"
+import { defaultTsconfig } from "../../util/defaultTsconfig"
 
 export function setupTsconfig(): void {
 	fs.writeFileSync(

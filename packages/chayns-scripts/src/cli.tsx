@@ -6,7 +6,7 @@ import React from "react"
 import Build from "./commands/Build"
 import Dev from "./commands/Dev"
 import Lint from "./commands/Lint"
-import { checkForTsconfig } from "./util/checkForTsconfig"
+import { checkForTsconfig } from "./features/tsconfig/checkForTsconfig"
 
 const program = new Command()
 program.version(
