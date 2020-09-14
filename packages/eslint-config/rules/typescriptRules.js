@@ -5,6 +5,16 @@ const typescriptRules = {
 		"error",
 		{ functions: false, classes: false, variables: false, enums: false },
 	],
+	"@typescript-eslint/ban-ts-comment": [
+		"error",
+		{
+			"ts-expect-error": "allow-with-description",
+			"ts-ignore": true,
+			"ts-nocheck": true,
+			"ts-check": true,
+			minimumDescriptionLength: 4,
+		},
+	],
 }
 
 module.exports = typescriptRules
