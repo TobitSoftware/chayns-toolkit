@@ -12,13 +12,13 @@
 ---
 
 **chayns-scripts** contains pre-configured tools for the development, publishing
-and testing of your app. It was created to simplify the development experience
-when working with [React](https://reactjs.org).
+and quality assurance of your app. It was created to simplify the development
+experience when working with [React](https://reactjs.org).
 
-> This toolchain is specialized in developing apps for the
+> This toolchain is specialized in developing apps and plugins for the
 > [chayns®](https://chayns.org/) platform. If you want to develop a general
 > purpose web app, take a look at [Next.js](https://nextjs.org/) or
-> [`create-react-app`](https://create-react-app.dev/)
+> [`create-react-app`](https://create-react-app.dev/).
 
 ## Overview
 
@@ -33,6 +33,7 @@ when working with [React](https://reactjs.org).
     -   [Image Assets](#image-assets)
     -   [HMR With `react-refresh` Support](#hmr-with-react-refresh-support)
     -   [ESLint Configuration](#eslint-configuration)
+    -   [Single-File Builds](#single-file-builds)
     -   [Analyzing Your Bundle](#analyzing-your-bundle)
     -   [Tree-Shaking for chayns-components](#tree-shaking-for-chayns-components)
     -   [The `chayns-scripts.json` Configuration File](#the-chayns-scriptsjson-configuration-file)
@@ -40,7 +41,7 @@ when working with [React](https://reactjs.org).
 
 ## Get Started
 
-First install the `chayns-scripts` package in your project:
+First install the `chayns-scripts` package in your project as a dev dependency:
 
 ```bash
 yarn add chayns-scripts -D
@@ -72,9 +73,6 @@ We recommend adding these to the scripts section of your package.json:
 }
 ```
 
-Your project will have two entry points. An `index.html` files in the `src/`
-directory at the root of your project will be the entry point for visitors.
-
 A JavaScript/TypeScript file in the `src/` directory with one of the following
 names will be the entry point for your bundle:
 
@@ -86,13 +84,16 @@ names will be the entry point for your bundle:
 > To use TypeScript, you need a `tsconfig.json`.
 > [Read more](#typescript-support)
 
+If you specify a `src/index.html` file, it will be included included in the
+build process.
+
 Your project structure should look similar to this:
 
 ```
 ├── src
 │   ├── components
 │   │   └── MyComponent.jsx
-│   ├── index.html
+│   ├── index.html // optional
 │   └── index.jsx
 ├── package-lock.json
 ├── package.json
@@ -102,22 +103,13 @@ Your project structure should look similar to this:
 An example project can be found
 [here](https://github.com/leodr/chayns-scripts/tree/master/packages/example-project).
 
-### Linting
+### Configuring Linting
 
 We also provide an [ESLint](https://eslint.org/)-configuration that works with
-JavaScript and TypeScript. To activate linting, install ESLint first:
+JavaScript and TypeScript. ESLint comes preinstalled with this package, so
+there's no need to install it seperately.
 
-```bash
-yarn add eslint -D
-```
-
-or
-
-```bash
-npm i eslint -D
-```
-
-Then add a `eslintConfig` key to your `package.json` like that:
+All you have to do is add the `eslintConfig` key to your `package.json`:
 
 ```json
 {
@@ -129,41 +121,84 @@ Then add a `eslintConfig` key to your `package.json` like that:
 }
 ```
 
-For integration into your editor check out the official
-[Integrations page](https://eslint.org/docs/user-guide/integrations#editors).
+For editor integrations check out the official
+[ESLint integrations page](https://eslint.org/docs/user-guide/integrations#editors).
+
+### Code Formatting
+
+All projects are using `chayns-scripts` should be formatted with
+[Prettier](https://prettier.io/). First, install Prettier and its
+`package.json`-formatter in your project:
+
+```bash
+yarn add prettier prettier-plugin-packagejson -D
+```
+
+or
+
+```bash
+npm i prettier prettier-plugin-packagejson -D
+```
+
+Then add the `prettier` key with the following configuration to your
+`package.json`:
+
+```json
+{
+    "...": "",
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true
+    },
+    "...": ""
+}
+```
+
+Now you can format all files in your project with `yarn prettier . --write` or
+`npx prettier . --write`.
+
+To format your files on save, check out the
+[Prettier editor integrations](https://prettier.io/docs/en/editors.html) page
+(or the [Webstorm guide](https://prettier.io/docs/en/webstorm.html), if you're
+using that).
+
+> Using the same code formatter mostly important for Git diffs when working on a
+> team. Read [this](https://prettier.io/docs/en/why-prettier.html) for more
+> information on why you should use Prettier.
 
 ## Commands
 
 ### `chayns-scripts dev`
 
-Starts the local development server on
-[`https://0.0.0.0:1234/`](https://0.0.0.0:1234/) if SSL was configured,
-otherwise it will use [`https://localhost:1234/`](https://localhost:1234/).
+Starts a local development server on
+[`http://localhost:1234/`](https://localhost:1234/) or
+[`https://0.0.0.0:1234/`](https://0.0.0.0:1234/) if SSL was configured.
 
 You can configure the host, port and SSL settings in a `chayns-scripts.json`
 configuration file:
 
 ```json
 {
-    "host": "123.0.0.1",
-    "port": 1337,
-    "https": {
+    "development": {
+        "host": "123.0.0.1",
+        "port": 1337,
         "cert": "path-to-cert",
         "key": "path-to-key"
-    }
+    },
+    "...": ""
 }
 ```
 
-> To achieve faster builds and rebuilds this command only transpiles your code
-> to work with the latest versions of Google Chrome, Safari and Firefox.
+> To achieve faster (re-)build times this command only transpiles your code to
+> work with the latest versions of Google Chrome, Safari and Firefox.
 
 ### `chayns-scripts build`
 
-Builds your source code for production. The assets will be emitted into the
-`build/` directory in your project root.
+Compiles your source code for production. The output is emitted into a `build/`
+directory in your project root.
 
-It will transpile your code to work with browsers matching the following
-[browserslist](https://github.com/browserslist/browserslist) configuration:
+Your code is transpiled to work with browsers matching the following
+[browserslist](https://github.com/browserslist/browserslist) query:
 
 ```
 >0.5%
@@ -171,9 +206,9 @@ not dead
 not op_mini all
 ```
 
-| Parameters        | Function                                                                                                                                      |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-a`, `--analyze` | Analyze your bundle with [`webpack-bundle-analyzer`](https://github.com/webpack-contrib/webpack-bundle-analyzer) after the build is complete. |
+| Parameters        | Function                                                                                                                                              |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-a`, `--analyze` | Analyze your bundle with [`webpack-bundle-analyzer`](https://github.com/webpack-contrib/webpack-bundle-analyzer). [Read more](#analyzing-your-bundle) |
 
 ### `chayns-scripts lint`
 
@@ -321,6 +356,12 @@ If you think that a rule should be adjusted, please
 [open an issue](https://github.com/leodr/chayns-scripts/issues/new) to discuss
 the suggested change instead of adjusting your local configuration.
 
+### Single-File Builds
+
+In single-file build mode, the compiler will inline everything (CSS, assets,
+etc.) into a single bundle. This can be useful when building smaller parts of a
+UI, for example a wallet- or messenger-plugin.
+
 ### Analyzing Your Bundle
 
 By passing the `--analyze` flag to `chayns-scripts build` you can use
@@ -329,7 +370,7 @@ to investigate your bundle-size. It will automatically open the tree-map of your
 bundled files after compiling. This will run as long as you keep the terminal
 process alive.
 
-### Tree-Shaking for [chayns-components](https://github.com/TobitSoftware/chayns-components)
+### Tree-Shaking [`chayns-components`](https://github.com/TobitSoftware/chayns-components)
 
 The tree-shaking for chayns-components is built into the build configuration and
 configured automatically. For further information refer to
@@ -343,26 +384,44 @@ If your bundle size is unexpectedly large, please
 A `chayns-scripts.json` file in the root of your projects is used to configure
 certain aspects of the scripts (but is not required).
 
-Example `chayns-scripts.json`:
+Example `chayns-scripts.json` with all of the available options specified:
 
 ```json
 {
-    "host": "123.0.0.1",
-    "port": 1337,
-    "https": {
+    "development": {
+        "host": "123.0.0.1",
+        "port": 1337,
         "cert": "//path/to/ssl/cert",
         "key": "//path/to/ssl/key"
+    },
+    "output": {
+        "singleBundle": false,
+        "filename": "[package].[contenthash].bundle.js"
     }
 }
 ```
 
-The following options are supported:
+#### `development` Options:
 
-| Option      | Type                             | Explanation                                                                                                                                                                            |
-| ----------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`host`**  | `string`                         | This configures the hostname for your dev server (used by `chayns-scripts dev`). Will default to `localhost` without SSL certificates or `0.0.0.0` when SSL certificates are provided. |
-| **`port`**  | `number`                         | This sets the port for your dev server. Defaults to `1234`.                                                                                                                            |
-| **`https`** | `{ cert: string; key: string; }` | This option configures SSL certificates to be used during development. `cert` and `key` have to be paths to the corresponding `.crt` and `.key` files.                                 |
+These options configure the behavior of your development server (the
+`chayns-scripts dev` command).
+
+| Option     | Type     | Explanation                                                                                                             |
+| ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **`host`** | `string` | Configures the hostname of your dev server. Defaults to `localhost` or `0.0.0.0` if both `cert` and `key` are provided. |
+| **`port`** | `number` | Sets the port of your dev server. Defaults to `1234`.                                                                   |
+| **`cert`** | `string` | Specifies the path to a SSL certificate file for your development server. Not specified by default.                     |
+| **`key`**  | `string` | Specifies the path to a SSL key file for your development server. Not specified by default.                             |
+
+#### `output` Options:
+
+These options configure your output bundles (affect the `chayns-scripts build`
+command).
+
+| Option             | Type      | Explanation                                                                                                                                                                                                                                                                                                          |
+| ------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`singleBundle`** | `boolean` | Toggles the [single-file build functionality](#single-file-builds).                                                                                                                                                                                                                                                  |
+| **`filename`**     | `string`  | Change the file-name your of primary output bundle. You can use any of the [webpack substitutions](https://webpack.js.org/configuration/output/#template-strings) as well as the `[package]` substitution (will be replaced by the name specified in your `package.json`). Defaults to `[package].[contenthash].js`. |
 
 ## Notes on Multiple Entrypoints
 
