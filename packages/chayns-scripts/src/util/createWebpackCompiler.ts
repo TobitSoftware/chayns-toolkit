@@ -1,91 +1,102 @@
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
+import { CleanWebpackPlugin } from "clean-webpack-plugin"
+import * as fs from "fs"
 import HtmlWebpackPlugin from "html-webpack-plugin"
+import { kebabCase } from "lodash"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
-import path from "path"
-import postcssFlexbugsFixes from "postcss-flexbugs-fixes"
-import postcssPresetEnv from "postcss-preset-env"
+import * as path from "path"
 import webpack, { Compiler, Plugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
+import { setBrowsersListEnv } from "../features/environment/browserslist"
+import { resolveProjectPath } from "./resolveProjectPath"
 
 type Mode = "development" | "production"
 
 interface CreateConfigOptions {
 	mode: Mode
-	analyze?: boolean
+	analyze: boolean
+	singleBundle: boolean
+	outputFilename: string
 }
 
 export function createWebpackCompiler({
 	mode,
-	analyze = false,
+	analyze,
+	outputFilename,
+	singleBundle,
 }: CreateConfigOptions): Compiler {
-	const plugins: Plugin[] = [
-		new HtmlWebpackPlugin({
-			template: path.resolve(process.cwd(), "src/index.html"),
-			minify:
-				mode === "production"
-					? {
-							removeComments: true,
-							collapseWhitespace: true,
-							removeRedundantAttributes: true,
-							useShortDoctype: true,
-							removeEmptyAttributes: true,
-							removeStyleLinkTypeAttributes: true,
-							keepClosingSlash: true,
-							minifyJS: true,
-							minifyCSS: true,
-							minifyURLs: true,
-					  }
-					: undefined,
-		}),
-	]
+	const plugins: Plugin[] = []
 
-	if (analyze) {
-		plugins.push(new BundleAnalyzerPlugin({}))
+	const hasHTMLFile = fs.existsSync(resolveProjectPath("src/index.html"))
+	// eslint-disable-next-line
+	const packageJson: { name: string } = require(resolveProjectPath(
+		"package.json"
+	))
+	const packageName = packageJson.name
+
+	if (hasHTMLFile) {
+		const minify =
+			mode === "production"
+				? {
+						removeComments: true,
+						collapseWhitespace: true,
+						removeRedundantAttributes: true,
+						useShortDoctype: true,
+						removeEmptyAttributes: true,
+						removeStyleLinkTypeAttributes: true,
+						keepClosingSlash: true,
+						minifyJS: true,
+						minifyCSS: true,
+						minifyURLs: true,
+				  }
+				: undefined
+
+		plugins.push(
+			new HtmlWebpackPlugin({
+				template: path.resolve(process.cwd(), "src/index.html"),
+				minify,
+			})
+		)
 	}
 
-	switch (mode) {
-		case "development":
-			process.env.BROWSERSLIST = [
-				"last 1 chrome version",
-				"last 1 firefox version",
-				"last 1 safari version",
-			].join()
+	if (analyze) {
+		plugins.push(new BundleAnalyzerPlugin())
+	}
 
-			plugins.push(new ReactRefreshWebpackPlugin())
-			break
-		case "production":
-			process.env.BROWSERSLIST = [">0.5%", "not dead", "not op_mini all"].join()
+	if (mode === "production") {
+		plugins.push(new CleanWebpackPlugin())
+	}
 
-			plugins.push(
-				new MiniCssExtractPlugin({
-					filename: "static/css/[name].[contenthash].css",
-					chunkFilename: "static/css/[name].[chunkhash].chunk.css",
-				})
-			)
-			plugins.push(new OptimizeCssAssetsPlugin())
-			break
-		default:
+	setBrowsersListEnv(mode)
+
+	if (mode === "development") {
+		plugins.push(new ReactRefreshWebpackPlugin())
+	}
+
+	if (mode === "production" && !singleBundle) {
+		plugins.push(
+			new MiniCssExtractPlugin({
+				filename: `static/css/${packageName}.[contenthash].css`,
+				chunkFilename: `static/css/${packageName}.[chunkhash].chunk.css`,
+			})
+		)
+		plugins.push(new OptimizeCssAssetsPlugin())
 	}
 
 	const shouldUseSourceMaps = mode !== "production"
 
 	return webpack({
-		entry: path.resolve(process.cwd(), "src/index"),
+		entry: resolveProjectPath("src/index"),
 		mode,
 		devtool: shouldUseSourceMaps ? "cheap-module-eval-source-map" : false,
 		context: process.cwd(),
 		output: {
-			path: path.resolve(process.cwd(), "build"),
+			path: resolveProjectPath("build/"),
 			hashDigestLength: 12,
-			filename:
-				mode === "development"
-					? "static/js/bundle.js"
-					: "static/js/[name].[contenthash].js",
+			filename: getOutputPath({ mode, filename: outputFilename, singleBundle }),
 		},
-		resolve: {
-			extensions: [".js", ".jsx", ".ts", ".tsx"],
-		},
+		resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
 		module: {
 			rules: [
 				{
@@ -104,7 +115,7 @@ export function createWebpackCompiler({
 				{
 					test: /\.(css|scss)/,
 					use: [
-						mode === "development"
+						mode === "development" || singleBundle
 							? "style-loader"
 							: MiniCssExtractPlugin.loader,
 						"css-loader",
@@ -113,12 +124,16 @@ export function createWebpackCompiler({
 							options: {
 								postcssOptions: {
 									plugins: [
-										postcssPresetEnv({
-											autoprefixer: { flexbox: "no-2009" },
-											stage: 2,
-										}),
-										postcssFlexbugsFixes(),
-									],
+										[
+											"postcss-preset-env",
+											{
+												autoprefixer: { flexbox: "no-2009" },
+												stage: 2,
+											},
+										],
+										"postcss-flexbugs-fixes",
+										"cssnano",
+									].filter(Boolean),
 								},
 							},
 						},
@@ -130,7 +145,7 @@ export function createWebpackCompiler({
 					use: {
 						loader: "url-loader",
 						options: {
-							limit: 10000,
+							limit: singleBundle ? Infinity : 10000,
 							fallback: {
 								loader: "file-loader",
 								options: { name: "static/media/[contenthash:12].[ext]" },
@@ -146,11 +161,35 @@ export function createWebpackCompiler({
 		},
 		plugins,
 		optimization: {
-			splitChunks: {
-				chunks: "all",
-				name: false,
-			},
+			splitChunks: singleBundle
+				? false
+				: {
+						chunks: "all",
+						name: false,
+				  },
 		},
 		performance: false,
 	})
+}
+
+function getOutputPath({
+	mode,
+	filename,
+	singleBundle,
+}: {
+	mode: "development" | "production"
+	filename: string
+	singleBundle: boolean
+}) {
+	const outputPath = singleBundle ? "" : "static/js/"
+
+	// eslint-disable-next-line
+	const pkg: { name: string } = require(resolveProjectPath("package.json"))
+
+	const preparedFilename = filename.replace("[package]", kebabCase(pkg.name))
+
+	if (mode === "development") {
+		return `${outputPath}bundle.js`
+	}
+	return outputPath + preparedFilename
 }

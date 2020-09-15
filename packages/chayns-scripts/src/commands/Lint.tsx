@@ -19,12 +19,9 @@ export default function Lint(): JSX.Element {
 	if (lintError) {
 		return (
 			<>
-				<Box marginBottom={1}>
-					<Box marginRight={1}>
-						<Badge color="red">Error</Badge>
-					</Box>
-					<Text>An error occured during linting.</Text>
-				</Box>
+				<StatusMessage badge={<Badge color="red">Error</Badge>}>
+					An error occured during linting.
+				</StatusMessage>
 				<Box marginBottom={1}>
 					<Text color="redBright">{lintError.toString()}</Text>
 				</Box>
