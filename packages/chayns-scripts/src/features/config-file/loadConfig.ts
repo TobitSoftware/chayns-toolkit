@@ -15,7 +15,7 @@ export async function loadConfig(): Promise<ChaynsScriptsConfiguration> {
 			{ encoding: "utf8" }
 		)
 	} catch {
-		return {}
+		config = "{}"
 	}
 
 	let parsedConfig
@@ -24,9 +24,7 @@ export async function loadConfig(): Promise<ChaynsScriptsConfiguration> {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		parsedConfig = JSON.parse(config.toString())
 	} catch {
-		throw Error(
-			`Your \`${CONFIG_FILE_NAME}\` file does not seem to contain valid JSON.`
-		)
+		throw Error(`The configuration does not seem to contain valid JSON.`)
 	}
 
 	try {
