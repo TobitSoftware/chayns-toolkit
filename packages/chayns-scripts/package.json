@@ -1,6 +1,6 @@
 {
 	"name": "chayns-scripts",
-	"version": "0.0.17",
+	"version": "0.1.0",
 	"description": "A zero-config toolchain for developing chayns® apps.",
 	"keywords": [
 		"chayns",
@@ -38,8 +38,8 @@
 	},
 	"dependencies": {
 		"@babel/core": "^7.11.6",
-		"@chayns-scripts/babel-preset": "^0.0.17",
-		"@chayns-scripts/eslint-config": "^0.0.17",
+		"@chayns-scripts/babel-preset": "^0.1.0",
+		"@chayns-scripts/eslint-config": "^0.1.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.4.2",
 		"@svgr/webpack": "^5.4.0",
 		"@types/dotenv-webpack": "^1.8.0",
