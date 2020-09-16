@@ -1,5 +1,6 @@
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
+import Dotenv from "dotenv-webpack"
 import * as fs from "fs"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import { kebabCase } from "lodash"
@@ -26,7 +27,12 @@ export function createWebpackCompiler({
 	outputFilename,
 	singleBundle,
 }: CreateConfigOptions): Compiler {
-	const plugins: Plugin[] = []
+	const plugins: Plugin[] = [
+		new Dotenv({
+			path: "./.env.local",
+			systemvars: true,
+		}),
+	]
 
 	const hasHTMLFile = fs.existsSync(resolveProjectPath("src/index.html"))
 	// eslint-disable-next-line
