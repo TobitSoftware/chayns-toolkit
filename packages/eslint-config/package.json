@@ -1,6 +1,6 @@
 {
 	"name": "@chayns-scripts/eslint-config",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "The sharable eslint-config for developing chayns® apps. Used in chayns-scripts.",
 	"keywords": [
 		"chayns",
