@@ -26,7 +26,6 @@ const sharedRules = {
 			name: "chayns-components/lib",
 		},
 	],
-	"react/jsx-props-no-spreading": "off",
 }
 
 module.exports = sharedRules
