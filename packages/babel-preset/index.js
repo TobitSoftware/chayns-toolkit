@@ -36,6 +36,7 @@ module.exports = () => {
 				},
 			],
 			"macros",
+			"optimize-clsx",
 			[
 				"@babel/plugin-transform-runtime",
 				{
