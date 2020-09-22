@@ -2,10 +2,10 @@
     <h1><img src="assets/logo.png" width="500px" alt="chayns-toolkit" /></h1>
     <p>A zero-config toolchain for developing chayns® apps.</p>
     <div>
-        <img src="https://img.shields.io/github/license/leodr/chayns-toolkit?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/github/license/TobitSoftware/chayns-toolkit?style=for-the-badge" alt="" />
         <img src="https://img.shields.io/npm/v/chayns-toolkit?style=for-the-badge" alt="" />
-        <img src="https://img.shields.io/github/last-commit/leodr/chayns-toolkit?style=for-the-badge" alt="" />
-        <img src="https://img.shields.io/github/issues-raw/leodr/chayns-toolkit?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/github/last-commit/TobitSoftware/chayns-toolkit?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/github/issues-raw/TobitSoftware/chayns-toolkit?style=for-the-badge" alt="" />
     </div>
 </div>
 
