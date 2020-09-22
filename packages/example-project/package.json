@@ -2,6 +2,8 @@
 	"name": "example-project",
 	"version": "0.1.1",
 	"private": true,
+	"description": "An example of using chayns-toolkit.",
+	"homepage": "https://github.com/TobitSoftware/chayns-toolkit#readme",
 	"license": "MIT",
 	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
 	"source": "src/index.html",

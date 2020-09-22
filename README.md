@@ -105,7 +105,7 @@ Your project structure should look similar to this:
 ```
 
 An example project can be found
-[here](https://github.com/leodr/chayns-toolkit/tree/master/packages/example-project).
+[here](https://github.com/TobitSoftware/chayns-toolkit/tree/HEAD/packages/example-project).
 
 > You should also make sure that you specify a meaningful name in your
 > `package.json`-file, as it will be used by this package to determine the name
@@ -365,8 +365,8 @@ The configuration can also be installed as a standalone package
 > should be taken seriously,
 
 If you think a rule should be adjusted, please
-[open an issue](https://github.com/leodr/chayns-toolkit/issues/new) to discuss
-the suggested change instead of adjusting your local configuration.
+[open an issue](https://github.com/TobitSoftware/chayns-toolkit/issues/new) to
+discuss the suggested change instead of adjusting your local configuration.
 
 ### Single-File Builds
 
@@ -404,7 +404,7 @@ information refer to
 [this document](https://github.com/TobitSoftware/chayns-components/blob/master/tree-shaking.md).
 
 If your bundle size is unexpectedly large, please
-[open an issue](https://github.com/leodr/chayns-toolkit/issues/new).
+[open an issue](https://github.com/TobitSoftware/chayns-toolkit/issues/new).
 
 ### The `chayns-toolkit.json` Configuration File
 

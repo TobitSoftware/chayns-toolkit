@@ -9,14 +9,14 @@
 		"eslint",
 		"eslint-config"
 	],
-	"homepage": "https://github.com/leodr/chayns-toolkit#readme",
+	"homepage": "https://github.com/TobitSoftware/chayns-toolkit#readme",
 	"bugs": {
-		"url": "https://github.com/leodr/chayns-toolkit/issues",
+		"url": "https://github.com/TobitSoftware/chayns-toolkit/issues",
 		"email": "leonhard.driesch@tobit.com"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/leodr/chayns-toolkit.git"
+		"url": "https://github.com/TobitSoftware/chayns-toolkit.git"
 	},
 	"license": "MIT",
 	"author": {
