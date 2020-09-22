@@ -1,6 +1,6 @@
 {
 	"name": "example-project",
-	"version": "0.1.1",
+	"version": "1.0.0",
 	"private": true,
 	"description": "An example of using chayns-toolkit.",
 	"homepage": "https://github.com/TobitSoftware/chayns-toolkit#readme",
@@ -26,6 +26,6 @@
 		"react-dom": "^16.13.1"
 	},
 	"devDependencies": {
-		"chayns-toolkit": "^0.1.1"
+		"chayns-toolkit": "^1.0.0"
 	}
 }
