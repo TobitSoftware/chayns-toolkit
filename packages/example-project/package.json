@@ -6,17 +6,17 @@
 	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
 	"source": "src/index.html",
 	"scripts": {
-		"build": "chayns-scripts build",
-		"dev": "chayns-scripts dev",
-		"lint": "chayns-scripts lint"
+		"build": "chayns-toolkit build",
+		"dev": "chayns-toolkit dev",
+		"lint": "chayns-toolkit lint"
 	},
 	"babel": {
 		"presets": [
-			"@chayns-scripts"
+			"@chayns-toolkit"
 		]
 	},
 	"eslintConfig": {
-		"extends": "@chayns-scripts"
+		"extends": "@chayns-toolkit"
 	},
 	"dependencies": {
 		"chayns-components": "^4.18.10",
@@ -24,6 +24,6 @@
 		"react-dom": "^16.13.1"
 	},
 	"devDependencies": {
-		"chayns-scripts": "^0.1.1"
+		"chayns-toolkit": "^0.1.1"
 	}
 }

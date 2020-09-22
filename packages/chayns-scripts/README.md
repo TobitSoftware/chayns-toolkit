@@ -1,17 +1,17 @@
 <div align="center">
-    <h1><img src="assets/logo.png" width="500px" alt="chayns-scripts" /></h1>
+    <h1><img src="assets/logo.png" width="500px" alt="chayns-toolkit" /></h1>
     <p>A zero-config toolchain for developing chayns® apps.</p>
     <div>
-        <img src="https://img.shields.io/github/license/leodr/chayns-scripts?style=for-the-badge" alt="" />
-        <img src="https://img.shields.io/npm/v/chayns-scripts?style=for-the-badge" alt="" />
-        <img src="https://img.shields.io/github/last-commit/leodr/chayns-scripts?style=for-the-badge" alt="" />
-        <img src="https://img.shields.io/github/issues-raw/leodr/chayns-scripts?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/github/license/leodr/chayns-toolkit?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/npm/v/chayns-toolkit?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/github/last-commit/leodr/chayns-toolkit?style=for-the-badge" alt="" />
+        <img src="https://img.shields.io/github/issues-raw/leodr/chayns-toolkit?style=for-the-badge" alt="" />
     </div>
 </div>
 
 ---
 
-**chayns-scripts** contains pre-configured tools for the development, publishing
+**chayns-toolkit** contains pre-configured tools for the development, publishing
 and quality assurance of your app. It was created to simplify the development
 experience when working with [React](https://reactjs.org).
 
@@ -24,9 +24,9 @@ experience when working with [React](https://reactjs.org).
 
 -   [Get Started](#get-started)
 -   [Commands](#commands)
-    -   [`chayns-scripts dev`](#chayns-scripts-dev)
-    -   [`chayns-scripts build`](#chayns-scripts-build)
-    -   [`chayns-scripts lint`](#chayns-scripts-lint)
+    -   [`chayns-toolkit dev`](#chayns-toolkit-dev)
+    -   [`chayns-toolkit build`](#chayns-toolkit-build)
+    -   [`chayns-toolkit lint`](#chayns-toolkit-lint)
 -   [Features](#features)
     -   [TypeScript Support](#typescript-support)
     -   [(S)CSS Support](#scss-support)
@@ -37,31 +37,31 @@ experience when working with [React](https://reactjs.org).
     -   [Environment Variables](#environment-variables)
     -   [Analyzing Your Bundle](#analyzing-your-bundle)
     -   [Tree-Shaking `chayns-components`](#tree-shaking-chayns-components)
-    -   [The `chayns-scripts.json` Configuration File](#the-chayns-scriptsjson-configuration-file)
+    -   [The `chayns-toolkit.json` Configuration File](#the-chayns-toolkitjson-configuration-file)
 -   [Notes on Multiple Entrypoints](#notes-on-multiple-entrypoints)
 
 ## Get Started
 
-First install the `chayns-scripts` package in your project as a dev dependency
+First install the `chayns-toolkit` package in your project as a dev dependency
 by executing
 
 ```bash
-yarn add chayns-scripts -D
+yarn add chayns-toolkit -D
 ```
 
 or
 
 ```bash
-npm i chayns-scripts -D
+npm i chayns-toolkit -D
 ```
 
 in your project.
 
 The package provides the following commands:
 
--   `chayns-scripts dev`
--   `chayns-scripts build`
--   `chayns-scripts lint`
+-   `chayns-toolkit dev`
+-   `chayns-toolkit build`
+-   `chayns-toolkit lint`
 
 We recommend adding these to the scripts section of your package.json:
 
@@ -69,9 +69,9 @@ We recommend adding these to the scripts section of your package.json:
 {
     "...": "",
     "scripts": {
-        "dev": "chayns-scripts dev",
-        "build": "chayns-scripts build",
-        "lint": "chayns-scripts lint"
+        "dev": "chayns-toolkit dev",
+        "build": "chayns-toolkit build",
+        "lint": "chayns-toolkit lint"
     },
     "...": ""
 }
@@ -105,7 +105,7 @@ Your project structure should look similar to this:
 ```
 
 An example project can be found
-[here](https://github.com/leodr/chayns-scripts/tree/master/packages/example-project).
+[here](https://github.com/leodr/chayns-toolkit/tree/master/packages/example-project).
 
 > You should also make sure that you specify a meaningful name in your
 > `package.json`-file, as it will be used by this package to determine the name
@@ -124,7 +124,7 @@ extend our ESLint-configuration:
 {
     "...": "",
     "eslintConfig": {
-        "extends": "@chayns-scripts"
+        "extends": "@chayns-toolkit"
     },
     "...": ""
 }
@@ -135,7 +135,7 @@ For editor integrations check out the official
 
 ### Code Formatting
 
-All projects using `chayns-scripts` should be formatted with
+All projects using `chayns-toolkit` should be formatted with
 [Prettier](https://prettier.io/). First install Prettier and its
 `package.json`-formatter as dev dependencies:
 
@@ -177,13 +177,13 @@ using that).
 
 ## Commands
 
-### `chayns-scripts dev`
+### `chayns-toolkit dev`
 
 Starts a development server on
 [`http://localhost:1234/`](http://localhost:1234/) or
 [`https://0.0.0.0:1234/`](https://0.0.0.0:1234/) if SSL was configured.
 
-You can configure the host, port and SSL settings in a `chayns-scripts.json`
+You can configure the host, port and SSL settings in a `chayns-toolkit.json`
 configuration file:
 
 ```json
@@ -201,7 +201,7 @@ configuration file:
 > To achieve faster (re-)build times this command only transpiles your code to
 > work with the latest versions of Google Chrome, Safari and Firefox.
 
-### `chayns-scripts build`
+### `chayns-toolkit build`
 
 Compiles your source code for production. The output is emitted into a `build/`
 directory in your project directory.
@@ -219,7 +219,7 @@ not op_mini all
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `-a`, `--analyze` | Analyze your bundle with [`webpack-bundle-analyzer`](https://github.com/webpack-contrib/webpack-bundle-analyzer) after compilation. [Read more](#analyzing-your-bundle) |
 
-### `chayns-scripts lint`
+### `chayns-toolkit lint`
 
 Lints your JavaScript and TypeScript source code with
 [ESLint](https://eslint.org/) and reports any warnings or errors, automatically
@@ -238,7 +238,7 @@ We recommend to use our included [ESLint configuration](#eslint-configuration).
 -   [Environment Variables](#environment-variables)
 -   [Analyzing Your Bundle](#analyzing-your-bundle)
 -   [Tree-Shaking `chayns-components`](#tree-shaking-chayns-components)
--   [The `chayns-scripts.json` Configuration File](#the-chayns-scriptsjson-configuration-file)
+-   [The `chayns-toolkit.json` Configuration File](#the-chayns-toolkitjson-configuration-file)
 
 ### TypeScript Support
 
@@ -247,7 +247,7 @@ TypeScript is supported by default and we encourage to use it.
 #### Getting Started
 
 To start using TypeScript in your project, create a `tsconfig.json` file in the
-root of your project and start the `chayns-scripts dev` command. We will
+root of your project and start the `chayns-toolkit dev` command. We will
 automatically populate `tsconfig.json` with our recommended configuration.
 
 > If you do not have a `tsconfig.json` file and use `.ts` or `.tsx` files,
@@ -339,8 +339,8 @@ further information refer to
 
 ### ESLint Configuration
 
-Our ESLint-config `@chayns-scripts/eslint-config` is automatically included when
-`chayns-scripts` is installed.
+Our ESLint-config `@chayns-toolkit/eslint-config` is automatically included when
+`chayns-toolkit` is installed.
 
 To activate the config add an `eslintConfig` key to your `package.json`:
 
@@ -348,7 +348,7 @@ To activate the config add an `eslintConfig` key to your `package.json`:
 {
     "...": "",
     "eslintConfig": {
-        "extends": "@chayns-scripts"
+        "extends": "@chayns-toolkit"
     },
     "...": ""
 }
@@ -358,14 +358,14 @@ or use one of the
 [other options for configuring ESLint](https://eslint.org/docs/user-guide/configuring#using-configuration-files-1).
 
 The configuration can also be installed as a standalone package
-(`@chayns-scripts/eslint-config`).
+(`@chayns-toolkit/eslint-config`).
 
 > We've decided on these rules for a reason. They extend the
 > [AirBnB JavaScript Guidelines](https://github.com/airbnb/javascript) and
 > should be taken seriously,
 
 If you think a rule should be adjusted, please
-[open an issue](https://github.com/leodr/chayns-scripts/issues/new) to discuss
+[open an issue](https://github.com/leodr/chayns-toolkit/issues/new) to discuss
 the suggested change instead of adjusting your local configuration.
 
 ### Single-File Builds
@@ -389,7 +389,7 @@ in your source code.
 
 ### Analyzing Your Bundle
 
-By passing the `--analyze` flag to `chayns-scripts build` you can use
+By passing the `--analyze` flag to `chayns-toolkit build` you can use
 [`webpack-bundle-analyzer`](https://github.com/webpack-contrib/webpack-bundle-analyzer)
 to investigate your bundle-size. It will automatically open the tree-map of your
 bundled files after compiling. It runs as long as you keep the terminal process
@@ -404,14 +404,14 @@ information refer to
 [this document](https://github.com/TobitSoftware/chayns-components/blob/master/tree-shaking.md).
 
 If your bundle size is unexpectedly large, please
-[open an issue](https://github.com/leodr/chayns-scripts/issues/new).
+[open an issue](https://github.com/leodr/chayns-toolkit/issues/new).
 
-### The `chayns-scripts.json` Configuration File
+### The `chayns-toolkit.json` Configuration File
 
-Optionally, a `chayns-scripts.json` file in the root of your project directory
+Optionally, a `chayns-toolkit.json` file in the root of your project directory
 configures the commands.
 
-Example `chayns-scripts.json` with all of the available options specified:
+Example `chayns-toolkit.json` with all of the available options specified:
 
 ```json
 {
@@ -430,7 +430,7 @@ Example `chayns-scripts.json` with all of the available options specified:
 
 #### `development` Options:
 
-These options configure your development server (affect the `chayns-scripts dev`
+These options configure your development server (affect the `chayns-toolkit dev`
 command).
 
 | Option     | Type     | Explanation                                                                                                          |
@@ -442,7 +442,7 @@ command).
 
 #### `output` Options:
 
-These options configure your build output (affect the `chayns-scripts build`
+These options configure your build output (affect the `chayns-toolkit build`
 command).
 
 | Option             | Type      | Explanation                                                                                                                                                                                                                                                                                                          |

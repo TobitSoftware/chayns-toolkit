@@ -110,7 +110,7 @@ export function createWebpackCompiler({
 					use: {
 						loader: "babel-loader",
 						options: {
-							presets: ["@chayns-scripts"],
+							presets: ["@chayns-toolkit"],
 							babelrc: false,
 							configFile: false,
 							compact: mode === "production",

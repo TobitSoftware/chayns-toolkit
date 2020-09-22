@@ -1,7 +1,7 @@
 {
-	"name": "@chayns-scripts/eslint-config",
+	"name": "@chayns-toolkit/eslint-config",
 	"version": "0.1.1",
-	"description": "The sharable eslint-config for developing chayns® apps. Used in chayns-scripts.",
+	"description": "The sharable eslint-config for developing chayns® apps. Used in chayns-toolkit.",
 	"keywords": [
 		"chayns",
 		"react",
@@ -9,14 +9,14 @@
 		"eslint",
 		"eslint-config"
 	],
-	"homepage": "https://github.com/leodr/chayns-scripts#readme",
+	"homepage": "https://github.com/leodr/chayns-toolkit#readme",
 	"bugs": {
-		"url": "https://github.com/leodr/chayns-scripts/issues",
+		"url": "https://github.com/leodr/chayns-toolkit/issues",
 		"email": "leonhard.driesch@tobit.com"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/leodr/chayns-scripts.git"
+		"url": "https://github.com/leodr/chayns-toolkit.git"
 	},
 	"license": "MIT",
 	"author": {

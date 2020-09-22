@@ -46,4 +46,4 @@ export async function loadConfig(): Promise<ChaynsScriptsConfiguration> {
 	}
 }
 
-export const CONFIG_FILE_NAME = "chayns-scripts.json"
+export const CONFIG_FILE_NAME = "chayns-toolkit.json"

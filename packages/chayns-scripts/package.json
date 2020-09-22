@@ -1,5 +1,5 @@
 {
-	"name": "chayns-scripts",
+	"name": "chayns-toolkit",
 	"version": "0.1.1",
 	"description": "A zero-config toolchain for developing chayns® apps.",
 	"keywords": [
@@ -8,14 +8,14 @@
 		"chayns-components",
 		"webpack"
 	],
-	"homepage": "https://github.com/leodr/chayns-scripts#readme",
+	"homepage": "https://github.com/leodr/chayns-toolkit#readme",
 	"bugs": {
-		"url": "https://github.com/leodr/chayns-scripts/issues",
+		"url": "https://github.com/leodr/chayns-toolkit/issues",
 		"email": "leonhard.driesch@tobit.com"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/leodr/chayns-scripts.git"
+		"url": "https://github.com/leodr/chayns-toolkit.git"
 	},
 	"license": "MIT",
 	"author": {
@@ -23,7 +23,7 @@
 		"email": "leonhard.driesch@tobit.com"
 	},
 	"bin": {
-		"chayns-scripts": "./lib/cli.js"
+		"chayns-toolkit": "./lib/cli.js"
 	},
 	"files": [
 		"lib/*"
@@ -34,12 +34,12 @@
 		"prepublishOnly": "yarn build"
 	},
 	"eslintConfig": {
-		"extends": "@chayns-scripts"
+		"extends": "@chayns-toolkit"
 	},
 	"dependencies": {
 		"@babel/core": "^7.11.6",
-		"@chayns-scripts/babel-preset": "^0.1.0",
-		"@chayns-scripts/eslint-config": "^0.1.1",
+		"@chayns-toolkit/babel-preset": "^0.1.0",
+		"@chayns-toolkit/eslint-config": "^0.1.1",
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.4.2",
 		"@svgr/webpack": "^5.4.0",
 		"@types/dotenv-webpack": "^1.8.0",

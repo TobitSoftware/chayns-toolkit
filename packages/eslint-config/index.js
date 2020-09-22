@@ -13,7 +13,7 @@ module.exports = {
 	parser: "babel-eslint",
 	parserOptions: {
 		babelOptions: {
-			extends: "@chayns-scripts",
+			extends: "@chayns-toolkit",
 		},
 	},
 	settings: {
