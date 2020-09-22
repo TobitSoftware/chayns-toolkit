@@ -1,5 +1,7 @@
 <div align="center">
-    <h1><img src="assets/logo.png" width="500px" alt="chayns-toolkit" /></h1>
+    <h1>
+        <img src="https://raw.githubusercontent.com/TobitSoftware/chayns-toolkit/HEAD/assets/logo.png" width="500px" alt="chayns-toolkit" />
+    </h1>
     <p>A zero-config toolchain for developing chayns® apps.</p>
     <div>
         <img src="https://img.shields.io/github/license/TobitSoftware/chayns-toolkit?style=for-the-badge" alt="" />
