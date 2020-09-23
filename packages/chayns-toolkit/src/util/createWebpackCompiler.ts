@@ -1,6 +1,6 @@
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
-import Dotenv from "dotenv-webpack"
+import DotenvWebpackPlugin from "dotenv-webpack"
 import * as fs from "fs"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import { kebabCase } from "lodash"
@@ -28,7 +28,7 @@ export function createWebpackCompiler({
 	singleBundle,
 }: CreateConfigOptions): Compiler {
 	const plugins: Plugin[] = [
-		new Dotenv({
+		new DotenvWebpackPlugin({
 			path: "./.env.local",
 			systemvars: true,
 		}),
