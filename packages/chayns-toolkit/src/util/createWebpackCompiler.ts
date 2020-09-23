@@ -31,6 +31,7 @@ export function createWebpackCompiler({
 		new DotenvWebpackPlugin({
 			path: "./.env.local",
 			systemvars: true,
+			silent: true,
 		}),
 	]
 
