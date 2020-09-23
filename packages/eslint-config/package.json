@@ -25,6 +25,7 @@
 	},
 	"main": "index.js",
 	"dependencies": {
+		"@chayns-toolkit/utilities": "*",
 		"@typescript-eslint/eslint-plugin": "^4.2.0",
 		"babel-eslint": "^10.1.0",
 		"eslint-config-airbnb": "^18.2.0",

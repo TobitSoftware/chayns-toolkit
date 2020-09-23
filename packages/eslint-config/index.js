@@ -1,6 +1,9 @@
+const { usesPackageSync } = require("@chayns-toolkit/utilities")
 const javascriptRules = require("./rules/javascriptRules")
 const sharedRules = require("./rules/sharedRules")
 const typescriptRules = require("./rules/typescriptRules")
+
+const usesTypeScript = usesPackageSync("typescript")
 
 module.exports = {
 	env: {
@@ -23,7 +26,7 @@ module.exports = {
 		"import/extensions": [".js", ".jsx", ".ts", ".tsx"],
 	},
 	overrides: [
-		{
+		usesTypeScript && {
 			files: ["**/*.ts?(x)"],
 			extends: [
 				"airbnb-typescript",
@@ -55,5 +58,5 @@ module.exports = {
 				"jest/valid-expect": "error",
 			},
 		},
-	],
+	].filter(Boolean),
 }
