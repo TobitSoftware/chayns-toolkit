@@ -10,7 +10,8 @@
 	"scripts": {
 		"build": "chayns-toolkit build",
 		"dev": "chayns-toolkit dev",
-		"lint": "chayns-toolkit lint"
+		"lint": "chayns-toolkit lint",
+		"test": "yarn lint"
 	},
 	"babel": {
 		"presets": [

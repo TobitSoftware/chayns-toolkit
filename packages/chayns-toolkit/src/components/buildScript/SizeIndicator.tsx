@@ -1,6 +1,7 @@
 import { Text } from "ink"
 import React from "react"
 import GridItem from "../grid/GridItem"
+import type { Asset } from "./asset"
 
 interface SizeIndicatorProps {
 	asset: Asset

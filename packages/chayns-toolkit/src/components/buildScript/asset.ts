@@ -1,4 +1,4 @@
-interface Asset {
+export interface Asset {
 	chunks: (string | number)[]
 	chunkNames: string[]
 	emitted: boolean

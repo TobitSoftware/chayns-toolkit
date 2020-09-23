@@ -1,0 +1,7 @@
+{
+	"eslint.workingDirectories": [
+		"packages/chayns-toolkit",
+		"packages/example-project",
+		"packages/utilities"
+	]
+}

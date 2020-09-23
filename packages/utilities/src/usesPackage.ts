@@ -4,6 +4,11 @@ import { promisify } from "util"
 
 const readFileAsync = promisify(fs.readFile)
 
+interface PackageJson {
+	dependencies?: { [packageName: string]: string }
+	devDependencies?: { [packageName: string]: string }
+}
+
 export async function usesPackage(packageName: string): Promise<boolean> {
 	const packagePath = path.resolve(process.cwd(), "package.json")
 
@@ -11,7 +16,7 @@ export async function usesPackage(packageName: string): Promise<boolean> {
 		encoding: "utf-8",
 	})
 
-	const packageJson = JSON.parse(packageJsonString)
+	const packageJson = JSON.parse(packageJsonString) as PackageJson
 
 	return Object.keys({
 		...packageJson.dependencies,
@@ -26,7 +31,7 @@ export function usesPackageSync(packageName: string): boolean {
 		encoding: "utf-8",
 	})
 
-	const packageJson = JSON.parse(packageJsonString)
+	const packageJson = JSON.parse(packageJsonString) as PackageJson
 
 	return Object.keys({
 		...packageJson.dependencies,
