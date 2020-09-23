@@ -10,4 +10,7 @@ export const output = {
 	error(text: string): void {
 		console.info(`${chalk.redBright("error")} -  ${text}`)
 	},
+	blank(text: string): void {
+		console.info(`         ${text}`)
+	},
 }

@@ -2,6 +2,7 @@ import { usesPackage } from "@chayns-toolkit/utilities"
 import chalk from "chalk"
 import * as fs from "fs"
 import { promisify } from "util"
+import { getPackageManager } from "../../util/getPackageManager"
 import { output } from "../../util/output"
 import { resolveProjectPath } from "../../util/resolveProjectPath"
 import { shouldCreateTsConfig } from "./shouldCreateTsConfig"
@@ -42,13 +43,13 @@ export async function checkForTypeScript(): Promise<void> {
 			output.info(
 				`To use TypeScript, you have to install the ${chalk.blueBright(
 					"typescript"
-				)} package by running \`${installCommand}\`.\n`
+				)} package by running \`${installCommand}\`.`
 			)
 		} else {
 			output.info(
 				`To use TypeScript, you have to install the ${chalk.blueBright(
 					"typescript"
-				)} package.\n`
+				)} package.`
 			)
 		}
 
@@ -65,7 +66,7 @@ async function createTsConfig(): Promise<void> {
 	output.info(
 		`Seems like you want to use TypeScript. A ${chalk.blueBright(
 			"tsconfig.json"
-		)} file has been set up for you.\n`
+		)} file has been set up for you.`
 	)
 }
 
@@ -83,18 +84,4 @@ const defaultTsconfig = {
 		skipLibCheck: true,
 		strict: true,
 	},
-}
-
-type PackageManager = "npm" | "yarn"
-
-function getPackageManager(): PackageManager | undefined {
-	if (fs.existsSync(resolveProjectPath("package-lock.json"))) {
-		return "npm"
-	}
-
-	if (fs.existsSync(resolveProjectPath("yarn.lock"))) {
-		return "yarn"
-	}
-
-	return undefined
 }

@@ -1,0 +1,17 @@
+export const extraneousPackages: Array<string | RegExp> = [
+	"@hot-loader/react-dom",
+	"autoprefixer",
+	"babel-loader",
+	"css-loader",
+	"eslint",
+	"html-webpack-plugin",
+	"postcss-loader",
+	"react-hot-loader",
+	"sass-loader",
+	"style-loader",
+	"webpack-cli",
+	"webpack-dev-server",
+	"webpack",
+	/^@babel\//gi,
+	/^babel-/gi,
+]
