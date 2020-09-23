@@ -3,9 +3,9 @@ import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import DotenvWebpackPlugin from "dotenv-webpack"
 import * as fs from "fs"
 import HtmlWebpackPlugin from "html-webpack-plugin"
-import { kebabCase } from "lodash"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
+import { paramCase } from "param-case"
 import * as path from "path"
 import webpack, { Compiler, Plugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
@@ -192,7 +192,7 @@ function getOutputPath({
 	// eslint-disable-next-line
 	const pkg: { name: string } = require(resolveProjectPath("package.json"))
 
-	const preparedFilename = filename.replace("[package]", kebabCase(pkg.name))
+	const preparedFilename = filename.replace("[package]", paramCase(pkg.name))
 
 	if (mode === "development") {
 		return `${outputPath}bundle.js`
