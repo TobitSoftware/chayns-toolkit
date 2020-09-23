@@ -8,6 +8,7 @@
 	],
 	"scripts": {
 		"bootstrap": "lerna bootstrap",
+		"dev": "lerna run dev --parallel --no-private",
 		"format": "prettier . --write"
 	},
 	"devDependencies": {

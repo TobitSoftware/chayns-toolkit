@@ -26,6 +26,7 @@
 		"react-dom": "^16.13.1"
 	},
 	"devDependencies": {
-		"chayns-toolkit": "^1.0.0"
+		"chayns-toolkit": "^1.0.0",
+		"typescript": "^4.0.3"
 	}
 }

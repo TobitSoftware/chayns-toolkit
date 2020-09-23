@@ -1,3 +1,5 @@
+// @ts-expect-error This function is so small, it doesn't need typings.
+import getCacheIdentifier from "@chayns-toolkit/babel-preset/getCacheIdentifier"
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import DotenvWebpackPlugin from "dotenv-webpack"
@@ -115,6 +117,9 @@ export function createWebpackCompiler({
 							babelrc: false,
 							configFile: false,
 							compact: mode === "production",
+							cacheDirectory: true,
+							// eslint-disable-next-line
+							cacheIdentifier: getCacheIdentifier(),
 						},
 					},
 					exclude: /node_modules/,
