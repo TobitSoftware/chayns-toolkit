@@ -109,6 +109,11 @@ export function createWebpackCompiler({
 		module: {
 			rules: [
 				{
+					test: /\.(js|jsx)$/,
+					use: "source-map-loader",
+					include: /node_modules\/chayns-components/,
+				},
+				{
 					test: /\.(js|jsx|ts|tsx)$/,
 					use: {
 						loader: "babel-loader",
