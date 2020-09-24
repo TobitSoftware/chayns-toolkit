@@ -1,6 +1,6 @@
 {
 	"name": "@chayns-toolkit/utilities",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Contains different utilities used in chayns-toolkit.",
 	"homepage": "https://github.com/TobitSoftware/chayns-toolkit#readme",
 	"bugs": {

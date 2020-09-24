@@ -1,6 +1,6 @@
 {
 	"name": "@chayns-toolkit/babel-preset",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"private": false,
 	"description": "The sharable babel-preset for developing chayns® apps. Used in chayns-toolkit.",
 	"keywords": [
@@ -37,7 +37,7 @@
 		"@babel/preset-react": "^7.10.4",
 		"@babel/preset-typescript": "^7.10.4",
 		"@babel/runtime": "^7.11.2",
-		"@chayns-toolkit/utilities": "*",
+		"@chayns-toolkit/utilities": "^1.1.0",
 		"babel-plugin-macros": "^2.8.0",
 		"babel-plugin-optimize-clsx": "^2.6.1",
 		"babel-plugin-transform-imports": "^2.0.0",
