@@ -1,0 +1,35 @@
+{
+	"name": "@chayns-toolkit/utilities",
+	"version": "1.0.0",
+	"description": "Contains different utilities used in chayns-toolkit.",
+	"homepage": "https://github.com/TobitSoftware/chayns-toolkit#readme",
+	"bugs": {
+		"url": "https://github.com/TobitSoftware/chayns-toolkit/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TobitSoftware/chayns-toolkit.git"
+	},
+	"license": "MIT",
+	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"files": [
+		"lib"
+	],
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch --incremental",
+		"lint": "eslint src/ --ext js,jsx,ts,tsx --fix",
+		"prepublishOnly": "yarn build",
+		"test": "yarn test:tsc && yarn lint",
+		"test:tsc": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"eslint": "^7.9.0",
+		"typescript": "^4.0.3"
+	},
+	"publishConfig": {
+		"registry": "https://registry.yarnpkg.com"
+	}
+}

@@ -6,7 +6,8 @@ import React from "react"
 import Build from "./commands/Build"
 import Dev from "./commands/Dev"
 import Lint from "./commands/Lint"
-import { checkForTsconfig } from "./features/tsconfig/checkForTsconfig"
+import { checkPackages } from "./features/extraneous-packages/checkPackages"
+import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
 
 const program = new Command()
 program.version(
@@ -19,8 +20,10 @@ program.version(
 program
 	.command("dev")
 	.description("start up a development server with hot module replacement")
-	.action(() => {
-		checkForTsconfig()
+	.action(async () => {
+		await checkPackages()
+		await checkForTypeScript()
+		console.info("")
 		render(<Dev />)
 	})
 

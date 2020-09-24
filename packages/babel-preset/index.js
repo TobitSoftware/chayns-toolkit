@@ -1,6 +1,9 @@
-const resolveAbsoluteImport = require("chayns-components/lib/utils/babel/resolveAbsoluteImport")
+const getCacheIdentifier = require("./getCacheIdentifier")
+const { usesTypeScript, usesChaynsComponents } = require("./uses")
 
-module.exports = () => {
+module.exports = (api) => {
+	api.cache.using(() => getCacheIdentifier())
+
 	const isProduction = process.env.NODE_ENV === "production"
 	const isTest = process.env.NODE_ENV === "test"
 
@@ -23,14 +26,15 @@ module.exports = () => {
 				},
 			],
 			"@babel/preset-react",
-			"@babel/preset-typescript",
-		],
+			usesTypeScript && "@babel/preset-typescript",
+		].filter(Boolean),
 		plugins: [
-			[
+			usesChaynsComponents && [
 				"transform-imports",
 				{
 					"chayns-components": {
-						transform: resolveAbsoluteImport,
+						// eslint-disable-next-line global-require
+						transform: require("chayns-components/lib/utils/babel/resolveAbsoluteImport"),
 						preventFullImport: true,
 					},
 				},
@@ -51,16 +55,11 @@ module.exports = () => {
 			"@babel/plugin-proposal-numeric-separator",
 			"@babel/plugin-proposal-optional-chaining",
 			"@babel/plugin-proposal-nullish-coalescing-operator",
+			usesTypeScript && ["@babel/plugin-proposal-decorators", { legacy: true }],
 			["@babel/plugin-proposal-class-properties", { loose: true }],
 			isProduction && "@babel/plugin-transform-react-constant-elements",
 			isProduction && "transform-react-remove-prop-types",
 			!isProduction && "react-refresh/babel",
 		].filter(Boolean),
-		overrides: [
-			{
-				test: /\.tsx?$/,
-				plugins: [["@babel/plugin-proposal-decorators", { legacy: true }]],
-			},
-		],
 	}
 }

@@ -1,11 +1,13 @@
+// @ts-expect-error This function is so small, it doesn't need typings.
+import getCacheIdentifier from "@chayns-toolkit/babel-preset/getCacheIdentifier"
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
-import Dotenv from "dotenv-webpack"
+import DotenvWebpackPlugin from "dotenv-webpack"
 import * as fs from "fs"
 import HtmlWebpackPlugin from "html-webpack-plugin"
-import { kebabCase } from "lodash"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
+import { paramCase } from "param-case"
 import * as path from "path"
 import webpack, { Compiler, Plugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
@@ -28,9 +30,10 @@ export function createWebpackCompiler({
 	singleBundle,
 }: CreateConfigOptions): Compiler {
 	const plugins: Plugin[] = [
-		new Dotenv({
+		new DotenvWebpackPlugin({
 			path: "./.env.local",
 			systemvars: true,
+			silent: true,
 		}),
 	]
 
@@ -114,6 +117,9 @@ export function createWebpackCompiler({
 							babelrc: false,
 							configFile: false,
 							compact: mode === "production",
+							cacheDirectory: true,
+							// eslint-disable-next-line
+							cacheIdentifier: getCacheIdentifier(),
 						},
 					},
 					exclude: /node_modules/,
@@ -192,7 +198,7 @@ function getOutputPath({
 	// eslint-disable-next-line
 	const pkg: { name: string } = require(resolveProjectPath("package.json"))
 
-	const preparedFilename = filename.replace("[package]", kebabCase(pkg.name))
+	const preparedFilename = filename.replace("[package]", paramCase(pkg.name))
 
 	if (mode === "development") {
 		return `${outputPath}bundle.js`

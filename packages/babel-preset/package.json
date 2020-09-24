@@ -37,6 +37,7 @@
 		"@babel/preset-react": "^7.10.4",
 		"@babel/preset-typescript": "^7.10.4",
 		"@babel/runtime": "^7.11.2",
+		"@chayns-toolkit/utilities": "*",
 		"babel-plugin-macros": "^2.8.0",
 		"babel-plugin-optimize-clsx": "^2.6.1",
 		"babel-plugin-transform-imports": "^2.0.0",
