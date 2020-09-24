@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { usesPackage } from "@chayns-toolkit/utilities"
 import chalk from "chalk"
 import { getPackageManager } from "../../util/getPackageManager"
