@@ -30,6 +30,6 @@
 		"typescript": "^4.0.3"
 	},
 	"publishConfig": {
-		"registry": "https://registry.yarnpkg.com"
+		"access": "public"
 	}
 }
