@@ -2,6 +2,7 @@ export const extraneousPackages: Array<string | RegExp> = [
 	"@hot-loader/react-dom",
 	"autoprefixer",
 	"babel-loader",
+	"chayns-scripts",
 	"css-loader",
 	"eslint",
 	"html-webpack-plugin",
