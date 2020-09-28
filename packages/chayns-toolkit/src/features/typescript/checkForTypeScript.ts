@@ -1,10 +1,9 @@
-import { usesPackage } from "@chayns-toolkit/utilities"
+import { resolveProjectPath, usesPackage } from "@chayns-toolkit/utilities"
 import chalk from "chalk"
 import * as fs from "fs"
 import { promisify } from "util"
 import { getPackageManager } from "../../util/getPackageManager"
 import { output } from "../../util/output"
-import { resolveProjectPath } from "../../util/resolveProjectPath"
 import { shouldCreateTsConfig } from "./shouldCreateTsConfig"
 import { wantsToUseTypeScript } from "./wantsToUseTypeScript"
 

@@ -1,5 +1,5 @@
 const getCacheIdentifier = require("./getCacheIdentifier")
-const { usesTypeScript, usesChaynsComponents } = require("./uses")
+const { usesTypeScript, usesChaynsComponents, usesFlow } = require("./uses")
 
 module.exports = (api) => {
 	api.cache.using(() => getCacheIdentifier())
@@ -26,6 +26,7 @@ module.exports = (api) => {
 				},
 			],
 			"@babel/preset-react",
+			usesFlow && "@babel/preset-flow",
 			usesTypeScript && "@babel/preset-typescript",
 		].filter(Boolean),
 		plugins: [

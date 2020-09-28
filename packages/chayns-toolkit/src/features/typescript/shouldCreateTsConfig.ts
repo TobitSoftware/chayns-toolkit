@@ -1,6 +1,6 @@
+import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import * as fs from "fs"
 import { promisify } from "util"
-import { resolveProjectPath } from "../../util/resolveProjectPath"
 
 const readFileAsync = promisify(fs.readFile)
 

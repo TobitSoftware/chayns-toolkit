@@ -1,6 +1,6 @@
+import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import glob from "fast-glob"
 import * as fs from "fs"
-import { resolveProjectPath } from "../../util/resolveProjectPath"
 
 export async function wantsToUseTypeScript(): Promise<boolean> {
 	const hasTsConfig = fs.existsSync(resolveProjectPath("tsconfig.json"))

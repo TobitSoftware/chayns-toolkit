@@ -1,5 +1,6 @@
 // @ts-expect-error This function is so small, it doesn't need typings.
 import getCacheIdentifier from "@chayns-toolkit/babel-preset/getCacheIdentifier"
+import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import DotenvWebpackPlugin from "dotenv-webpack"
@@ -12,7 +13,6 @@ import * as path from "path"
 import webpack, { Compiler, Plugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowsersListEnv } from "../features/environment/browserslist"
-import { resolveProjectPath } from "./resolveProjectPath"
 
 type Mode = "development" | "production"
 
@@ -108,6 +108,11 @@ export function createWebpackCompiler({
 		resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
 		module: {
 			rules: [
+				{
+					test: /\.(js|jsx)$/,
+					use: "source-map-loader",
+					include: /node_modules\/chayns-components/,
+				},
 				{
 					test: /\.(js|jsx|ts|tsx)$/,
 					use: {
