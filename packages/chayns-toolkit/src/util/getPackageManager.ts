@@ -1,5 +1,5 @@
+import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import * as fs from "fs"
-import { resolveProjectPath } from "./resolveProjectPath"
 
 export type PackageManager = "npm" | "yarn"
 
