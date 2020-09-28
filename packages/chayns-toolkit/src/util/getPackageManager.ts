@@ -11,7 +11,6 @@ export function getPackageManager(): PackageManager | undefined {
 	if (isNpm) return "npm"
 
 	const isYarn = yarnSearchPaths.some((path) => {
-		console.log(resolveProjectPath(path))
 		return fs.existsSync(resolveProjectPath(path))
 	})
 
