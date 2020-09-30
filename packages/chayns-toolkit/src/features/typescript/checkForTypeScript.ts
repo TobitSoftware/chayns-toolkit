@@ -2,8 +2,11 @@ import { resolveProjectPath, usesPackage } from "@chayns-toolkit/utilities"
 import chalk from "chalk"
 import * as fs from "fs"
 import { promisify } from "util"
+import { fm } from "../../util/format"
 import { getPackageManager } from "../../util/getPackageManager"
 import { output } from "../../util/output"
+import { pkgCommands } from "../../util/packageCommands"
+import { checkForTypesPackages } from "./checkForTypesPackages"
 import { shouldCreateTsConfig } from "./shouldCreateTsConfig"
 import { wantsToUseTypeScript } from "./wantsToUseTypeScript"
 
@@ -14,6 +17,8 @@ export async function checkForTypeScript(): Promise<void> {
 	const shouldCreateConfig = await shouldCreateTsConfig()
 
 	if (hasTypeScript) {
+		await checkForTypesPackages()
+
 		if (shouldCreateConfig) {
 			await createTsConfig()
 		}
@@ -30,29 +35,15 @@ export async function checkForTypeScript(): Promise<void> {
 			await createTsConfig()
 		}
 
-		let installCommand: string | undefined
+		output.info(
+			`To use TypeScript, you have to install the ${fm.code`typescript`} package by running ${pkgCommands.install(
+				packageManager,
+				"typescript",
+				true
+			)}.`
+		)
 
-		if (packageManager === "npm") {
-			installCommand = "npm i typescript -D"
-		} else if (packageManager === "yarn") {
-			installCommand = "yarn add typescript -D"
-		}
-
-		if (installCommand !== undefined) {
-			output.info(
-				`To use TypeScript, you have to install the ${chalk.blueBright(
-					"typescript"
-				)} package by running \`${installCommand}\`.`
-			)
-		} else {
-			output.info(
-				`To use TypeScript, you have to install the ${chalk.blueBright(
-					"typescript"
-				)} package.`
-			)
-		}
-
-		process.exit(0)
+		output.exit()
 	}
 }
 
