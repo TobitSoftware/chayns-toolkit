@@ -4,8 +4,8 @@ export const output = {
 	info(text: string): void {
 		console.info(`${chalk.blueBright("info ")} - ${text}`)
 	},
-	tip(text: string): void {
-		console.info(`${chalk.greenBright("tip  ")} - ${text}`)
+	hint(text: string): void {
+		console.info(`${chalk.greenBright("hint ")} - ${text}`)
 	},
 	warn(text: string): void {
 		console.info(`${chalk.yellowBright("warn ")} - ${text}`)
