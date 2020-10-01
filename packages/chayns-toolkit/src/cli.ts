@@ -26,7 +26,6 @@ program
 			[checkPackages, checkForTypeScript, checkSSLConfig],
 			[devCommand]
 		)
-		console.info("")
 	})
 
 program
