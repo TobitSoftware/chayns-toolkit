@@ -2,7 +2,7 @@ import { usesPackage } from "@chayns-toolkit/utilities"
 import { fm } from "../../util/format"
 import { getPackageManager } from "../../util/getPackageManager"
 import { output } from "../../util/output"
-import { pkgCommands } from "../../util/packageCommands"
+import { pkgCommands } from "../../util/pkgCommands"
 
 export async function checkForTypesPackages(): Promise<void> {
 	const hasReactTypes = await usesPackage("@types/react")
@@ -18,7 +18,7 @@ export async function checkForTypesPackages(): Promise<void> {
 
 		const packages = missingPackages.map((p) => fm.code(p)).join(" and ")
 
-		output.tip(
+		output.hint(
 			`You should install the ${packages} package${
 				missingPackages.length > 0 ? "s" : ""
 			} to get TypeScript support for React.\n`

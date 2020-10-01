@@ -7,8 +7,9 @@ import Build from "./commands/Build"
 import Dev from "./commands/Dev"
 import Lint from "./commands/Lint"
 import { checkPackages } from "./features/extraneous-packages/checkPackages"
-import { checkSslPaths } from "./features/ssl-check/checkForSslFiles"
+import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
+import { runSteps } from "./util/runSteps"
 
 const program = new Command()
 program.version(
@@ -22,11 +23,15 @@ program
 	.command("dev")
 	.description("start up a development server with hot module replacement")
 	.action(async () => {
-		await checkPackages()
-		await checkForTypeScript()
-		await checkSslPaths()
-		console.info("")
-		render(<Dev />)
+		const shouldContinue = await runSteps(
+			checkPackages,
+			checkForTypeScript,
+			checkSSLConfig
+		)
+
+		if (shouldContinue) {
+			render(<Dev />)
+		}
 	})
 
 program

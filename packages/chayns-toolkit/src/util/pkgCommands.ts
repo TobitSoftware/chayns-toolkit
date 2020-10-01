@@ -21,4 +21,14 @@ export const pkgCommands = {
 
 		return fm.command(command)
 	},
+	remove(
+		packageManager: PackageManager | undefined,
+		packages: string | string[]
+	): string {
+		let command = packageManager === "yarn" ? "yarn remove " : "npm remove"
+
+		command += Array.isArray(packages) ? packages.join(" ") : packages
+
+		return fm.command(command)
+	},
 }

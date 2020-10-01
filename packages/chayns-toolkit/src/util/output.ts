@@ -2,16 +2,16 @@ import chalk from "chalk"
 
 export const output = {
 	info(text: string): void {
-		console.info(`${chalk.blueBright("info ")} - ${text}`)
+		console.info(`${chalk.hex("#76A9FA")("info ")} - ${text}`)
 	},
 	hint(text: string): void {
-		console.info(`${chalk.greenBright("hint ")} - ${text}`)
+		console.info(`${chalk.hex("#31C48D")("hint ")} - ${text}`)
 	},
 	warn(text: string): void {
-		console.info(`${chalk.yellowBright("warn ")} - ${text}`)
+		console.info(`${chalk.hex("#FACA15")("warn ")} - ${text}`)
 	},
 	error(text: string): void {
-		console.info(`${chalk.redBright("error")} - ${text}`)
+		console.info(`${chalk.hex("#F98080")("error")} - ${text}`)
 	},
 	blank(text: string): void {
 		console.info(`        ${text}`)

@@ -1,19 +1,23 @@
-import { resolveProjectPath, usesPackage } from "@chayns-toolkit/utilities"
-import chalk from "chalk"
+import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import * as fs from "fs"
 import { promisify } from "util"
 import { fm } from "../../util/format"
-import { getPackageManager } from "../../util/getPackageManager"
+import { isPackageInstalled } from "../../util/isPackageInstalled"
 import { output } from "../../util/output"
-import { pkgCommands } from "../../util/packageCommands"
+import { pkgCommands } from "../../util/pkgCommands"
+import { StepParams } from "../../util/runSteps"
 import { checkForTypesPackages } from "./checkForTypesPackages"
 import { shouldCreateTsConfig } from "./shouldCreateTsConfig"
 import { wantsToUseTypeScript } from "./wantsToUseTypeScript"
 
 const writeFileAsync = promisify(fs.writeFile)
 
-export async function checkForTypeScript(): Promise<void> {
-	const hasTypeScript = await usesPackage("typescript")
+export async function checkForTypeScript({
+	packageJson,
+	packageManager,
+}: StepParams): Promise<boolean> {
+	const hasTypeScript = isPackageInstalled(packageJson, "typescript")
+
 	const shouldCreateConfig = await shouldCreateTsConfig()
 
 	if (hasTypeScript) {
@@ -23,19 +27,17 @@ export async function checkForTypeScript(): Promise<void> {
 			await createTsConfig()
 		}
 
-		return
+		return false
 	}
 
 	const wantsToUse = await wantsToUseTypeScript()
 
 	if (wantsToUse) {
-		const packageManager = getPackageManager()
-
 		if (shouldCreateConfig) {
 			await createTsConfig()
 		}
 
-		output.info(
+		output.error(
 			`To use TypeScript, you have to install the ${fm.code`typescript`} package by running ${pkgCommands.install(
 				packageManager,
 				"typescript",
@@ -43,8 +45,10 @@ export async function checkForTypeScript(): Promise<void> {
 			)}.`
 		)
 
-		output.exit()
+		return true
 	}
+
+	return false
 }
 
 async function createTsConfig(): Promise<void> {
@@ -54,9 +58,7 @@ async function createTsConfig(): Promise<void> {
 	)
 
 	output.info(
-		`Seems like you want to use TypeScript. A ${chalk.blueBright(
-			"tsconfig.json"
-		)} file has been set up for you.`
+		`Seems like you want to use TypeScript. A ${fm.path`tsconfig.json`} file has been set up for you.`
 	)
 }
 

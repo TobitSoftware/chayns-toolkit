@@ -10,9 +10,9 @@ export function getPackageManager(): PackageManager | undefined {
 
 	if (isNpm) return "npm"
 
-	const isYarn = yarnSearchPaths.some((path) => {
-		return fs.existsSync(resolveProjectPath(path))
-	})
+	const isYarn = yarnSearchPaths.some((path) =>
+		fs.existsSync(resolveProjectPath(path))
+	)
 
 	if (isYarn) return "yarn"
 

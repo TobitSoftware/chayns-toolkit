@@ -4,13 +4,16 @@ type TemplateStringsOrString = TemplateStringsArray | string
 
 export const fm = {
 	path(path: TemplateStringsOrString): string {
-		return chalk.blueBright(`\`${getStringArg(path)}\``)
+		return chalk.hex("#16BDCA")(`\`${getStringArg(path)}\``)
 	},
 	command(command: TemplateStringsOrString): string {
-		return chalk.magentaBright(`\`${getStringArg(command)}\``)
+		return chalk.hex("#AC94FA")(`\`${getStringArg(command)}\``)
 	},
 	code(code: TemplateStringsOrString): string {
-		return chalk.blueBright(`\`${getStringArg(code)}\``)
+		return chalk.hex("#76A9FA")(`\`${getStringArg(code)}\``)
+	},
+	alt(text: TemplateStringsOrString): string {
+		return chalk.hex("#97A6BA")(getStringArg(text))
 	},
 }
 
