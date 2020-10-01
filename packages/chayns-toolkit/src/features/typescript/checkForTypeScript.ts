@@ -21,7 +21,7 @@ export async function checkForTypeScript({
 	const shouldCreateConfig = await shouldCreateTsConfig()
 
 	if (hasTypeScript) {
-		await checkForTypesPackages()
+		await checkForTypesPackages(packageManager)
 
 		if (shouldCreateConfig) {
 			await createTsConfig()

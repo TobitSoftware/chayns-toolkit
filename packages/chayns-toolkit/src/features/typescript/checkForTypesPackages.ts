@@ -1,10 +1,12 @@
 import { usesPackage } from "@chayns-toolkit/utilities"
 import { fm } from "../../util/format"
-import { getPackageManager } from "../../util/getPackageManager"
+import { PackageManager } from "../../util/getPackageManager"
 import { output } from "../../util/output"
 import { pkgCommands } from "../../util/pkgCommands"
 
-export async function checkForTypesPackages(): Promise<void> {
+export async function checkForTypesPackages(
+	packageManager: PackageManager | undefined
+): Promise<void> {
 	const hasReactTypes = await usesPackage("@types/react")
 	const hasReactDOMTypes = await usesPackage("@types/react-dom")
 
@@ -14,8 +16,6 @@ export async function checkForTypesPackages(): Promise<void> {
 	].filter(Boolean) as string[]
 
 	if (missingPackages.length > 0) {
-		const packageManager = getPackageManager()
-
 		const packages = missingPackages.map((p) => fm.code(p)).join(" and ")
 
 		output.hint(
