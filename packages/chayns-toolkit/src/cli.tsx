@@ -4,7 +4,7 @@ import { render } from "ink"
 import * as path from "path"
 import React from "react"
 import Build from "./commands/Build"
-import Dev from "./commands/Dev"
+import { devCommand } from "./commands/devCommand"
 import Lint from "./commands/Lint"
 import { checkPackages } from "./features/extraneous-packages/checkPackages"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
@@ -23,15 +23,10 @@ program
 	.command("dev")
 	.description("start up a development server with hot module replacement")
 	.action(async () => {
-		const shouldContinue = await runSteps(
-			checkPackages,
-			checkForTypeScript,
-			checkSSLConfig
+		await runSteps(
+			[checkPackages, checkForTypeScript, checkSSLConfig],
+			[devCommand]
 		)
-
-		if (shouldContinue) {
-			render(<Dev />)
-		}
 	})
 
 program

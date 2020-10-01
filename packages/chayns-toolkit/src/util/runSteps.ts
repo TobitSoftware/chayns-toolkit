@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 import type { JSONSchemaForNPMPackageJsonFiles as PackageJson } from "@schemastore/package"
 import { ChaynsScriptsConfiguration } from "../features/config-file/configSchema"
 import { loadConfig } from "../features/config-file/loadConfig"
@@ -14,26 +16,28 @@ export interface StepParams {
 type PromiseOrNot<T> = T | Promise<T>
 type Step = (params: StepParams) => PromiseOrNot<boolean> | PromiseOrNot<void>
 
-export async function runSteps(...steps: Step[]): Promise<boolean> {
+export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 	const [config, packageJson, packageManager] = await Promise.all([
 		loadConfig(),
 		loadPackageJson(),
 		getPackageManager(),
 	])
 
-	let shouldContinue = true
+	for (const sequence of sequences) {
+		let shouldContinue = true
 
-	// eslint-disable-next-line no-restricted-syntax
-	for (const step of steps) {
-		// eslint-disable-next-line no-await-in-loop
-		const result = await step({ config, packageJson, packageManager })
+		if (shouldContinue) {
+			for (const step of sequence) {
+				const result = await step({ config, packageJson, packageManager })
 
-		if (result) {
-			shouldContinue = false
+				if (result) {
+					shouldContinue = false
+				}
+			}
+
+			if (sequences.indexOf(sequence) !== sequences.length - 1) {
+				output.blank("")
+			}
 		}
 	}
-
-	output.blank("")
-
-	return shouldContinue
 }
