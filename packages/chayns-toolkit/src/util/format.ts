@@ -15,6 +15,9 @@ export const fm = {
 	alt(text: TemplateStringsOrString): string {
 		return chalk.hex("#97A6BA")(getStringArg(text))
 	},
+	number(number: string | number): string {
+		return chalk.hex("#F17EB8")(number)
+	},
 }
 
 function getStringArg(path: TemplateStringsArray | string): string {
