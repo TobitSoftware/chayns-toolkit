@@ -6,27 +6,23 @@
 	"homepage": "https://github.com/TobitSoftware/chayns-toolkit#readme",
 	"license": "MIT",
 	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
-	"source": "src/index.html",
 	"scripts": {
 		"build": "chayns-toolkit build",
 		"dev": "chayns-toolkit dev",
 		"lint": "chayns-toolkit lint",
 		"test": "yarn lint"
 	},
-	"babel": {
-		"presets": [
-			"@chayns-toolkit"
-		]
-	},
 	"eslintConfig": {
 		"extends": "@chayns-toolkit"
 	},
 	"dependencies": {
-		"chayns-components": "^4.19.0",
+		"chayns-components": "^4.19.1",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1"
 	},
 	"devDependencies": {
+		"@types/react": "^16.9.49",
+		"@types/react-dom": "^16.9.8",
 		"chayns-toolkit": "^1.2.1",
 		"typescript": "^4.0.3"
 	}
