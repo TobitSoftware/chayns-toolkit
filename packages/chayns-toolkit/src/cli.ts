@@ -8,6 +8,7 @@ import { loadConfig } from "./features/config-file/loadConfig"
 import { checkPackages } from "./features/extraneous-packages/checkPackages"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
+import { output } from "./util/output"
 import { runSteps } from "./util/runSteps"
 
 const program = new Command()
@@ -35,7 +36,11 @@ program
 	.action(async (options: { analyze: boolean }) => {
 		const config = await loadConfig()
 
-		await buildCommand({ analyze: options.analyze, config })
+		try {
+			await buildCommand({ analyze: options.analyze, config })
+		} catch (e) {
+			output.error(e)
+		}
 		console.info("")
 	})
 

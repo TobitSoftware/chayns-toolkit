@@ -20,6 +20,7 @@ interface CreateConfigOptions {
 	analyze: boolean
 	singleBundle: boolean
 	outputFilename: string
+	path?: string
 }
 
 export function createWebpackCompiler({
@@ -27,6 +28,7 @@ export function createWebpackCompiler({
 	analyze,
 	outputFilename,
 	singleBundle,
+	path,
 }: CreateConfigOptions): Compiler {
 	const plugins: Plugin[] = [
 		new DotenvWebpackPlugin({
@@ -113,7 +115,7 @@ export function createWebpackCompiler({
 		devtool: shouldUseSourceMaps ? "cheap-module-eval-source-map" : false,
 		context: process.cwd(),
 		output: {
-			path: resolveProjectPath("build/"),
+			path: path ?? resolveProjectPath("build/"),
 			hashDigestLength: 12,
 			filename: getOutputPath({ mode, filename: outputFilename, singleBundle }),
 		},

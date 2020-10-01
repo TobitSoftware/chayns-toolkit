@@ -20,6 +20,7 @@ export function buildCommand({ config, analyze }: BuildOptions): Promise<void> {
 			analyze,
 			outputFilename: config.output.filename,
 			singleBundle: config.output.singleBundle,
+			path: config.output.path,
 		})
 
 		const startTime = Date.now()
@@ -28,7 +29,7 @@ export function buildCommand({ config, analyze }: BuildOptions): Promise<void> {
 
 		compiler.run((err, stats) => {
 			const buildTime = (Date.now() - startTime) / 1000
-			if (err) reject(err)
+			if (err) return reject(err)
 
 			const hasErrors = stats.hasErrors()
 
@@ -38,58 +39,58 @@ export function buildCommand({ config, analyze }: BuildOptions): Promise<void> {
 				stats.compilation.errors.forEach((error: Error) => {
 					console.info(error.message)
 				})
-				resolve()
-			} else {
-				const { assets } = stats.toJson()
-
-				output.info(
-					`Finished build in ${fm.number(
-						buildTime.toFixed(2)
-					)} seconds. These files were emitted:`
-				)
-
-				console.info("")
-
-				if (assets) {
-					const table = new Table({
-						...tableStyles,
-						colAligns: ["left", "right"],
-					})
-
-					assets.forEach((asset) => {
-						let unit = "B"
-						let amount = asset.size
-
-						if (asset.size > 1_000_000) {
-							unit = "mB"
-							amount = asset.size / 1_000_000
-						} else if (asset.size > 1_000) {
-							unit = "kB"
-							amount = asset.size / 1_000
-						}
-
-						const size = `${amount.toLocaleString("en-US", {
-							maximumFractionDigits: 2,
-						})} ${unit}`
-
-						let symbol = " "
-
-						if (asset.size > 500_000) {
-							symbol = chalk.yellow("!")
-						}
-
-						if (asset.size > 1_000_000) {
-							symbol = chalk.redBright("!")
-						}
-
-						table.push([asset.name, size, symbol])
-					})
-
-					console.info(table.toString())
-
-					resolve()
-				}
+				return resolve()
 			}
+
+			const { assets } = stats.toJson()
+
+			output.info(
+				`Finished build in ${fm.number(
+					buildTime.toFixed(2)
+				)} seconds. These files were emitted:`
+			)
+
+			console.info("")
+
+			if (assets) {
+				const table = new Table({
+					...tableStyles,
+					colAligns: ["left", "right"],
+				})
+
+				assets.forEach((asset) => {
+					let unit = "B"
+					let amount = asset.size
+
+					if (asset.size > 1_000_000) {
+						unit = "mB"
+						amount = asset.size / 1_000_000
+					} else if (asset.size > 1_000) {
+						unit = "kB"
+						amount = asset.size / 1_000
+					}
+
+					const size = `${amount.toLocaleString("en-US", {
+						maximumFractionDigits: 2,
+					})} ${unit}`
+
+					let symbol = " "
+
+					if (asset.size > 500_000) {
+						symbol = chalk.yellow("!")
+					}
+
+					if (asset.size > 1_000_000) {
+						symbol = chalk.redBright("!")
+					}
+
+					table.push([asset.name, size, symbol])
+				})
+
+				console.info(table.toString())
+			}
+
+			return resolve()
 		})
 	})
 }

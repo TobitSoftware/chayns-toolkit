@@ -14,6 +14,7 @@ const outputSchema = yup
 	.object({
 		singleBundle: yup.boolean().default(false).required(),
 		filename: yup.string().default("[package].[contenthash].js").required(),
+		path: yup.string().notRequired(),
 	})
 	.required()
 	.noUnknown()
