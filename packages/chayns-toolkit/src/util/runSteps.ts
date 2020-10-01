@@ -3,6 +3,7 @@
 import type { JSONSchemaForNPMPackageJsonFiles as PackageJson } from "@schemastore/package"
 import { ChaynsScriptsConfiguration } from "../features/config-file/configSchema"
 import { loadConfig } from "../features/config-file/loadConfig"
+import { fm } from "./format"
 import { getPackageManager, PackageManager } from "./getPackageManager"
 import { loadPackageJson } from "./loadPackageJson"
 import { output } from "./output"
@@ -17,8 +18,20 @@ type PromiseOrNot<T> = T | Promise<T>
 type Step = (params: StepParams) => PromiseOrNot<boolean> | PromiseOrNot<void>
 
 export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
-	const [config, packageJson, packageManager] = await Promise.all([
-		loadConfig(),
+	let config: ChaynsScriptsConfiguration
+
+	try {
+		config = await loadConfig()
+	} catch (e) {
+		const error = e as Error
+		output.error(
+			`An error occured while loading the ${fm.path`chayns-toolkit.json`} file:\n`
+		)
+		output.blank(error.message)
+		return
+	}
+
+	const [packageJson, packageManager] = await Promise.all([
 		loadPackageJson(),
 		getPackageManager(),
 	])
