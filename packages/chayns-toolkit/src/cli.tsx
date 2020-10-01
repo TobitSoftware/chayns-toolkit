@@ -7,6 +7,7 @@ import Build from "./commands/Build"
 import Dev from "./commands/Dev"
 import Lint from "./commands/Lint"
 import { checkPackages } from "./features/extraneous-packages/checkPackages"
+import { checkSslPaths } from "./features/ssl-check/checkForSslFiles"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
 
 const program = new Command()
@@ -23,6 +24,7 @@ program
 	.action(async () => {
 		await checkPackages()
 		await checkForTypeScript()
+		await checkSslPaths()
 		console.info("")
 		render(<Dev />)
 	})
