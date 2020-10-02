@@ -1,21 +1,29 @@
 import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import * as fs from "fs"
+import { fm } from "./format"
+import { output } from "./output"
 
 export type PackageManager = "npm" | "yarn"
 
 export function getPackageManager(): PackageManager | undefined {
-	const isNpm = npmSearchPaths.some((path) =>
+	const hasPackageLock = npmSearchPaths.some((path) =>
+		fs.existsSync(resolveProjectPath(path))
+	)
+	const hasYarnLock = yarnSearchPaths.some((path) =>
 		fs.existsSync(resolveProjectPath(path))
 	)
 
-	if (isNpm) return "npm"
+	if (hasPackageLock && hasYarnLock) {
+		output.warn(
+			`You have both ${fm.path`package-lock.json`} and ${fm.path`yarn.lock`} files in your project.\n`
+		)
+		output.blank(
+			"Decide on wether you want to use Yarn or NPM and remove one of the lockfiles."
+		)
+	}
 
-	const isYarn = yarnSearchPaths.some((path) => {
-		return fs.existsSync(resolveProjectPath(path))
-	})
-
-	if (isYarn) return "yarn"
-
+	if (hasPackageLock) return "npm"
+	if (hasYarnLock) return "yarn"
 	return undefined
 }
 

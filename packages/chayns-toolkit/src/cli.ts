@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 import { Command } from "commander"
-import { render } from "ink"
 import * as path from "path"
-import React from "react"
-import Build from "./commands/Build"
-import Dev from "./commands/Dev"
-import Lint from "./commands/Lint"
+import { buildCommand } from "./commands/buildCommand"
+import { devCommand } from "./commands/devCommand"
+import { lintCommand } from "./commands/lintCommand"
+import { loadConfig } from "./features/config-file/loadConfig"
 import { checkPackages } from "./features/extraneous-packages/checkPackages"
+import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
+import { output } from "./util/output"
+import { runSteps } from "./util/runSteps"
 
 const program = new Command()
 program.version(
@@ -21,25 +23,33 @@ program
 	.command("dev")
 	.description("start up a development server with hot module replacement")
 	.action(async () => {
-		await checkPackages()
-		await checkForTypeScript()
-		console.info("")
-		render(<Dev />)
+		await runSteps(
+			[checkPackages, checkForTypeScript, checkSSLConfig],
+			[devCommand]
+		)
 	})
 
 program
 	.command("build")
 	.description("bundles your code for production")
 	.option("-a, --analyze", "analyze your bundle size", false)
-	.action((options: { analyze: boolean }) => {
-		render(<Build analyze={options.analyze} />)
+	.action(async (options: { analyze: boolean }) => {
+		const config = await loadConfig()
+
+		try {
+			await buildCommand({ analyze: options.analyze, config })
+		} catch (e) {
+			output.error(e)
+		}
+		console.info("")
 	})
 
 program
 	.command("lint")
 	.description("lints your code for possible errors")
-	.action(() => {
-		render(<Lint />)
+	.action(async () => {
+		await lintCommand()
+		console.info("")
 	})
 
 program.parse(process.argv)

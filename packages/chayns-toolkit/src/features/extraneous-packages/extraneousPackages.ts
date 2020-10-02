@@ -13,6 +13,6 @@ export const extraneousPackages: Array<string | RegExp> = [
 	"webpack-cli",
 	"webpack-dev-server",
 	"webpack",
-	/^@babel\//gi,
-	/^babel-/gi,
+	/^@babel\//,
+	/^babel-/,
 ]

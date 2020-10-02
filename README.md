@@ -91,7 +91,8 @@ following names as the entry point to your bundle:
 > [Read more](#typescript-support)
 
 If you specify a `src/index.html` file, it will be included included in the
-build process.
+build process. If it exists, a `src/index.dev.html` will be used during
+development.
 
 Your project structure should look similar to this:
 
@@ -425,7 +426,8 @@ Example `chayns-toolkit.json` with all of the available options specified:
     },
     "output": {
         "singleBundle": false,
-        "filename": "[package].[contenthash].js"
+        "filename": "[package].[contenthash].js",
+        "path": "//my-qa-server/example-project"
     }
 }
 ```
@@ -451,6 +453,7 @@ command).
 | ------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`singleBundle`** | `boolean` | Toggles the [single-file build functionality](#single-file-builds).                                                                                                                                                                                                                                                  |
 | **`filename`**     | `string`  | Change the file-name your of primary output bundle. You can use any of the [webpack substitutions](https://webpack.js.org/configuration/output/#template-strings) as well as the `[package]` substitution (will be replaced by the name specified in your `package.json`). Defaults to `[package].[contenthash].js`. |
+| **`path`**         | `string`  | Set an absolute path where your output will be emitted to (e.g. build directly to a directory that is accessible via HTTPS on a QA server).                                                                                                                                                                          |
 
 ## Notes on Multiple Entrypoints
 

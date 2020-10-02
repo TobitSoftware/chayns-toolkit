@@ -1,59 +1,54 @@
-import { resolveProjectPath, usesPackage } from "@chayns-toolkit/utilities"
-import chalk from "chalk"
+import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import * as fs from "fs"
 import { promisify } from "util"
-import { getPackageManager } from "../../util/getPackageManager"
+import { fm } from "../../util/format"
+import { isPackageInstalled } from "../../util/isPackageInstalled"
 import { output } from "../../util/output"
+import { pkgCommands } from "../../util/pkgCommands"
+import { StepParams } from "../../util/runSteps"
+import { checkForTypesPackages } from "./checkForTypesPackages"
 import { shouldCreateTsConfig } from "./shouldCreateTsConfig"
 import { wantsToUseTypeScript } from "./wantsToUseTypeScript"
 
 const writeFileAsync = promisify(fs.writeFile)
 
-export async function checkForTypeScript(): Promise<void> {
-	const hasTypeScript = await usesPackage("typescript")
+export async function checkForTypeScript({
+	packageJson,
+	packageManager,
+}: StepParams): Promise<boolean> {
+	const hasTypeScript = isPackageInstalled(packageJson, "typescript")
+
 	const shouldCreateConfig = await shouldCreateTsConfig()
 
 	if (hasTypeScript) {
+		await checkForTypesPackages(packageManager)
+
 		if (shouldCreateConfig) {
 			await createTsConfig()
 		}
 
-		return
+		return false
 	}
 
 	const wantsToUse = await wantsToUseTypeScript()
 
 	if (wantsToUse) {
-		const packageManager = getPackageManager()
-
 		if (shouldCreateConfig) {
 			await createTsConfig()
 		}
 
-		let installCommand: string | undefined
+		output.error(
+			`To use TypeScript, you have to install the ${fm.code`typescript`} package by running ${pkgCommands.install(
+				packageManager,
+				"typescript",
+				true
+			)}.`
+		)
 
-		if (packageManager === "npm") {
-			installCommand = "npm i typescript -D"
-		} else if (packageManager === "yarn") {
-			installCommand = "yarn add typescript -D"
-		}
-
-		if (installCommand !== undefined) {
-			output.info(
-				`To use TypeScript, you have to install the ${chalk.blueBright(
-					"typescript"
-				)} package by running \`${installCommand}\`.`
-			)
-		} else {
-			output.info(
-				`To use TypeScript, you have to install the ${chalk.blueBright(
-					"typescript"
-				)} package.`
-			)
-		}
-
-		process.exit(0)
+		return true
 	}
+
+	return false
 }
 
 async function createTsConfig(): Promise<void> {
@@ -63,9 +58,7 @@ async function createTsConfig(): Promise<void> {
 	)
 
 	output.info(
-		`Seems like you want to use TypeScript. A ${chalk.blueBright(
-			"tsconfig.json"
-		)} file has been set up for you.`
+		`Seems like you want to use TypeScript. A ${fm.path`tsconfig.json`} file has been set up for you.`
 	)
 }
 

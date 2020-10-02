@@ -9,7 +9,6 @@ import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
 import { paramCase } from "param-case"
-import * as path from "path"
 import webpack, { Compiler, Plugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowsersListEnv } from "../features/environment/browserslist"
@@ -21,6 +20,7 @@ interface CreateConfigOptions {
 	analyze: boolean
 	singleBundle: boolean
 	outputFilename: string
+	path?: string
 }
 
 export function createWebpackCompiler({
@@ -28,6 +28,7 @@ export function createWebpackCompiler({
 	analyze,
 	outputFilename,
 	singleBundle,
+	path,
 }: CreateConfigOptions): Compiler {
 	const plugins: Plugin[] = [
 		new DotenvWebpackPlugin({
@@ -37,14 +38,27 @@ export function createWebpackCompiler({
 		}),
 	]
 
-	const hasHTMLFile = fs.existsSync(resolveProjectPath("src/index.html"))
+	let htmlPath: string | undefined
+
+	if (mode === "development") {
+		const hasDevFile = fs.existsSync(resolveProjectPath("src/index.dev.html"))
+
+		if (hasDevFile) {
+			htmlPath = "src/index.dev.html"
+		}
+	}
+
+	if (fs.existsSync(resolveProjectPath("src/index.html"))) {
+		htmlPath ??= "src/index.html"
+	}
+
 	// eslint-disable-next-line
 	const packageJson: { name: string } = require(resolveProjectPath(
 		"package.json"
 	))
 	const packageName = packageJson.name
 
-	if (hasHTMLFile) {
+	if (htmlPath) {
 		const minify =
 			mode === "production"
 				? {
@@ -63,7 +77,7 @@ export function createWebpackCompiler({
 
 		plugins.push(
 			new HtmlWebpackPlugin({
-				template: path.resolve(process.cwd(), "src/index.html"),
+				template: resolveProjectPath(htmlPath),
 				minify,
 			})
 		)
@@ -101,7 +115,7 @@ export function createWebpackCompiler({
 		devtool: shouldUseSourceMaps ? "cheap-module-eval-source-map" : false,
 		context: process.cwd(),
 		output: {
-			path: resolveProjectPath("build/"),
+			path: path ?? resolveProjectPath("build/"),
 			hashDigestLength: 12,
 			filename: getOutputPath({ mode, filename: outputFilename, singleBundle }),
 		},
