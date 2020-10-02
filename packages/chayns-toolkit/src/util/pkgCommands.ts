@@ -25,7 +25,7 @@ export const pkgCommands = {
 		packageManager: PackageManager | undefined,
 		packages: string | string[]
 	): string {
-		let command = packageManager === "yarn" ? "yarn remove " : "npm remove"
+		let command = packageManager === "yarn" ? "yarn remove " : "npm remove "
 
 		command += Array.isArray(packages) ? packages.join(" ") : packages
 
