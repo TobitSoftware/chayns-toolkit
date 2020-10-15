@@ -29,12 +29,12 @@
 		"lib/*"
 	],
 	"scripts": {
-		"build": "tsc",
-		"dev": "tsc --watch --incremental",
-		"lint": "eslint src/ --ext js,jsx,ts,tsx --fix",
+		"build": "cross-env NODE_ENV=production rollup -c",
+		"check-types": "tsc --noEmit",
+		"dev": "cross-env NODE_ENV=development rollup -c -w",
+		"lint": "eslint src/ --ext js,jsx,ts,tsx",
 		"prepublishOnly": "yarn build",
-		"test": "yarn test:tsc && yarn lint",
-		"test:tsc": "tsc --noEmit"
+		"test": "yarn check-types && yarn lint"
 	},
 	"eslintConfig": {
 		"extends": "@chayns-toolkit",
@@ -82,6 +82,10 @@
 		"yup": "^0.29.3"
 	},
 	"devDependencies": {
+		"@rollup/plugin-commonjs": "^15.1.0",
+		"@rollup/plugin-json": "^4.1.0",
+		"@rollup/plugin-node-resolve": "^9.0.0",
+		"@rollup/plugin-typescript": "^6.0.0",
 		"@schemastore/package": "^0.0.6",
 		"@types/cli-table": "^0.3.0",
 		"@types/cssnano": "^4.0.0",
@@ -96,6 +100,11 @@
 		"@types/webpack-bundle-analyzer": "^3.8.0",
 		"@types/webpack-dev-server": "^3.11.0",
 		"@types/yup": "^0.29.8",
+		"cross-env": "^7.0.2",
+		"rollup": "^2.30.0",
+		"rollup-plugin-auto-external": "^2.0.0",
+		"rollup-plugin-terser": "^7.0.2",
+		"tslib": "^2.0.3",
 		"typescript": "^4.0.3"
 	},
 	"engines": {

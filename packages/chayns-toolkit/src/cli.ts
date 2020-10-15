@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { Command } from "commander"
 import * as path from "path"
 import { buildCommand } from "./commands/buildCommand"
