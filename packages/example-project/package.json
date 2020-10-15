@@ -16,12 +16,12 @@
 		"extends": "@chayns-toolkit"
 	},
 	"dependencies": {
-		"chayns-components": "^4.19.1",
-		"react": "^16.13.1",
-		"react-dom": "^16.13.1"
+		"chayns-components": "^4.19.6",
+		"react": "^16.14.0",
+		"react-dom": "^16.14.0"
 	},
 	"devDependencies": {
-		"@types/react": "^16.9.49",
+		"@types/react": "^16.9.52",
 		"@types/react-dom": "^16.9.8",
 		"chayns-toolkit": "^1.3.0",
 		"typescript": "^4.0.3"
