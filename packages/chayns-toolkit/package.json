@@ -50,23 +50,17 @@
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.4.2",
 		"@svgr/webpack": "^5.4.0",
 		"babel-loader": "^8.1.0",
-		"chalk": "^4.1.0",
 		"clean-webpack-plugin": "^3.0.0",
-		"cli-table": "^0.3.1",
-		"commander": "^6.1.0",
 		"css-loader": "^4.3.0",
 		"cssnano": "^4.1.10",
 		"dotenv-webpack": "^2.0.0",
 		"eslint": "^7.11.0",
 		"eslint-formatter-pretty": "^4.0.0",
-		"fast-glob": "^3.2.4",
 		"file-loader": "^6.1.0",
 		"html-webpack-plugin": "^4.5.0",
-		"ink-spinner": "^4.0.1",
 		"mini-css-extract-plugin": "^0.11.2",
 		"node-sass": "^4.14.1",
 		"optimize-css-assets-webpack-plugin": "^5.0.4",
-		"param-case": "^3.0.3",
 		"postcss": "^7.0.35",
 		"postcss-flexbugs-fixes": "^4.2.1",
 		"postcss-loader": "^4.0.2",
@@ -78,8 +72,7 @@
 		"url-loader": "^4.1.0",
 		"webpack": "^4.44.2",
 		"webpack-bundle-analyzer": "^3.9.0",
-		"webpack-dev-server": "^3.11.0",
-		"yup": "^0.29.3"
+		"webpack-dev-server": "^3.11.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "^15.1.0",
@@ -100,12 +93,18 @@
 		"@types/webpack-bundle-analyzer": "^3.8.0",
 		"@types/webpack-dev-server": "^3.11.0",
 		"@types/yup": "^0.29.8",
+		"chalk": "^4.1.0",
+		"cli-table": "^0.3.1",
+		"commander": "^6.1.0",
 		"cross-env": "^7.0.2",
+		"fast-glob": "^3.2.4",
+		"param-case": "^3.0.3",
 		"rollup": "^2.30.0",
 		"rollup-plugin-auto-external": "^2.0.0",
 		"rollup-plugin-terser": "^7.0.2",
 		"tslib": "^2.0.3",
-		"typescript": "^4.0.3"
+		"typescript": "^4.0.3",
+		"yup": "^0.29.3"
 	},
 	"engines": {
 		"node": ">=12.10.0"
