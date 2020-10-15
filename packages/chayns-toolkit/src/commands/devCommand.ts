@@ -4,7 +4,7 @@ import { getDevServerOptions } from "../util/getDevServerOptions"
 import { output } from "../util/output"
 import { StepParams } from "../util/runSteps"
 
-export function devCommand({ config }: StepParams): void {
+export function devCommand({ config, packageJson }: StepParams): void {
 	process.env.BABEL_ENV = "development"
 	process.env.NODE_ENV = "development"
 
@@ -25,6 +25,7 @@ export function devCommand({ config }: StepParams): void {
 			mode: "development",
 			outputFilename: config.output.filename,
 			singleBundle: config.output.singleBundle,
+			packageJson,
 		}),
 		getDevServerOptions({
 			host,

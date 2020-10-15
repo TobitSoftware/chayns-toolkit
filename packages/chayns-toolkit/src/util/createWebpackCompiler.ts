@@ -2,6 +2,7 @@
 import getCacheIdentifier from "@chayns-toolkit/babel-preset/getCacheIdentifier"
 import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
+import type { JSONSchemaForNPMPackageJsonFiles as PackageJson } from "@schemastore/package"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import DotenvWebpackPlugin from "dotenv-webpack"
 import * as fs from "fs"
@@ -21,6 +22,7 @@ interface CreateConfigOptions {
 	singleBundle: boolean
 	outputFilename: string
 	path?: string
+	packageJson: PackageJson
 }
 
 export function createWebpackCompiler({
@@ -29,6 +31,7 @@ export function createWebpackCompiler({
 	outputFilename,
 	singleBundle,
 	path,
+	packageJson,
 }: CreateConfigOptions): Compiler {
 	const plugins: Plugin[] = [
 		new DotenvWebpackPlugin({
@@ -51,12 +54,6 @@ export function createWebpackCompiler({
 	if (fs.existsSync(resolveProjectPath("src/index.html"))) {
 		htmlPath ??= "src/index.html"
 	}
-
-	// eslint-disable-next-line
-	const packageJson: { name: string } = require(resolveProjectPath(
-		"package.json"
-	))
-	const packageName = packageJson.name
 
 	if (htmlPath) {
 		const minify =
@@ -97,6 +94,11 @@ export function createWebpackCompiler({
 		plugins.push(new ReactRefreshWebpackPlugin())
 	}
 
+	const packageName = packageJson.name
+
+	if (!packageName)
+		throw Error("The name field in package.json has to be provided.")
+
 	if (mode === "production" && !singleBundle) {
 		plugins.push(
 			new MiniCssExtractPlugin({
@@ -117,7 +119,12 @@ export function createWebpackCompiler({
 		output: {
 			path: path ?? resolveProjectPath("build/"),
 			hashDigestLength: 12,
-			filename: getOutputPath({ mode, filename: outputFilename, singleBundle }),
+			filename: getOutputPath({
+				mode,
+				filename: outputFilename,
+				singleBundle,
+				packageName,
+			}),
 		},
 		resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
 		module: {
@@ -207,17 +214,16 @@ function getOutputPath({
 	mode,
 	filename,
 	singleBundle,
+	packageName,
 }: {
 	mode: "development" | "production"
 	filename: string
 	singleBundle: boolean
+	packageName: string
 }) {
 	const outputPath = singleBundle ? "" : "static/js/"
 
-	// eslint-disable-next-line
-	const pkg: { name: string } = require(resolveProjectPath("package.json"))
-
-	const preparedFilename = filename.replace("[package]", paramCase(pkg.name))
+	const preparedFilename = filename.replace("[package]", paramCase(packageName))
 
 	if (mode === "development") {
 		return `${outputPath}bundle.js`
