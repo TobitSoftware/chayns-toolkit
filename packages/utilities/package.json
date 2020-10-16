@@ -26,7 +26,8 @@
 		"test:tsc": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"eslint": "^7.10.0",
+		"eslint": "^7.11.0",
+		"type-fest": "^0.18.0",
 		"typescript": "^4.0.3"
 	},
 	"publishConfig": {

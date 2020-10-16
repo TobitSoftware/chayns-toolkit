@@ -4,20 +4,11 @@ import { getDevServerOptions } from "../util/getDevServerOptions"
 import { output } from "../util/output"
 import { StepParams } from "../util/runSteps"
 
-export function devCommand({ config }: StepParams): void {
+export function devCommand({ config, packageJson }: StepParams): void {
 	process.env.BABEL_ENV = "development"
 	process.env.NODE_ENV = "development"
 
-	const hasHttpsCertificates = Boolean(
-		config.development.cert && config.development.key
-	)
-
-	const port = config.development.port || DEFAULT_PORT
-	let { host } = config.development
-
-	if (host === "adaptive") {
-		host = hasHttpsCertificates ? DEFAULT_HTTPS_HOSTNAME : DEFAULT_HOSTNAME
-	}
+	const { port, host, cert, key } = config.development
 
 	const devServer = new WebpackDevServer(
 		createWebpackCompiler({
@@ -25,20 +16,12 @@ export function devCommand({ config }: StepParams): void {
 			mode: "development",
 			outputFilename: config.output.filename,
 			singleBundle: config.output.singleBundle,
+			packageJson,
 		}),
-		getDevServerOptions({
-			host,
-			port,
-			cert: config.development.cert,
-			key: config.development.key,
-		})
+		getDevServerOptions({ host, port, cert, key })
 	)
 
 	devServer.listen(port, host, (err) => {
 		if (err) output.error(err.message)
 	})
 }
-
-const DEFAULT_PORT = 1234
-const DEFAULT_HOSTNAME = "localhost"
-const DEFAULT_HTTPS_HOSTNAME = "0.0.0.0"

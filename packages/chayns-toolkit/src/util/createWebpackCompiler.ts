@@ -7,9 +7,9 @@ import DotenvWebpackPlugin from "dotenv-webpack"
 import * as fs from "fs"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
-import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
 import { paramCase } from "param-case"
-import webpack, { Compiler, Plugin } from "webpack"
+import type { PackageJson } from "type-fest"
+import webpack, { Compiler } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowsersListEnv } from "../features/environment/browserslist"
 
@@ -21,6 +21,7 @@ interface CreateConfigOptions {
 	singleBundle: boolean
 	outputFilename: string
 	path?: string
+	packageJson: PackageJson
 }
 
 export function createWebpackCompiler({
@@ -29,8 +30,9 @@ export function createWebpackCompiler({
 	outputFilename,
 	singleBundle,
 	path,
+	packageJson,
 }: CreateConfigOptions): Compiler {
-	const plugins: Plugin[] = [
+	const plugins = [
 		new DotenvWebpackPlugin({
 			path: "./.env.local",
 			systemvars: true,
@@ -51,12 +53,6 @@ export function createWebpackCompiler({
 	if (fs.existsSync(resolveProjectPath("src/index.html"))) {
 		htmlPath ??= "src/index.html"
 	}
-
-	// eslint-disable-next-line
-	const packageJson: { name: string } = require(resolveProjectPath(
-		"package.json"
-	))
-	const packageName = packageJson.name
 
 	if (htmlPath) {
 		const minify =
@@ -97,40 +93,53 @@ export function createWebpackCompiler({
 		plugins.push(new ReactRefreshWebpackPlugin())
 	}
 
-	if (mode === "production" && !singleBundle) {
+	const packageName = packageJson.name
+
+	if (!packageName)
+		throw Error("The name field in package.json has to be provided.")
+
+	if (!singleBundle) {
 		plugins.push(
 			new MiniCssExtractPlugin({
 				filename: `static/css/${packageName}.[contenthash].css`,
 				chunkFilename: `static/css/${packageName}.[chunkhash].chunk.css`,
 			})
 		)
-		plugins.push(new OptimizeCssAssetsPlugin())
 	}
 
 	const shouldUseSourceMaps = mode !== "production"
 
 	return webpack({
+		// @ts-expect-error: The plugin typing for webpack 5 is not working properly.
 		entry: resolveProjectPath("src/index"),
 		mode,
-		devtool: shouldUseSourceMaps ? "cheap-module-eval-source-map" : false,
+		// `webpack-dev-server` does not yet pick up `browserslist` as a web
+		// target, so HMR does not work.
+		target: mode === "development" ? "web" : "browserslist",
+		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
 		context: process.cwd(),
 		output: {
 			path: path ?? resolveProjectPath("build/"),
 			hashDigestLength: 12,
-			filename: getOutputPath({ mode, filename: outputFilename, singleBundle }),
+			filename: getOutputPath({
+				mode,
+				filename: outputFilename,
+				singleBundle,
+				packageName,
+			}),
 		},
 		resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
 		module: {
 			rules: [
 				{
 					test: /\.(js|jsx)$/,
-					use: "source-map-loader",
+					use: require.resolve("source-map-loader"),
 					include: /node_modules\/chayns-components/,
 				},
 				{
 					test: /\.(js|jsx|ts|tsx)$/,
 					use: {
-						loader: "babel-loader",
+						loader: require.resolve("babel-loader"),
 						options: {
 							presets: ["@chayns-toolkit"],
 							babelrc: false,
@@ -146,12 +155,12 @@ export function createWebpackCompiler({
 				{
 					test: /\.(css|scss)/,
 					use: [
-						mode === "development" || singleBundle
-							? "style-loader"
+						singleBundle
+							? require.resolve("style-loader")
 							: MiniCssExtractPlugin.loader,
-						"css-loader",
+						require.resolve("css-loader"),
 						{
-							loader: "postcss-loader",
+							loader: require.resolve("postcss-loader"),
 							options: {
 								postcssOptions: {
 									plugins: [
@@ -163,22 +172,22 @@ export function createWebpackCompiler({
 											},
 										],
 										"postcss-flexbugs-fixes",
-										"cssnano",
+										mode === "production" && "cssnano",
 									].filter(Boolean),
 								},
 							},
 						},
-						"sass-loader",
+						require.resolve("sass-loader"),
 					],
 				},
 				{
 					test: /\.(png|jpe?g|gif|webp)$/i,
 					use: {
-						loader: "url-loader",
+						loader: require.resolve("url-loader"),
 						options: {
 							limit: singleBundle ? Infinity : 10000,
 							fallback: {
-								loader: "file-loader",
+								loader: require.resolve("file-loader"),
 								options: { name: "static/media/[contenthash:12].[ext]" },
 							},
 						},
@@ -186,18 +195,15 @@ export function createWebpackCompiler({
 				},
 				{
 					test: /\.svg$/,
-					use: "@svgr/webpack",
+					use: require.resolve("@svgr/webpack"),
 				},
 			],
 		},
 		plugins,
 		optimization: {
 			splitChunks: singleBundle
-				? false
-				: {
-						chunks: "all",
-						name: false,
-				  },
+				? { default: false, defaultVendors: false }
+				: { chunks: "all" },
 		},
 		performance: false,
 	})
@@ -207,20 +213,19 @@ function getOutputPath({
 	mode,
 	filename,
 	singleBundle,
+	packageName,
 }: {
 	mode: "development" | "production"
 	filename: string
 	singleBundle: boolean
+	packageName: string
 }) {
 	const outputPath = singleBundle ? "" : "static/js/"
 
-	// eslint-disable-next-line
-	const pkg: { name: string } = require(resolveProjectPath("package.json"))
-
-	const preparedFilename = filename.replace("[package]", paramCase(pkg.name))
+	const preparedFilename = filename.replace("[package]", paramCase(packageName))
 
 	if (mode === "development") {
-		return `${outputPath}bundle.js`
+		return `${outputPath}[name].bundle.js`
 	}
 	return outputPath + preparedFilename
 }

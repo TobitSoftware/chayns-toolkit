@@ -1,14 +1,14 @@
 {
 	"compilerOptions": {
 		"esModuleInterop": true,
-		"jsx": "react",
-		"lib": ["ESNext"],
+		"lib": ["ES2018"],
 		"module": "CommonJS",
-		"moduleResolution": "node",
-		"outDir": "lib",
+		"noEmit": true,
+		"resolveJsonModule": true,
+		"rootDir": "src",
+		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"target": "ES2017"
-	},
-	"include": ["src"]
+		"target": "ES2018"
+	}
 }

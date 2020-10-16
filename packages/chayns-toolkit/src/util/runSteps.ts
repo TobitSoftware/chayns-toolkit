@@ -1,6 +1,4 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
-import type { JSONSchemaForNPMPackageJsonFiles as PackageJson } from "@schemastore/package"
+import type { PackageJson } from "type-fest"
 import { ChaynsScriptsConfiguration } from "../features/config-file/configSchema"
 import { loadConfig } from "../features/config-file/loadConfig"
 import { fm } from "./format"
@@ -36,11 +34,12 @@ export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 		getPackageManager(),
 	])
 
-	for (const sequence of sequences) {
-		let shouldContinue = true
+	let shouldContinue = true
 
+	for (const sequence of sequences) {
 		if (shouldContinue) {
 			for (const step of sequence) {
+				// eslint-disable-next-line no-await-in-loop
 				const result = await step({ config, packageJson, packageManager })
 
 				if (result) {

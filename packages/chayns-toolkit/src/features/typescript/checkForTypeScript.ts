@@ -1,5 +1,6 @@
 import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import * as fs from "fs"
+import type { TsConfigJson } from "type-fest"
 import { promisify } from "util"
 import { fm } from "../../util/format"
 import { isPackageInstalled } from "../../util/isPackageInstalled"
@@ -62,7 +63,7 @@ async function createTsConfig(): Promise<void> {
 	)
 }
 
-const defaultTsconfig = {
+const defaultTsconfig: TsConfigJson = {
 	compilerOptions: {
 		allowJs: true,
 		allowSyntheticDefaultImports: true,
