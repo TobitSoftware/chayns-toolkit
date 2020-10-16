@@ -1,5 +1,4 @@
 import { Command } from "commander"
-import pkg from "../package.json"
 import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
@@ -10,7 +9,7 @@ import { output } from "./util/output"
 import { runSteps } from "./util/runSteps"
 
 const program = new Command()
-program.version(pkg.version, "-v, --version", "output the version number")
+program.version(__PKG_VERSION__, "-v, --version", "output the version number")
 
 program
 	.command("dev")
