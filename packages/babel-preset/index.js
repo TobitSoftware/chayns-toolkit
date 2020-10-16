@@ -25,7 +25,13 @@ module.exports = (api) => {
 					corejs: 3,
 				},
 			],
-			"@babel/preset-react",
+			[
+				"@babel/preset-react",
+				{
+					runtime: "automatic",
+					development: !isProduction,
+				},
+			],
 			usesFlow && "@babel/preset-flow",
 			usesTypeScript && "@babel/preset-typescript",
 		].filter(Boolean),

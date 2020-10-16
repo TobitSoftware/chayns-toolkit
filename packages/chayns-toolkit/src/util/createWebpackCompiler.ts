@@ -8,9 +8,8 @@ import DotenvWebpackPlugin from "dotenv-webpack"
 import * as fs from "fs"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
-import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin"
 import { paramCase } from "param-case"
-import webpack, { Compiler, Plugin } from "webpack"
+import webpack, { Compiler } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowsersListEnv } from "../features/environment/browserslist"
 
@@ -33,7 +32,7 @@ export function createWebpackCompiler({
 	path,
 	packageJson,
 }: CreateConfigOptions): Compiler {
-	const plugins: Plugin[] = [
+	const plugins = [
 		new DotenvWebpackPlugin({
 			path: "./.env.local",
 			systemvars: true,
@@ -99,22 +98,22 @@ export function createWebpackCompiler({
 	if (!packageName)
 		throw Error("The name field in package.json has to be provided.")
 
-	if (mode === "production" && !singleBundle) {
+	if (!singleBundle) {
 		plugins.push(
 			new MiniCssExtractPlugin({
 				filename: `static/css/${packageName}.[contenthash].css`,
 				chunkFilename: `static/css/${packageName}.[chunkhash].chunk.css`,
 			})
 		)
-		plugins.push(new OptimizeCssAssetsPlugin())
 	}
 
 	const shouldUseSourceMaps = mode !== "production"
 
 	return webpack({
+		// @ts-expect-error: The plugin typing for webpack 5 is not working properly.
 		entry: resolveProjectPath("src/index"),
 		mode,
-		devtool: shouldUseSourceMaps ? "cheap-module-eval-source-map" : false,
+		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
 		context: process.cwd(),
 		output: {
 			path: path ?? resolveProjectPath("build/"),
@@ -131,13 +130,13 @@ export function createWebpackCompiler({
 			rules: [
 				{
 					test: /\.(js|jsx)$/,
-					use: "source-map-loader",
+					use: require.resolve("source-map-loader"),
 					include: /node_modules\/chayns-components/,
 				},
 				{
 					test: /\.(js|jsx|ts|tsx)$/,
 					use: {
-						loader: "babel-loader",
+						loader: require.resolve("babel-loader"),
 						options: {
 							presets: ["@chayns-toolkit"],
 							babelrc: false,
@@ -153,12 +152,12 @@ export function createWebpackCompiler({
 				{
 					test: /\.(css|scss)/,
 					use: [
-						mode === "development" || singleBundle
-							? "style-loader"
+						singleBundle
+							? require.resolve("style-loader")
 							: MiniCssExtractPlugin.loader,
-						"css-loader",
+						require.resolve("css-loader"),
 						{
-							loader: "postcss-loader",
+							loader: require.resolve("postcss-loader"),
 							options: {
 								postcssOptions: {
 									plugins: [
@@ -170,22 +169,22 @@ export function createWebpackCompiler({
 											},
 										],
 										"postcss-flexbugs-fixes",
-										"cssnano",
+										mode === "production" && "cssnano",
 									].filter(Boolean),
 								},
 							},
 						},
-						"sass-loader",
+						require.resolve("sass-loader"),
 					],
 				},
 				{
 					test: /\.(png|jpe?g|gif|webp)$/i,
 					use: {
-						loader: "url-loader",
+						loader: require.resolve("url-loader"),
 						options: {
 							limit: singleBundle ? Infinity : 10000,
 							fallback: {
-								loader: "file-loader",
+								loader: require.resolve("file-loader"),
 								options: { name: "static/media/[contenthash:12].[ext]" },
 							},
 						},
@@ -193,18 +192,15 @@ export function createWebpackCompiler({
 				},
 				{
 					test: /\.svg$/,
-					use: "@svgr/webpack",
+					use: require.resolve("@svgr/webpack"),
 				},
 			],
 		},
 		plugins,
 		optimization: {
 			splitChunks: singleBundle
-				? false
-				: {
-						chunks: "all",
-						name: false,
-				  },
+				? { default: false, defaultVendors: false }
+				: { chunks: "all" },
 		},
 		performance: false,
 	})
@@ -226,7 +222,7 @@ function getOutputPath({
 	const preparedFilename = filename.replace("[package]", paramCase(packageName))
 
 	if (mode === "development") {
-		return `${outputPath}bundle.js`
+		return `${outputPath}[name].bundle.js`
 	}
 	return outputPath + preparedFilename
 }

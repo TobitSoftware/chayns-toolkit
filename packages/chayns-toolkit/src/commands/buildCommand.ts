@@ -30,13 +30,12 @@ export function buildCommand({
 
 			output.info(`Bundling your code...`)
 
+			// eslint-disable-next-line consistent-return
 			compiler.run((err, stats) => {
 				const buildTime = (Date.now() - startTime) / 1000
 				if (err) return reject(err)
 
-				const hasErrors = stats.hasErrors()
-
-				if (hasErrors) {
+				if (stats?.hasErrors()) {
 					output.error("Compilation failed.\n")
 
 					stats.compilation.errors.forEach((error: Error) => {
@@ -45,7 +44,8 @@ export function buildCommand({
 					return resolve()
 				}
 
-				const { assets } = stats.toJson()
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				const { assets } = stats?.toJson()
 
 				output.info(
 					`Finished build in ${fm.number(
@@ -61,7 +61,8 @@ export function buildCommand({
 						colAligns: ["left", "right"],
 					})
 
-					assets.forEach((asset) => {
+					// eslint-disable-next-line
+					assets.forEach((asset: { size: number; name: any }) => {
 						let unit = "B"
 						let amount = asset.size
 
@@ -93,7 +94,9 @@ export function buildCommand({
 					console.info(table.toString())
 				}
 
-				return resolve()
+				compiler.close(() => {
+					resolve()
+				})
 			})
 		})
 	}
