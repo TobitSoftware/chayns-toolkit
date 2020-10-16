@@ -114,7 +114,7 @@ export function createWebpackCompiler({
 	return webpack({
 		entry: resolveProjectPath("src/index"),
 		mode,
-		devtool: shouldUseSourceMaps ? "cheap-module-eval-source-map" : false,
+		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
 		context: process.cwd(),
 		output: {
 			path: path ?? resolveProjectPath("build/"),
