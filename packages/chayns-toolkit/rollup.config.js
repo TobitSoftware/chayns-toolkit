@@ -18,6 +18,9 @@ export default {
 		exports: "default",
 	},
 	plugins: [
+		replace({
+			__PKG_VERSION__: JSON.stringify(pkg.version),
+		}),
 		resolve({
 			extensions: [".js", ".ts"],
 		}),
@@ -28,8 +31,5 @@ export default {
 			include: ["src/**/*.ts"],
 		}),
 		isProduction && terser(),
-		replace({
-			__PKG_VERSION__: pkg.version,
-		}),
 	].filter(Boolean),
 }
