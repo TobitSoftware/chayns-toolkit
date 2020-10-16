@@ -1,4 +1,4 @@
-import type { JSONSchemaForNPMPackageJsonFiles as PackageJson } from "@schemastore/package"
+import type { PackageJson } from "type-fest"
 import { types } from "util"
 
 const { isRegExp } = types

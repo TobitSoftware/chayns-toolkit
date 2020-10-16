@@ -3,10 +3,12 @@
 		"esModuleInterop": true,
 		"lib": ["ES2018"],
 		"module": "CommonJS",
+		"noEmit": true,
+		"resolveJsonModule": true,
+		"rootDir": "src",
+		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"target": "ES2018",
-		"rootDir": "src",
-		"resolveJsonModule": true
+		"target": "ES2018"
 	}
 }

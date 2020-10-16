@@ -1,15 +1,11 @@
 import * as fs from "fs"
 import * as path from "path"
+import type { PackageJson } from "type-fest"
 import { promisify } from "util"
 
 const readFileAsync = promisify(fs.readFile)
 
 type PackageMatcher = string | RegExp
-
-interface PackageJson {
-	dependencies?: { [packageName: string]: string }
-	devDependencies?: { [packageName: string]: string }
-}
 
 export async function usesPackage(query: PackageMatcher): Promise<boolean>
 export async function usesPackage(query: PackageMatcher[]): Promise<string[]>

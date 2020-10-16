@@ -1,6 +1,6 @@
 import { resolveProjectPath } from "@chayns-toolkit/utilities"
-import type { JSONSchemaForNPMPackageJsonFiles as PackageJson } from "@schemastore/package"
 import * as fs from "fs"
+import type { PackageJson } from "type-fest"
 import { promisify } from "util"
 
 const readFileAsync = promisify(fs.readFile)

@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-import type { JSONSchemaForNPMPackageJsonFiles as PackageJson } from "@schemastore/package"
+import type { PackageJson } from "type-fest"
 import { ChaynsScriptsConfiguration } from "../features/config-file/configSchema"
 import { loadConfig } from "../features/config-file/loadConfig"
 import { fm } from "./format"
