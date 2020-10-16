@@ -113,6 +113,9 @@ export function createWebpackCompiler({
 		// @ts-expect-error: The plugin typing for webpack 5 is not working properly.
 		entry: resolveProjectPath("src/index"),
 		mode,
+		// `webpack-dev-server` does not yet pick up `browserslist` as a web
+		// target, so HMR does not work.
+		target: mode === "development" ? "web" : "browserslist",
 		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
 		context: process.cwd(),
 		output: {
