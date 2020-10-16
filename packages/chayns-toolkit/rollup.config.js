@@ -1,5 +1,4 @@
 import commonjs from "@rollup/plugin-commonjs"
-import json from "@rollup/plugin-json"
 import resolve from "@rollup/plugin-node-resolve"
 import replace from "@rollup/plugin-replace"
 import typescript from "@rollup/plugin-typescript"
@@ -28,7 +27,6 @@ export default {
 			tsconfig: "./tsconfig.json",
 			include: ["src/**/*.ts"],
 		}),
-		json(),
 		isProduction && terser(),
 		replace({
 			__PKG_VERSION__: pkg.version,
