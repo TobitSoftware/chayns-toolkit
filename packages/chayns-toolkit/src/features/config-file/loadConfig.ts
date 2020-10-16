@@ -30,6 +30,14 @@ export async function loadConfig(): Promise<ChaynsScriptsConfiguration> {
 	try {
 		const validatedValue = await configSchema.validate(parsedConfig)
 
+		const { host, cert, key } = validatedValue.development
+
+		if (host === "adaptive") {
+			const https = Boolean(cert && key)
+
+			validatedValue.development.host = https ? "0.0.0.0" : "localhost"
+		}
+
 		return validatedValue
 	} catch (error: unknown) {
 		const validationError = error as yup.ValidationError
