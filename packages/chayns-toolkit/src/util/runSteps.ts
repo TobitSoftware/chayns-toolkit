@@ -34,9 +34,9 @@ export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 		getPackageManager(),
 	])
 
-	for (const sequence of sequences) {
-		let shouldContinue = true
+	let shouldContinue = true
 
+	for (const sequence of sequences) {
 		if (shouldContinue) {
 			for (const step of sequence) {
 				// eslint-disable-next-line no-await-in-loop
