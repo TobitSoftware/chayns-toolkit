@@ -106,7 +106,6 @@ export function createWebpackCompiler({
 				chunkFilename: `static/css/${packageName}.[chunkhash].chunk.css`,
 			})
 		)
-		plugins.push(new OptimizeCssAssetsPlugin())
 	}
 
 	const shouldUseSourceMaps = mode !== "production"
@@ -168,7 +167,7 @@ export function createWebpackCompiler({
 											},
 										],
 										"postcss-flexbugs-fixes",
-										"cssnano",
+										mode === "production" && "cssnano",
 									].filter(Boolean),
 								},
 							},
