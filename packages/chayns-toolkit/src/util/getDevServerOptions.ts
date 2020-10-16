@@ -26,11 +26,7 @@ export function getDevServerOptions({
 			errors: true,
 			warnings: true,
 		},
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
-		cert,
-		key,
-		https: Boolean(cert && key),
+		https: Boolean(cert && key) && { key, cert },
 		hot: true,
 		headers: {
 			"Access-Control-Allow-Origin": "*",

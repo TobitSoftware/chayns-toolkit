@@ -1,7 +1,9 @@
 {
 	"extends": "@chayns-toolkit",
+	"globals": {
+		"__PKG_VERSION__": true
+	},
 	"rules": {
-		"no-console": "off",
 		"import/no-extraneous-dependencies": [
 			"error",
 			{
@@ -10,9 +12,13 @@
 				"peerDependencies": false
 			}
 		],
-		"import/no-unresolved": ["error", { "ignore": ["type-fest"] }]
-	},
-	"globals": {
-		"__PKG_VERSION__": true
+		"import/no-unresolved": [
+			"error",
+			{
+				"ignore": ["type-fest"]
+			}
+		],
+		"no-console": "off",
+		"no-restricted-syntax": "off"
 	}
 }

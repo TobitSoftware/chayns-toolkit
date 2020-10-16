@@ -4,6 +4,7 @@ import { createWebpackCompiler } from "../util/createWebpackCompiler"
 import { fm } from "../util/format"
 import { output } from "../util/output"
 import { StepParams } from "../util/runSteps"
+import { BuildStatsJSON } from "./buildStatsJson"
 
 interface BuildOptions {
 	analyze: boolean
@@ -44,8 +45,9 @@ export function buildCommand({
 					return resolve()
 				}
 
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				const { assets } = stats?.toJson()
+				const statsJson = stats?.toJson() as BuildStatsJSON
+
+				const { assets } = statsJson
 
 				output.info(
 					`Finished build in ${fm.number(
@@ -61,8 +63,7 @@ export function buildCommand({
 						colAligns: ["left", "right"],
 					})
 
-					// eslint-disable-next-line
-					assets.forEach((asset: { size: number; name: any }) => {
+					assets.forEach((asset) => {
 						let unit = "B"
 						let amount = asset.size
 

@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 import type { PackageJson } from "type-fest"
 import { ChaynsScriptsConfiguration } from "../features/config-file/configSchema"
 import { loadConfig } from "../features/config-file/loadConfig"
@@ -41,6 +39,7 @@ export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 
 		if (shouldContinue) {
 			for (const step of sequence) {
+				// eslint-disable-next-line no-await-in-loop
 				const result = await step({ config, packageJson, packageManager })
 
 				if (result) {

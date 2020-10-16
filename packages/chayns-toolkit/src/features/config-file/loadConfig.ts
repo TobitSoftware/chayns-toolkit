@@ -1,5 +1,6 @@
 import { readFile } from "fs"
 import path from "path"
+import type { JsonValue } from "type-fest"
 import { promisify } from "util"
 import * as yup from "yup"
 import { ChaynsScriptsConfiguration, configSchema } from "./configSchema"
@@ -21,8 +22,7 @@ export async function loadConfig(): Promise<ChaynsScriptsConfiguration> {
 	let parsedConfig
 
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		parsedConfig = JSON.parse(config.toString())
+		parsedConfig = JSON.parse(config.toString()) as JsonValue
 	} catch {
 		throw Error(`The configuration does not seem to contain valid JSON.`)
 	}
