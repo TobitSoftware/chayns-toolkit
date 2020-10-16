@@ -5,6 +5,7 @@ import { lintCommand } from "./commands/lintCommand"
 import { checkPackages } from "./features/extraneous-packages/checkPackages"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
+import { waitForPort } from "./features/wait-for-port/waitForPort"
 import { output } from "./util/output"
 import { runSteps } from "./util/runSteps"
 
@@ -16,7 +17,7 @@ program
 	.description("start up a development server with hot module replacement")
 	.action(async () => {
 		await runSteps(
-			[checkPackages, checkForTypeScript, checkSSLConfig],
+			[checkPackages, checkForTypeScript, checkSSLConfig, waitForPort],
 			[devCommand]
 		)
 	})
