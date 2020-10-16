@@ -1,4 +1,4 @@
-import React from "react"
+import React, { Suspense } from "react"
 import styles from "./app.module.css"
 import CorejsTest from "./components/corejs-test/CorejsTest"
 import CssModules from "./components/css-modules/CssModules"
@@ -20,6 +20,13 @@ export default function App() {
 			<TsTest />
 			<CorejsTest />
 			<EnvTest />
+			<Suspense fallback={<div />}>
+				<LazyComponent />
+			</Suspense>
 		</div>
 	)
 }
+
+const LazyComponent = React.lazy(() =>
+	import("./components/code-splitting-test/CodeSplittingTest")
+)
