@@ -7,9 +7,9 @@ import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
 import type { PackageJson } from "type-fest"
-import webpack, { Compiler } from "webpack"
+import { Configuration } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
-import { setBrowsersListEnv } from "../features/environment/browserslist"
+import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import { project } from "./project"
 
 type Mode = "development" | "production"
@@ -23,14 +23,14 @@ interface CreateConfigOptions {
 	packageJson: PackageJson
 }
 
-export function createWebpackCompiler({
+export function createWebpackConfig({
 	mode,
 	analyze,
 	outputFilename,
 	singleBundle,
 	path,
 	packageJson,
-}: CreateConfigOptions): Compiler {
+}: CreateConfigOptions): Configuration {
 	const plugins = [
 		new DotenvWebpackPlugin({
 			path: "./.env.local",
@@ -49,8 +49,8 @@ export function createWebpackCompiler({
 		}
 	}
 
-	if (project.hasFile("src/index.html")) {
-		htmlPath ??= "src/index.html"
+	if (!htmlPath && project.hasFile("src/index.html")) {
+		htmlPath = "src/index.html"
 	}
 
 	if (htmlPath) {
@@ -86,7 +86,7 @@ export function createWebpackCompiler({
 		plugins.push(new CleanWebpackPlugin())
 	}
 
-	setBrowsersListEnv(mode)
+	setBrowserslistEnvironment(mode)
 
 	if (mode === "development") {
 		plugins.push(new ReactRefreshWebpackPlugin())
@@ -108,8 +108,7 @@ export function createWebpackCompiler({
 
 	const shouldUseSourceMaps = mode !== "production"
 
-	return webpack({
-		// @ts-expect-error: The plugin typing for webpack 5 is not working properly.
+	return {
 		entry: project.resolvePath("src/index"),
 		mode,
 		// `webpack-dev-server` does not yet pick up `browserslist` as a web
@@ -198,14 +197,13 @@ export function createWebpackCompiler({
 				},
 			],
 		},
+		// @ts-expect-error: The plugin type definitions do not yet match webpack 5.
 		plugins,
 		optimization: {
-			splitChunks: singleBundle
-				? { default: false, defaultVendors: false }
-				: { chunks: "all" },
+			splitChunks: singleBundle ? false : { chunks: "all" },
 		},
 		performance: false,
-	})
+	}
 }
 
 function getOutputPath({
@@ -214,7 +212,7 @@ function getOutputPath({
 	singleBundle,
 	packageName,
 }: {
-	mode: "development" | "production"
+	mode: Mode
 	filename: string
 	singleBundle: boolean
 	packageName: string

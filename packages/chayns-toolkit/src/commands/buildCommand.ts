@@ -1,10 +1,12 @@
 import chalk from "chalk"
 import Table from "cli-table"
-import { createWebpackCompiler } from "../util/createWebpackCompiler"
+import webpack from "webpack"
+import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
 import { output } from "../util/output"
 import { StepParams } from "../util/runSteps"
 import { BuildStatsJSON } from "./buildStatsJson"
+import { WebpackModifierFunction } from "./webpackFunction"
 
 interface BuildOptions {
 	analyze: boolean
@@ -18,7 +20,7 @@ export function buildCommand({
 			process.env.BABEL_ENV = "production"
 			process.env.NODE_ENV = "production"
 
-			const compiler = createWebpackCompiler({
+			let webpackConfig = createWebpackConfig({
 				mode: "production",
 				analyze,
 				outputFilename: config.output.filename,
@@ -26,6 +28,17 @@ export function buildCommand({
 				path: config.output.path,
 				packageJson,
 			})
+
+			if (typeof config.webpack === "function") {
+				const webpackModifier = config.webpack as WebpackModifierFunction
+
+				webpackConfig = webpackModifier(webpackConfig, {
+					webpack,
+					dev: false,
+				})
+			}
+
+			const compiler = webpack(webpackConfig)
 
 			const startTime = Date.now()
 

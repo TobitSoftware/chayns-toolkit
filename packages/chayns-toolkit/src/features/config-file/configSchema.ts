@@ -23,8 +23,18 @@ export const configSchema = yup
 	.object({
 		development: developmentSchema,
 		output: outputSchema,
+		webpack: yup
+			.mixed()
+			.notRequired()
+			.default(null)
+			.test(
+				"is-function-or-null",
+				// eslint-disable-next-line no-template-curly-in-string
+				"${path} is not a function or null",
+				(value) => typeof value === "function" || value === null
+			),
 	})
 	.required()
 	.noUnknown()
 
-export type ChaynsScriptsConfiguration = yup.InferType<typeof configSchema>
+export type ToolkitConfig = yup.InferType<typeof configSchema>

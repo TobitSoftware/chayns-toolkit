@@ -1,21 +1,21 @@
 import type { JsonValue } from "type-fest"
 import * as yup from "yup"
 import { project } from "../../util/project"
-import { ChaynsScriptsConfiguration, configSchema } from "./configSchema"
+import { configSchema, ToolkitConfig } from "./configSchema"
 
-export async function loadConfig(): Promise<ChaynsScriptsConfiguration> {
-	const config = (await project.readFile(CONFIG_FILE_NAME)) ?? "{}"
+export async function loadConfig(): Promise<ToolkitConfig> {
+	let config: unknown = {}
 
-	let parsedConfig
+	if (project.hasFile(JS_CONFIG_FILENAME)) {
+		config = await import(project.resolvePath(JS_CONFIG_FILENAME))
+	} else if (project.hasFile(JSON_CONFIG_FILENAME)) {
+		const configString = (await project.readFile(JSON_CONFIG_FILENAME)) ?? "{}"
 
-	try {
-		parsedConfig = JSON.parse(config.toString()) as JsonValue
-	} catch {
-		throw Error(`The configuration does not seem to contain valid JSON.`)
+		config = JSON.parse(configString) as JsonValue
 	}
 
 	try {
-		const validatedValue = await configSchema.validate(parsedConfig)
+		const validatedValue = await configSchema.validate(config)
 
 		const { host, cert, key } = validatedValue.development
 
@@ -41,4 +41,5 @@ export async function loadConfig(): Promise<ChaynsScriptsConfiguration> {
 	}
 }
 
-export const CONFIG_FILE_NAME = "chayns-toolkit.json"
+export const JSON_CONFIG_FILENAME = "chayns-toolkit.json"
+export const JS_CONFIG_FILENAME = "toolkit.config.js"
