@@ -1,10 +1,8 @@
 // @ts-expect-error This function is so small, it doesn't need typings.
 import getCacheIdentifier from "@chayns-toolkit/babel-preset/getCacheIdentifier"
-import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import DotenvWebpackPlugin from "dotenv-webpack"
-import * as fs from "fs"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
@@ -12,6 +10,7 @@ import type { PackageJson } from "type-fest"
 import webpack, { Compiler } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowsersListEnv } from "../features/environment/browserslist"
+import { project } from "./project"
 
 type Mode = "development" | "production"
 
@@ -43,14 +42,14 @@ export function createWebpackCompiler({
 	let htmlPath: string | undefined
 
 	if (mode === "development") {
-		const hasDevFile = fs.existsSync(resolveProjectPath("src/index.dev.html"))
+		const hasDevFile = project.hasFile("src/index.dev.html")
 
 		if (hasDevFile) {
 			htmlPath = "src/index.dev.html"
 		}
 	}
 
-	if (fs.existsSync(resolveProjectPath("src/index.html"))) {
+	if (project.hasFile("src/index.html")) {
 		htmlPath ??= "src/index.html"
 	}
 
@@ -73,7 +72,7 @@ export function createWebpackCompiler({
 
 		plugins.push(
 			new HtmlWebpackPlugin({
-				template: resolveProjectPath(htmlPath),
+				template: project.resolvePath(htmlPath),
 				minify,
 			})
 		)
@@ -111,7 +110,7 @@ export function createWebpackCompiler({
 
 	return webpack({
 		// @ts-expect-error: The plugin typing for webpack 5 is not working properly.
-		entry: resolveProjectPath("src/index"),
+		entry: project.resolvePath("src/index"),
 		mode,
 		// `webpack-dev-server` does not yet pick up `browserslist` as a web
 		// target, so HMR does not work.
@@ -119,7 +118,7 @@ export function createWebpackCompiler({
 		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
 		context: process.cwd(),
 		output: {
-			path: path ?? resolveProjectPath("build/"),
+			path: path ?? project.resolvePath("build/"),
 			hashDigestLength: 12,
 			filename: getOutputPath({
 				mode,

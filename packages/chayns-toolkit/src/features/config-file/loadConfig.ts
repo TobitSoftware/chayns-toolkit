@@ -1,23 +1,10 @@
-import { readFile } from "fs"
-import path from "path"
 import type { JsonValue } from "type-fest"
-import { promisify } from "util"
 import * as yup from "yup"
+import { project } from "../../util/project"
 import { ChaynsScriptsConfiguration, configSchema } from "./configSchema"
 
-const readFileAsync = promisify(readFile)
-
 export async function loadConfig(): Promise<ChaynsScriptsConfiguration> {
-	let config: string
-
-	try {
-		config = await readFileAsync(
-			path.resolve(process.cwd(), CONFIG_FILE_NAME),
-			{ encoding: "utf8" }
-		)
-	} catch {
-		config = "{}"
-	}
+	const config = (await project.readFile(CONFIG_FILE_NAME)) ?? "{}"
 
 	let parsedConfig
 
