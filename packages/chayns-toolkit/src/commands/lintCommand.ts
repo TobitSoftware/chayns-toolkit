@@ -1,15 +1,34 @@
-import { collectLintingResults } from "../util/collectLintingResults"
+import { ESLint } from "eslint"
 import { output } from "../util/output"
 
 export async function lintCommand(): Promise<void> {
 	output.info(`Linting your code...`)
 
 	try {
-		const {
-			errorCount,
-			formattedResults,
-			warningCount,
-		} = await collectLintingResults()
+		const eslint = new ESLint({
+			fix: true,
+			extensions: ["js", "jsx", "ts", "tsx"],
+		})
+
+		const results = await eslint.lintFiles(["./src"])
+
+		await ESLint.outputFixes(results)
+
+		const warningCount = results.reduce(
+			(count, file) => count + file.warningCount,
+			0
+		)
+		const errorCount = results.reduce(
+			(count, file) => count + file.errorCount,
+			0
+		)
+
+		let formattedResults = ""
+
+		if (warningCount || errorCount) {
+			const formatter = await eslint.loadFormatter("pretty")
+			formattedResults = formatter.format(results)
+		}
 
 		if (errorCount + warningCount === 0) {
 			output.info(`No linting errors were found.\n`)

@@ -5,7 +5,7 @@ export const pkgCommands = {
 	install(
 		packageManager: PackageManager | undefined,
 		packages: string | string[],
-		dev = false
+		asDevDependencies = false
 	): string {
 		let command = "npm i "
 
@@ -17,10 +17,11 @@ export const pkgCommands = {
 			command += packages
 		}
 
-		if (dev) command += " -D"
+		if (asDevDependencies) command += " -D"
 
 		return fm.command(command)
 	},
+
 	remove(
 		packageManager: PackageManager | undefined,
 		packages: string | string[]

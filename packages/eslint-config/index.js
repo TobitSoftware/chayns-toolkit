@@ -46,7 +46,7 @@ module.exports = {
 			},
 		},
 		{
-			files: ["**/*.@(test|spec).@(j|t)s?(x)"],
+			files: ["**/*.@(test|spec).@(js|jsx|ts|tsx)"],
 			env: { "jest/globals": true },
 			plugins: ["jest"],
 			rules: {

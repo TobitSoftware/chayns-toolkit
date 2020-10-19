@@ -6,7 +6,9 @@ export const devBrowsers = [
 
 export const prodBrowsers = [">0.5%", "not dead", "not op_mini all"].join()
 
-export function setBrowsersListEnv(mode: "development" | "production"): void {
+export function setBrowserslistEnvironment(
+	mode: "development" | "production"
+): void {
 	if (mode === "development") {
 		process.env.BROWSERSLIST = devBrowsers
 	} else if (mode === "production") {
