@@ -2,6 +2,7 @@ import { Command } from "commander"
 import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
+import { convertConfigFile } from "./features/config-file/convertConfigFile"
 import { checkPackages } from "./features/extraneous-packages/checkPackages"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
@@ -17,7 +18,13 @@ program
 	.description("start up a development server with hot module replacement")
 	.action(async () => {
 		await runSteps(
-			[checkPackages, checkForTypeScript, checkSSLConfig, waitForPort],
+			[
+				convertConfigFile,
+				checkPackages,
+				checkForTypeScript,
+				checkSSLConfig,
+				waitForPort,
+			],
 			[devCommand]
 		)
 	})
