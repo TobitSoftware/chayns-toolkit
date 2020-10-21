@@ -1,5 +1,5 @@
 import React, { Suspense } from "react"
-import styles from "./app.module.css"
+import "./App.css"
 import CorejsTest from "./components/corejs-test/CorejsTest"
 import CssModules from "./components/css-modules/CssModules"
 import EnvTest from "./components/env-test/EnvTest"
@@ -12,7 +12,7 @@ import UrlLoaderTest from "./components/url-loader-test/UrlLoaderTest"
 
 export default function App() {
 	return (
-		<div className={styles.container}>
+		<div>
 			<CssModules />
 			<HmrTest />
 			<FileLoaderTest />
