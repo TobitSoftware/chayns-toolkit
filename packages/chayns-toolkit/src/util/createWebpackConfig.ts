@@ -97,7 +97,7 @@ export function createWebpackConfig({
 	if (!packageName)
 		throw Error("The name field in package.json has to be provided.")
 
-	if (!singleBundle) {
+	if (!singleBundle && mode !== "development") {
 		plugins.push(
 			new MiniCssExtractPlugin({
 				filename: `static/css/${packageName}.[contenthash].css`,
@@ -153,7 +153,7 @@ export function createWebpackConfig({
 				{
 					test: /\.(css|scss)/,
 					use: [
-						singleBundle
+						mode === "development" || singleBundle
 							? require.resolve("style-loader")
 							: MiniCssExtractPlugin.loader,
 						require.resolve("css-loader"),
