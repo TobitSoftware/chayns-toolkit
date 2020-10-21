@@ -3,10 +3,13 @@ import Table from "cli-table"
 import webpack from "webpack"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
+import {
+	modifyWebpackConfig,
+	WebpackModifierFunction,
+} from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
 import { StepParams } from "../util/runSteps"
 import { BuildStatsJSON } from "./buildStatsJson"
-import { WebpackModifierFunction } from "./webpackFunction"
 
 interface BuildOptions {
 	analyze: boolean
@@ -30,11 +33,12 @@ export function buildCommand({
 			})
 
 			if (typeof config.webpack === "function") {
-				const webpackModifier = config.webpack as WebpackModifierFunction
+				const modifier = config.webpack as WebpackModifierFunction
 
-				webpackConfig = webpackModifier(webpackConfig, {
-					webpack,
+				webpackConfig = modifyWebpackConfig({
+					config: webpackConfig,
 					dev: false,
+					modifier,
 				})
 			}
 

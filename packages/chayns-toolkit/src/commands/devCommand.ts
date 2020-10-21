@@ -1,9 +1,12 @@
 import webpack from "webpack"
 import WebpackDevServer from "webpack-dev-server"
 import { createWebpackConfig } from "../util/createWebpackConfig"
+import {
+	modifyWebpackConfig,
+	WebpackModifierFunction,
+} from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
 import { StepParams } from "../util/runSteps"
-import { WebpackModifierFunction } from "./webpackFunction"
 
 export function devCommand({ config, packageJson }: StepParams): void {
 	process.env.BABEL_ENV = "development"
@@ -20,11 +23,12 @@ export function devCommand({ config, packageJson }: StepParams): void {
 	})
 
 	if (typeof config.webpack === "function") {
-		const webpackModifier = config.webpack as WebpackModifierFunction
+		const modifier = config.webpack as WebpackModifierFunction
 
-		webpackConfig = webpackModifier(webpackConfig, {
-			webpack,
-			dev: false,
+		webpackConfig = modifyWebpackConfig({
+			config: webpackConfig,
+			dev: true,
+			modifier,
 		})
 	}
 
