@@ -1,17 +1,12 @@
-import { resolveProjectPath } from "@chayns-toolkit/utilities"
-import * as fs from "fs"
 import { fm } from "./format"
 import { output } from "./output"
+import { project } from "./project"
 
 export type PackageManager = "npm" | "yarn"
 
 export function getPackageManager(): PackageManager | undefined {
-	const hasPackageLock = npmSearchPaths.some((path) =>
-		fs.existsSync(resolveProjectPath(path))
-	)
-	const hasYarnLock = yarnSearchPaths.some((path) =>
-		fs.existsSync(resolveProjectPath(path))
-	)
+	const hasPackageLock = npmSearchPaths.some((path) => project.hasFile(path))
+	const hasYarnLock = yarnSearchPaths.some((path) => project.hasFile(path))
 
 	if (hasPackageLock && hasYarnLock) {
 		output.warn(

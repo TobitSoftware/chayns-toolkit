@@ -15,9 +15,12 @@ export default {
 		format: "cjs",
 		banner: "#! /usr/bin/env node",
 		sourcemap: true,
-		exports: "default",
+		exports: "none",
 	},
 	plugins: [
+		typescript({
+			include: ["src/**/*.ts"],
+		}),
 		replace({
 			__PKG_VERSION__: JSON.stringify(pkg.version),
 		}),
@@ -26,10 +29,6 @@ export default {
 		}),
 		commonjs({ extensions: [".js", ".ts"] }),
 		autoExternal(),
-		typescript({
-			tsconfig: "./tsconfig.json",
-			include: ["src/**/*.ts"],
-		}),
 		isProduction && terser(),
 	].filter(Boolean),
 }

@@ -14,5 +14,5 @@ export const extraneousPackages: Array<string | RegExp> = [
 	"webpack-dev-server",
 	"webpack",
 	/^@babel\//,
-	/^babel-/,
+	/^babel-(?!jest)/,
 ]

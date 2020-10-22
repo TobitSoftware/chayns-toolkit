@@ -5,7 +5,7 @@ export const pkgCommands = {
 	install(
 		packageManager: PackageManager | undefined,
 		packages: string | string[],
-		dev = false
+		asDevDependencies = false
 	): string {
 		let command = "npm i "
 
@@ -17,10 +17,11 @@ export const pkgCommands = {
 			command += packages
 		}
 
-		if (dev) command += " -D"
+		if (asDevDependencies) command += " -D"
 
 		return fm.command(command)
 	},
+
 	remove(
 		packageManager: PackageManager | undefined,
 		packages: string | string[]
@@ -30,5 +31,27 @@ export const pkgCommands = {
 		command += Array.isArray(packages) ? packages.join(" ") : packages
 
 		return fm.command(command)
+	},
+
+	move(
+		packageManager: PackageManager | undefined,
+		packages: string | string[],
+		to: "dev" | "prod"
+	): string {
+		const packageString = Array.isArray(packages)
+			? packages.join(" ")
+			: packages
+
+		if (packageManager === "yarn") {
+			return fm.command(
+				`yarn remove ${packageString} && yarn add ${packageString}${
+					to === "dev" ? " -D" : ""
+				}`
+			)
+		}
+
+		return fm.command(
+			`npm install ${packageString}${to === "dev" ? " -D" : ""}`
+		)
 	},
 }

@@ -2,6 +2,7 @@ import { Command } from "commander"
 import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
+import { convertConfigFile } from "./features/config-file/convertConfigFile"
 import { checkPackages } from "./features/extraneous-packages/checkPackages"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
@@ -15,10 +16,17 @@ program.version(__PKG_VERSION__, "-v, --version", "output the version number")
 program
 	.command("dev")
 	.description("start up a development server with hot module replacement")
-	.action(async () => {
+	.option("-d, --devtools", "open react-devtools in a separate window", false)
+	.action(async (options: { devtools: boolean }) => {
 		await runSteps(
-			[checkPackages, checkForTypeScript, checkSSLConfig, waitForPort],
-			[devCommand]
+			[
+				convertConfigFile,
+				checkPackages,
+				checkForTypeScript,
+				checkSSLConfig,
+				waitForPort,
+			],
+			[devCommand({ devtools: options.devtools })]
 		)
 	})
 

@@ -1,17 +1,16 @@
 // @ts-expect-error This function is so small, it doesn't need typings.
 import getCacheIdentifier from "@chayns-toolkit/babel-preset/getCacheIdentifier"
-import { resolveProjectPath } from "@chayns-toolkit/utilities"
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import DotenvWebpackPlugin from "dotenv-webpack"
-import * as fs from "fs"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
 import type { PackageJson } from "type-fest"
-import webpack, { Compiler } from "webpack"
+import { Configuration } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
-import { setBrowsersListEnv } from "../features/environment/browserslist"
+import { setBrowserslistEnvironment } from "../features/environment/browserslist"
+import { project } from "./project"
 
 type Mode = "development" | "production"
 
@@ -22,16 +21,18 @@ interface CreateConfigOptions {
 	outputFilename: string
 	path?: string
 	packageJson: PackageJson
+	injectDevtoolsScript?: boolean
 }
 
-export function createWebpackCompiler({
+export async function createWebpackConfig({
 	mode,
 	analyze,
 	outputFilename,
 	singleBundle,
-	path,
+	path: outputPath,
 	packageJson,
-}: CreateConfigOptions): Compiler {
+	injectDevtoolsScript = false,
+}: CreateConfigOptions): Promise<Configuration> {
 	const plugins = [
 		new DotenvWebpackPlugin({
 			path: "./.env.local",
@@ -40,21 +41,30 @@ export function createWebpackCompiler({
 		}),
 	]
 
-	let htmlPath: string | undefined
+	let templateContent: string | null = null
 
-	if (mode === "development") {
-		const hasDevFile = fs.existsSync(resolveProjectPath("src/index.dev.html"))
-
-		if (hasDevFile) {
-			htmlPath = "src/index.dev.html"
-		}
+	if (mode === "development" && project.hasFile("src/index.dev.html")) {
+		templateContent = await project.readFile("src/index.dev.html")
 	}
 
-	if (fs.existsSync(resolveProjectPath("src/index.html"))) {
-		htmlPath ??= "src/index.html"
+	if (!templateContent && project.hasFile("src/index.html")) {
+		templateContent = await project.readFile("src/index.html")
 	}
 
-	if (htmlPath) {
+	// Add the React devtools script tag
+	if (injectDevtoolsScript && templateContent && mode === "development") {
+		const firstScriptIndex = templateContent.indexOf("<script")
+
+		templateContent = `${templateContent.substring(
+			0,
+			firstScriptIndex
+		)}\n<!-- The React Devtools connection script -->
+    <script src="http://localhost:8097"></script>\n${templateContent.substring(
+			firstScriptIndex
+		)}`
+	}
+
+	if (templateContent) {
 		const minify =
 			mode === "production"
 				? {
@@ -73,7 +83,7 @@ export function createWebpackCompiler({
 
 		plugins.push(
 			new HtmlWebpackPlugin({
-				template: resolveProjectPath(htmlPath),
+				templateContent,
 				minify,
 			})
 		)
@@ -87,7 +97,7 @@ export function createWebpackCompiler({
 		plugins.push(new CleanWebpackPlugin())
 	}
 
-	setBrowsersListEnv(mode)
+	setBrowserslistEnvironment(mode)
 
 	if (mode === "development") {
 		plugins.push(new ReactRefreshWebpackPlugin())
@@ -98,7 +108,7 @@ export function createWebpackCompiler({
 	if (!packageName)
 		throw Error("The name field in package.json has to be provided.")
 
-	if (!singleBundle) {
+	if (!singleBundle && mode !== "development") {
 		plugins.push(
 			new MiniCssExtractPlugin({
 				filename: `static/css/${packageName}.[contenthash].css`,
@@ -109,17 +119,16 @@ export function createWebpackCompiler({
 
 	const shouldUseSourceMaps = mode !== "production"
 
-	return webpack({
-		// @ts-expect-error: The plugin typing for webpack 5 is not working properly.
-		entry: resolveProjectPath("src/index"),
+	return {
+		entry: project.resolvePath("src/index"),
 		mode,
 		// `webpack-dev-server` does not yet pick up `browserslist` as a web
 		// target, so HMR does not work.
 		target: mode === "development" ? "web" : "browserslist",
 		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
-		context: process.cwd(),
+		context: project.resolvePath("."),
 		output: {
-			path: path ?? resolveProjectPath("build/"),
+			path: outputPath ?? project.resolvePath("build/"),
 			hashDigestLength: 12,
 			filename: getOutputPath({
 				mode,
@@ -155,7 +164,7 @@ export function createWebpackCompiler({
 				{
 					test: /\.(css|scss)/,
 					use: [
-						singleBundle
+						mode === "development" || singleBundle
 							? require.resolve("style-loader")
 							: MiniCssExtractPlugin.loader,
 						require.resolve("css-loader"),
@@ -199,14 +208,13 @@ export function createWebpackCompiler({
 				},
 			],
 		},
+		// @ts-expect-error: The plugin type definitions do not yet match webpack 5.
 		plugins,
 		optimization: {
-			splitChunks: singleBundle
-				? { default: false, defaultVendors: false }
-				: { chunks: "all" },
+			splitChunks: singleBundle ? false : { chunks: "all" },
 		},
 		performance: false,
-	})
+	}
 }
 
 function getOutputPath({
@@ -215,7 +223,7 @@ function getOutputPath({
 	singleBundle,
 	packageName,
 }: {
-	mode: "development" | "production"
+	mode: Mode
 	filename: string
 	singleBundle: boolean
 	packageName: string

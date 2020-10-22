@@ -5,8 +5,11 @@ export default function HmrTest() {
 	const [counter, increaseCounter] = useReducer((s) => s + 1, 0)
 
 	return (
-		<Button onClick={increaseCounter}>
-			I&apos;ve been clicked {counter} times.
-		</Button>
+		<div>
+			<h2>Hot Module Replacement</h2>
+			<Button onClick={increaseCounter}>
+				I&apos;ve been clicked {counter} times.
+			</Button>
+		</div>
 	)
 }

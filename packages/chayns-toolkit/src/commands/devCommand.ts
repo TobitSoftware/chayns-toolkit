@@ -1,27 +1,102 @@
+import { exec } from "child_process"
+import * as path from "path"
+import webpack from "webpack"
 import WebpackDevServer from "webpack-dev-server"
-import { createWebpackCompiler } from "../util/createWebpackCompiler"
-import { getDevServerOptions } from "../util/getDevServerOptions"
+import { createWebpackConfig } from "../util/createWebpackConfig"
+import { fm } from "../util/format"
+import {
+	modifyWebpackConfig,
+	WebpackModifierFunction,
+} from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
+import { pkgCommands } from "../util/pkgCommands"
 import { StepParams } from "../util/runSteps"
 
-export function devCommand({ config, packageJson }: StepParams): void {
-	process.env.BABEL_ENV = "development"
-	process.env.NODE_ENV = "development"
+interface DevCommandArgs {
+	devtools: boolean
+}
 
-	const { port, host, cert, key } = config.development
+export function devCommand({
+	devtools,
+}: DevCommandArgs): (stepParams: StepParams) => Promise<void> {
+	return async ({ config, packageJson, packageManager }) => {
+		process.env.BABEL_ENV = "development"
+		process.env.NODE_ENV = "development"
 
-	const devServer = new WebpackDevServer(
-		createWebpackCompiler({
+		const { port, host, cert, key } = config.development
+
+		let webpackConfig = await createWebpackConfig({
 			analyze: false,
 			mode: "development",
 			outputFilename: config.output.filename,
 			singleBundle: config.output.singleBundle,
 			packageJson,
-		}),
-		getDevServerOptions({ host, port, cert, key })
-	)
+			injectDevtoolsScript: devtools,
+		})
 
-	devServer.listen(port, host, (err) => {
-		if (err) output.error(err.message)
-	})
+		if (typeof config.webpack === "function") {
+			const modifier = config.webpack as WebpackModifierFunction
+
+			webpackConfig = modifyWebpackConfig({
+				config: webpackConfig,
+				dev: true,
+				modifier,
+			})
+		}
+
+		if (devtools) {
+			if ("react-devtools" in (packageJson.dependencies || {})) {
+				output.error(
+					`You added ${fm.code`react-devtools`} as a regular dependency.`
+				)
+				output.blank(
+					`Install it under ${fm.code`devDependencies`} by running ${pkgCommands.move(
+						packageManager,
+						"react-devtools",
+						"dev"
+					)}.\n`
+				)
+				process.exit(1)
+			} else if (!("react-devtools" in (packageJson.devDependencies || {}))) {
+				output.error(
+					`You need to install the ${fm.code`react-devtools`} package to use the ${fm.command`--devtools`} option.`
+				)
+				output.blank(
+					`Run ${pkgCommands.move(
+						packageManager,
+						"react-devtools",
+						"dev"
+					)} to add it as a ${fm.code`devDependency`}.\n`
+				)
+				process.exit(1)
+			}
+
+			exec(`node ${path.join(require.resolve("react-devtools"), "../bin.js")}`)
+		}
+
+		const compiler = webpack(webpackConfig)
+
+		const devServer = new WebpackDevServer(compiler, {
+			historyApiFallback: true,
+			compress: true,
+			disableHostCheck: true,
+			clientLogLevel: "none",
+			host,
+			port,
+			stats: { all: false, colors: true, errors: true, warnings: true },
+			https: Boolean(cert && key) && { key, cert },
+			hot: true,
+			headers: {
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods":
+					"GET, POST, PUT, DELETE, PATCH, OPTIONS",
+				"Access-Control-Allow-Headers":
+					"X-Requested-With, content-type, Authorization",
+			},
+		})
+
+		devServer.listen(port, host, (err) => {
+			if (err) output.error(err.message)
+		})
+	}
 }

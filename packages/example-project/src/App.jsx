@@ -1,17 +1,22 @@
 import React, { Suspense } from "react"
-import styles from "./app.module.css"
+import "./App.css"
 import CorejsTest from "./components/corejs-test/CorejsTest"
 import CssModules from "./components/css-modules/CssModules"
 import EnvTest from "./components/env-test/EnvTest"
 import FileLoaderTest from "./components/file-loader-test/FileLoaderTest"
 import HmrTest from "./components/hmr-test/HmrTest"
+import PipelineOperatorTest from "./components/pipeline-operator-test/PipelineOperatorTest"
 import SvgTest from "./components/svg-test/SvgTest"
 import TsTest from "./components/ts-test/TsTest"
 import UrlLoaderTest from "./components/url-loader-test/UrlLoaderTest"
 
+const LazyComponent = React.lazy(() =>
+	import("./components/code-splitting-test/CodeSplittingTest")
+)
+
 export default function App() {
 	return (
-		<div className={styles.container}>
+		<div>
 			<CssModules />
 			<HmrTest />
 			<FileLoaderTest />
@@ -23,10 +28,7 @@ export default function App() {
 			<Suspense fallback={<div />}>
 				<LazyComponent />
 			</Suspense>
+			<PipelineOperatorTest />
 		</div>
 	)
 }
-
-const LazyComponent = React.lazy(() =>
-	import("./components/code-splitting-test/CodeSplittingTest")
-)

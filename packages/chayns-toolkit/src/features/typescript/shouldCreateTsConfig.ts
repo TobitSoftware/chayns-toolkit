@@ -1,17 +1,11 @@
-import { resolveProjectPath } from "@chayns-toolkit/utilities"
-import * as fs from "fs"
-import { promisify } from "util"
-
-const readFileAsync = promisify(fs.readFile)
+import { project } from "../../util/project"
 
 export async function shouldCreateTsConfig(): Promise<boolean> {
-	const hasTsConfig = fs.existsSync(resolveProjectPath("tsconfig.json"))
+	const hasTsConfig = project.hasFile("tsconfig.json")
 
 	if (!hasTsConfig) return true
 
-	const tsConfig = await readFileAsync(resolveProjectPath("tsconfig.json"), {
-		encoding: "utf-8",
-	})
+	const tsConfig = (await project.readFile("tsconfig.json")) ?? ""
 
 	const trimmedTsConfig = tsConfig.replace(/\s/gi, "")
 

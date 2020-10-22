@@ -1,17 +1,13 @@
-import { resolveProjectPath } from "@chayns-toolkit/utilities"
-import * as fs from "fs"
 import type { TsConfigJson } from "type-fest"
-import { promisify } from "util"
 import { fm } from "../../util/format"
 import { isPackageInstalled } from "../../util/isPackageInstalled"
 import { output } from "../../util/output"
 import { pkgCommands } from "../../util/pkgCommands"
+import { project } from "../../util/project"
 import { StepParams } from "../../util/runSteps"
 import { checkForTypesPackages } from "./checkForTypesPackages"
 import { shouldCreateTsConfig } from "./shouldCreateTsConfig"
 import { wantsToUseTypeScript } from "./wantsToUseTypeScript"
-
-const writeFileAsync = promisify(fs.writeFile)
 
 export async function checkForTypeScript({
 	packageJson,
@@ -53,8 +49,8 @@ export async function checkForTypeScript({
 }
 
 async function createTsConfig(): Promise<void> {
-	await writeFileAsync(
-		resolveProjectPath("tsconfig.json"),
+	await project.writeFile(
+		"tsconfig.json",
 		JSON.stringify(defaultTsconfig, undefined, 4)
 	)
 
