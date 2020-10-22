@@ -82,7 +82,7 @@
 		"@types/jest": "^26.0.15",
 		"@types/mini-css-extract-plugin": "^1.0.0",
 		"@types/mock-fs": "^4.13.0",
-		"@types/node": "^14.14.0",
+		"@types/node": "^14.14.2",
 		"@types/postcss-flexbugs-fixes": "^4.2.0",
 		"@types/postcss-preset-env": "^6.7.0",
 		"@types/tcp-port-used": "^1.0.0",
