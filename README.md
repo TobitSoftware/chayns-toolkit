@@ -74,6 +74,10 @@ module.exports = {
 }
 ```
 
+| Parameters         | Function                                                                                      |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| `-d`, `--devtools` | Debug your application with the standalone React Devtools. [Read more](#using-react-devtools) |
+
 > To achieve faster (re-)build times during development this command only
 > transpiles your code to work with the latest versions of Chrome, Safari and
 > Firefox.
@@ -221,6 +225,27 @@ This allows you to see changes in your React components in real-time after
 saving without losing component state. Some patterns will force a full reload,
 for further information refer to
 [this paragraph](https://github.com/pmmmwh/react-refresh-webpack-plugin#caveats).
+
+### Using React Devtools
+
+Sometimes you might not be able to use the React Devtools browser extension,
+e.g. when developing inside of an iframe.
+
+For this case we support using the standalone React Devtools via the
+[`react-devtools`](https://github.com/facebook/react/tree/master/packages/react-devtools)-package.
+First you have to install it as a development dependency:
+
+```bash
+# Yarn
+yarn add react-devtools -D
+
+# NPM
+npm install react-devtools -D
+```
+
+Now you can pass the `-d` (or `--devtools`) option to `chayns-toolkit dev`. It
+then starts the React Devtools window, which will connect to your application
+once it has loaded in the browser.
 
 ### ESLint Configuration
 
