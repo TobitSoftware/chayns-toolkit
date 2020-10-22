@@ -56,7 +56,7 @@ export function buildCommand({
 			output.error("Compilation failed.\n")
 
 			stats.compilation.errors.forEach((error: Error) => {
-				output.blank(error.message)
+				console.error(error)
 			})
 		} else {
 			const statsJson = stats?.toJson() as BuildStatsJSON
