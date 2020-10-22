@@ -10,6 +10,10 @@ import SvgTest from "./components/svg-test/SvgTest"
 import TsTest from "./components/ts-test/TsTest"
 import UrlLoaderTest from "./components/url-loader-test/UrlLoaderTest"
 
+const LazyComponent = React.lazy(() =>
+	import("./components/code-splitting-test/CodeSplittingTest")
+)
+
 export default function App() {
 	return (
 		<div>
@@ -28,7 +32,3 @@ export default function App() {
 		</div>
 	)
 }
-
-const LazyComponent = React.lazy(() =>
-	import("./components/code-splitting-test/CodeSplittingTest")
-)
