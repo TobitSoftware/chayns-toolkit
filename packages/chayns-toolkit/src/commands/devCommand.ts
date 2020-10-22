@@ -3,11 +3,13 @@ import * as path from "path"
 import webpack from "webpack"
 import WebpackDevServer from "webpack-dev-server"
 import { createWebpackConfig } from "../util/createWebpackConfig"
+import { fm } from "../util/format"
 import {
 	modifyWebpackConfig,
 	WebpackModifierFunction,
 } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
+import { pkgCommands } from "../util/pkgCommands"
 import { StepParams } from "../util/runSteps"
 
 interface DevCommandArgs {
@@ -17,7 +19,7 @@ interface DevCommandArgs {
 export function devCommand({
 	devtools,
 }: DevCommandArgs): (stepParams: StepParams) => Promise<void> {
-	return async ({ config, packageJson }) => {
+	return async ({ config, packageJson, packageManager }) => {
 		process.env.BABEL_ENV = "development"
 		process.env.NODE_ENV = "development"
 
@@ -43,6 +45,32 @@ export function devCommand({
 		}
 
 		if (devtools) {
+			if ("react-devtools" in (packageJson.dependencies || {})) {
+				output.error(
+					`You added ${fm.code`react-devtools`} as a regular dependency.`
+				)
+				output.blank(
+					`Install it under ${fm.code`devDependencies`} by running ${pkgCommands.move(
+						packageManager,
+						"react-devtools",
+						"dev"
+					)}.\n`
+				)
+				process.exit(1)
+			} else if (!("react-devtools" in (packageJson.devDependencies || {}))) {
+				output.error(
+					`You need to install the ${fm.code`react-devtools`} package to use the ${fm.command`--devtools`} option.`
+				)
+				output.blank(
+					`Run ${pkgCommands.move(
+						packageManager,
+						"react-devtools",
+						"dev"
+					)} to add it as a ${fm.code`devDependency`}.\n`
+				)
+				process.exit(1)
+			}
+
 			exec(`node ${path.join(require.resolve("react-devtools"), "../bin.js")}`)
 		}
 

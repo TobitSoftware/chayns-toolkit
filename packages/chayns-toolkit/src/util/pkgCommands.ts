@@ -32,4 +32,26 @@ export const pkgCommands = {
 
 		return fm.command(command)
 	},
+
+	move(
+		packageManager: PackageManager | undefined,
+		packages: string | string[],
+		to: "dev" | "prod"
+	): string {
+		const packageString = Array.isArray(packages)
+			? packages.join(" ")
+			: packages
+
+		if (packageManager === "yarn") {
+			return fm.command(
+				`yarn remove ${packageString} && yarn add ${packageString}${
+					to === "dev" ? " -D" : ""
+				}`
+			)
+		}
+
+		return fm.command(
+			`npm install ${packageString}${to === "dev" ? " -D" : ""}`
+		)
+	},
 }
