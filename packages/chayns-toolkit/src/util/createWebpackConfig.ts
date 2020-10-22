@@ -21,16 +21,18 @@ interface CreateConfigOptions {
 	outputFilename: string
 	path?: string
 	packageJson: PackageJson
+	injectDevtoolsScript?: boolean
 }
 
-export function createWebpackConfig({
+export async function createWebpackConfig({
 	mode,
 	analyze,
 	outputFilename,
 	singleBundle,
-	path,
+	path: outputPath,
 	packageJson,
-}: CreateConfigOptions): Configuration {
+	injectDevtoolsScript = false,
+}: CreateConfigOptions): Promise<Configuration> {
 	const plugins = [
 		new DotenvWebpackPlugin({
 			path: "./.env.local",
@@ -39,21 +41,30 @@ export function createWebpackConfig({
 		}),
 	]
 
-	let htmlPath: string | undefined
+	let templateContent: string | null = null
 
-	if (mode === "development") {
-		const hasDevFile = project.hasFile("src/index.dev.html")
-
-		if (hasDevFile) {
-			htmlPath = "src/index.dev.html"
-		}
+	if (mode === "development" && project.hasFile("src/index.dev.html")) {
+		templateContent = await project.readFile("src/index.dev.html")
 	}
 
-	if (!htmlPath && project.hasFile("src/index.html")) {
-		htmlPath = "src/index.html"
+	if (!templateContent && project.hasFile("src/index.html")) {
+		templateContent = await project.readFile("src/index.html")
 	}
 
-	if (htmlPath) {
+	// Add the React devtools script tag
+	if (injectDevtoolsScript && templateContent && mode === "development") {
+		const firstScriptIndex = templateContent.indexOf("<script")
+
+		templateContent = `${templateContent.substring(
+			0,
+			firstScriptIndex
+		)}\n<!-- The React Devtools connection script -->
+    <script src="http://localhost:8097"></script>\n${templateContent.substring(
+			firstScriptIndex
+		)}`
+	}
+
+	if (templateContent) {
 		const minify =
 			mode === "production"
 				? {
@@ -72,7 +83,7 @@ export function createWebpackConfig({
 
 		plugins.push(
 			new HtmlWebpackPlugin({
-				template: project.resolvePath(htmlPath),
+				templateContent,
 				minify,
 			})
 		)
@@ -115,9 +126,9 @@ export function createWebpackConfig({
 		// target, so HMR does not work.
 		target: mode === "development" ? "web" : "browserslist",
 		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
-		context: process.cwd(),
+		context: project.resolvePath("."),
 		output: {
-			path: path ?? project.resolvePath("build/"),
+			path: outputPath ?? project.resolvePath("build/"),
 			hashDigestLength: 12,
 			filename: getOutputPath({
 				mode,

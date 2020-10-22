@@ -1,6 +1,6 @@
 import webpack, { Configuration } from "webpack"
-import { fm } from "../../lib/util/format"
 import { JS_CONFIG_FILENAME } from "../features/config-file/loadConfig"
+import { fm } from "./format"
 
 interface ModifyWebpackConfigOptions {
 	config: Configuration

@@ -16,7 +16,8 @@ program.version(__PKG_VERSION__, "-v, --version", "output the version number")
 program
 	.command("dev")
 	.description("start up a development server with hot module replacement")
-	.action(async () => {
+	.option("-d, --devtools", "open react-devtools in a separate window", false)
+	.action(async (options: { devtools: boolean }) => {
 		await runSteps(
 			[
 				convertConfigFile,
@@ -25,7 +26,7 @@ program
 				checkSSLConfig,
 				waitForPort,
 			],
-			[devCommand]
+			[devCommand({ devtools: options.devtools })]
 		)
 	})
 
