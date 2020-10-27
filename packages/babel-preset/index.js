@@ -1,22 +1,24 @@
-const getCacheIdentifier = require("./getCacheIdentifier")
-const { usesTypeScript, usesChaynsComponents, usesFlow } = require("./uses")
+const { declare } = require("@babel/helper-plugin-utils")
 
-module.exports = (api) => {
-	api.cache.using(() => getCacheIdentifier())
+module.exports = declare((api, options) => {
+	api.assertVersion(7)
 
-	const isProduction = process.env.NODE_ENV === "production"
-	const isTest = process.env.NODE_ENV === "test"
+	const env = process.env.BABEL_ENV || process.env.NODE_ENV
 
-	if (isTest) {
-		return {
-			presets: [["@babel/preset-env", { targets: { node: "current" } }]],
-		}
+	const {
+		typescriptSupport = false,
+		flowSupport = false,
+		transformChaynsComponentsImports = true,
+	} = options
+
+	if (env === "test") {
+		return { presets: [["@babel/env", { targets: { node: "current" } }]] }
 	}
 
 	return {
 		presets: [
 			[
-				"@babel/preset-env",
+				"@babel/env",
 				{
 					bugfixes: true,
 					modules: false,
@@ -26,17 +28,17 @@ module.exports = (api) => {
 				},
 			],
 			[
-				"@babel/preset-react",
+				"@babel/react",
 				{
 					runtime: "automatic",
-					development: !isProduction,
+					development: env !== "production",
 				},
 			],
-			usesFlow && "@babel/preset-flow",
-			usesTypeScript && "@babel/preset-typescript",
+			flowSupport && "@babel/flow",
+			typescriptSupport && "@babel/typescript",
 		].filter(Boolean),
 		plugins: [
-			usesChaynsComponents && [
+			transformChaynsComponentsImports && [
 				"transform-imports",
 				{
 					"chayns-components": {
@@ -49,7 +51,7 @@ module.exports = (api) => {
 			"macros",
 			"optimize-clsx",
 			[
-				"@babel/plugin-transform-runtime",
+				"@babel/transform-runtime",
 				{
 					// eslint-disable-next-line global-require
 					version: require("@babel/runtime/package.json").version,
@@ -59,14 +61,14 @@ module.exports = (api) => {
 			],
 			// This is included in preset-env, but we always want to compile it
 			// since the resulting numbers are smaller.
-			"@babel/plugin-proposal-numeric-separator",
-			"@babel/plugin-proposal-optional-chaining",
-			"@babel/plugin-proposal-nullish-coalescing-operator",
-			usesTypeScript && ["@babel/plugin-proposal-decorators", { legacy: true }],
-			["@babel/plugin-proposal-class-properties", { loose: true }],
-			isProduction && "@babel/plugin-transform-react-constant-elements",
-			isProduction && "transform-react-remove-prop-types",
-			!isProduction && "react-refresh/babel",
+			"@babel/proposal-numeric-separator",
+			"@babel/proposal-optional-chaining",
+			"@babel/proposal-nullish-coalescing-operator",
+			typescriptSupport && ["@babel/proposal-decorators", { legacy: true }],
+			["@babel/proposal-class-properties", { loose: true }],
+			env === "production" && "@babel/transform-react-constant-elements",
+			env === "production" && "transform-react-remove-prop-types",
+			env !== "production" && "react-refresh/babel",
 		].filter(Boolean),
 	}
-}
+})
