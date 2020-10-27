@@ -1,15 +1,17 @@
-// @ts-expect-error This function is so small, it doesn't need typings.
-import getCacheIdentifier from "@chayns-toolkit/babel-preset/getCacheIdentifier"
+import { version as babelVersion } from "@babel/core"
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
+import * as crypto from "crypto"
 import DotenvWebpackPlugin from "dotenv-webpack"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
+import semver from "semver"
 import type { PackageJson } from "type-fest"
 import { Configuration } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
+import { isPackageInstalled } from "./isPackageInstalled"
 import { project } from "./project"
 
 type Mode = "development" | "production"
@@ -119,6 +121,39 @@ export async function createWebpackConfig({
 
 	const shouldUseSourceMaps = mode !== "production"
 
+	let transformChaynsComponentsImports = false
+
+	const componentsVersion = packageJson.dependencies?.["chayns-components"]
+
+	if (componentsVersion) {
+		const minComponentsVersion = semver.minVersion(componentsVersion)
+
+		if (minComponentsVersion) {
+			transformChaynsComponentsImports = !semver.gt(
+				minComponentsVersion,
+				"4.19.0"
+			)
+		}
+	}
+
+	const babelPresetOptions = {
+		typescriptSupport: isPackageInstalled(packageJson, "typescript"),
+		flowSupport: project.hasFile(".flowconfig"),
+		transformChaynsComponentsImports,
+	}
+
+	const babelCacheIdentifier = crypto
+		.createHash("md5")
+		.update(
+			[
+				JSON.stringify(babelPresetOptions),
+				process.env.BABEL_ENV,
+				process.env.NODE_ENV,
+				babelVersion,
+			].join("--")
+		)
+		.digest("hex")
+
 	return {
 		entry: project.resolvePath("src/index"),
 		mode,
@@ -150,13 +185,13 @@ export async function createWebpackConfig({
 					use: {
 						loader: require.resolve("babel-loader"),
 						options: {
-							presets: ["@chayns-toolkit"],
+							presets: [["@chayns-toolkit", babelPresetOptions]],
 							babelrc: false,
 							configFile: false,
 							compact: mode === "production",
 							cacheDirectory: true,
 							// eslint-disable-next-line
-							cacheIdentifier: getCacheIdentifier(),
+							cacheIdentifier: babelCacheIdentifier,
 						},
 					},
 					exclude: /node_modules/,
