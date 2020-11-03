@@ -22,6 +22,8 @@ experience when working with [React](https://reactjs.org).
 > purpose web app, take a look at [Next.js](https://nextjs.org/) or
 > [`create-react-app`](https://create-react-app.dev/).
 
+> You have to use at least React 16.14 to use `chayns-toolkit`.
+
 ## Overview
 
 -   [Get Started](#get-started)
