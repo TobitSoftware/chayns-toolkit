@@ -1,6 +1,6 @@
 {
 	"name": "@chayns-toolkit/babel-preset",
-	"version": "1.5.1",
+	"version": "1.5.2",
 	"private": false,
 	"description": "The sharable babel-preset for developing chayns® apps. Used in chayns-toolkit.",
 	"keywords": [

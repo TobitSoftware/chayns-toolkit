@@ -1,6 +1,6 @@
 {
 	"name": "example-project",
-	"version": "1.5.1",
+	"version": "1.5.2",
 	"private": true,
 	"description": "An example of using chayns-toolkit.",
 	"homepage": "https://github.com/TobitSoftware/chayns-toolkit#readme",
@@ -24,7 +24,7 @@
 		"@babel/plugin-proposal-pipeline-operator": "^7.12.1",
 		"@types/react": "^17.0.0",
 		"@types/react-dom": "^17.0.0",
-		"chayns-toolkit": "^1.5.1",
+		"chayns-toolkit": "^1.5.2",
 		"react-devtools": "^4.10.0",
 		"typescript": "^4.1.2"
 	}
