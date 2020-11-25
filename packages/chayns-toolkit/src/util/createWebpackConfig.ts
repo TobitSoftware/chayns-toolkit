@@ -243,7 +243,6 @@ export async function createWebpackConfig({
 				},
 			],
 		},
-		// @ts-expect-error: The plugin type definitions do not yet match webpack 5.
 		plugins,
 		optimization: {
 			splitChunks: singleBundle ? false : { chunks: "all" },
