@@ -1,13 +1,18 @@
 import jest from 'jest';
-import path from 'path';
+import createBabelPresetOptions from "../util/createBabelPresetOptions"
+import { loadPackageJson } from "../util/loadPackageJson"
 
 export async function testCommand(): Promise<void> {
+	const packageJson = await loadPackageJson();
+	const babelConfig = createBabelPresetOptions({
+		packageJson,
+		transpileModules: 'commonjs',
+	});
+
 	const jestConfig = {
 		transform: {
 			'\\.[jt]sx?$': ['babel-jest', {
-				presets: [["@chayns-toolkit", {
-					transpileModules: 'commonjs',
-				}]],
+				presets: [["@chayns-toolkit", babelConfig]],
 			}],
 		},
 		moduleFileExtensions: [
