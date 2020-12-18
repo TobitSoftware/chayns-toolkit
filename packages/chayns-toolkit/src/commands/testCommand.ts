@@ -5,7 +5,9 @@ export async function testCommand(): Promise<void> {
 	const jestConfig = {
 		transform: {
 			'\\.[jt]sx?$': ['babel-jest', {
-				presets: ["@chayns-toolkit"],
+				presets: [["@chayns-toolkit", {
+					transpileModules: 'commonjs',
+				}]],
 			}],
 		},
 		moduleFileExtensions: [

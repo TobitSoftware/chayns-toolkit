@@ -9,6 +9,7 @@ module.exports = declare((api, options) => {
 		typescriptSupport = false,
 		flowSupport = false,
 		transformChaynsComponentsImports = true,
+		transpileModules = false
 	} = options
 
 	if (env === "test") {
@@ -21,7 +22,7 @@ module.exports = declare((api, options) => {
 				"@babel/env",
 				{
 					bugfixes: true,
-					modules: false,
+					modules: transpileModules,
 					exclude: ["transform-typeof-symbol"],
 					useBuiltIns: "usage",
 					corejs: 3,
