@@ -13,6 +13,7 @@ import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import { isPackageInstalled } from "./isPackageInstalled"
 import { project } from "./project"
+import createBabelPresetOptions from "./createBabelPresetOptions"
 
 type Mode = "development" | "production"
 
@@ -121,26 +122,9 @@ export async function createWebpackConfig({
 
 	const shouldUseSourceMaps = mode !== "production"
 
-	let transformChaynsComponentsImports = false
-
-	const componentsVersion = packageJson.dependencies?.["chayns-components"]
-
-	if (componentsVersion) {
-		const minComponentsVersion = semver.minVersion(componentsVersion)
-
-		if (minComponentsVersion) {
-			transformChaynsComponentsImports = !semver.gt(
-				minComponentsVersion,
-				"4.19.0"
-			)
-		}
-	}
-
-	const babelPresetOptions = {
-		typescriptSupport: isPackageInstalled(packageJson, "typescript"),
-		flowSupport: project.hasFile(".flowconfig"),
-		transformChaynsComponentsImports,
-	}
+	const babelPresetOptions = createBabelPresetOptions({
+		packageJson,
+	});
 
 	const babelCacheIdentifier = crypto
 		.createHash("md5")
