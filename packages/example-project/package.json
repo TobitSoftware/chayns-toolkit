@@ -10,7 +10,8 @@
 		"build": "chayns-toolkit build",
 		"dev": "chayns-toolkit dev",
 		"lint": "chayns-toolkit lint",
-		"test": "yarn lint"
+		"test": "yarn lint",
+		"jest": "chayns-toolkit test"
 	},
 	"eslintConfig": {
 		"extends": "@chayns-toolkit"
