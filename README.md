@@ -1,1 +1,1 @@
-C:/Dev/chayns-toolkit/packages/chayns-toolkit/
+packages/chayns-toolkit/
