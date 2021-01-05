@@ -26,7 +26,7 @@ export async function testCommand(): Promise<void> {
 
 	const args = [];
 	args.push('--config', JSON.stringify(jestConfig));
-	args.push('--json');
+	// args.push('--json'); // json output could be used for custom formatting
 
 	await jest.run(args);
 }
