@@ -1,4 +1,5 @@
 import commonjs from "@rollup/plugin-commonjs"
+import json from '@rollup/plugin-json'
 import resolve from "@rollup/plugin-node-resolve"
 import replace from "@rollup/plugin-replace"
 import typescript from "@rollup/plugin-typescript"
@@ -28,7 +29,8 @@ export default {
 			extensions: [".js", ".ts"],
 		}),
 		commonjs({ extensions: [".js", ".ts"] }),
-		autoExternal(),
+        autoExternal(),
+        json(),
 		isProduction && terser(),
 	].filter(Boolean),
 }
