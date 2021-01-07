@@ -14,7 +14,7 @@
 	},
 	"devDependencies": {
 		"lerna": "^3.22.1",
-		"prettier": "^2.2.0",
-		"prettier-plugin-packagejson": "^2.2.8"
+		"prettier": "^2.2.1",
+		"prettier-plugin-packagejson": "^2.2.9"
 	}
 }
