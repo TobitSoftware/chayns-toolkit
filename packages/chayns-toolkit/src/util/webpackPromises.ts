@@ -5,6 +5,8 @@ export function runCompiler(compiler: Compiler): Promise<Stats> {
 		compiler.run((error, stats) => {
 			if (error) {
 				reject(error)
+			} else if (!stats) {
+				reject(Error("No stats available."))
 			} else {
 				resolve(stats)
 			}
