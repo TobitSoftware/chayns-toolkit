@@ -62,8 +62,6 @@ module.exports = declare((api, options) => {
 			// This is included in preset-env, but we always want to compile it
 			// since the resulting numbers are smaller.
 			"@babel/proposal-numeric-separator",
-			"@babel/proposal-optional-chaining",
-			"@babel/proposal-nullish-coalescing-operator",
 			typescriptSupport && [
 				"@babel/proposal-decorators",
 				{ legacy: true },
