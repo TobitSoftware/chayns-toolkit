@@ -64,9 +64,11 @@ module.exports = declare((api, options) => {
 			"@babel/proposal-numeric-separator",
 			"@babel/proposal-optional-chaining",
 			"@babel/proposal-nullish-coalescing-operator",
-			typescriptSupport && ["@babel/proposal-decorators", { legacy: true }],
+			typescriptSupport && [
+				"@babel/proposal-decorators",
+				{ legacy: true },
+			],
 			["@babel/proposal-class-properties", { loose: true }],
-			env === "production" && "@babel/transform-react-constant-elements",
 			env === "production" && "transform-react-remove-prop-types",
 			env !== "production" && "react-refresh/babel",
 		].filter(Boolean),
