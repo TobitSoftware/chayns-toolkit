@@ -60,14 +60,11 @@ module.exports = declare((api, options) => {
 					regenerator: true,
 				},
 			],
-			// This is included in preset-env, but we always want to compile it
-			// since the resulting numbers are smaller.
-			"@babel/proposal-numeric-separator",
-			"@babel/proposal-optional-chaining",
-			"@babel/proposal-nullish-coalescing-operator",
-			typescriptSupport && ["@babel/proposal-decorators", { legacy: true }],
+			typescriptSupport && [
+				"@babel/proposal-decorators",
+				{ legacy: true },
+			],
 			["@babel/proposal-class-properties", { loose: true }],
-			env === "production" && "@babel/transform-react-constant-elements",
 			env === "production" && "transform-react-remove-prop-types",
 			env !== "production" && "react-refresh/babel",
 		].filter(Boolean),
