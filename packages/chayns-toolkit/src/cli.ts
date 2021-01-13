@@ -57,7 +57,8 @@ program
 	.command("test")
 	.description("tests your code for possible errors using jest")
     .option("-w, --watch", "watch for changes to rerun tests", false)
-    .action(async (options: { watch: boolean }) => {
+    .option("--setupFile <path>", "file that should be executed before the tests are initialized", '')
+    .action(async (options: { watch: boolean, setupFile: string }) => {
 		await testCommand(options)
 		console.info("")
 	})
