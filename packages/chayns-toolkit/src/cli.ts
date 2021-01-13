@@ -56,8 +56,9 @@ program
 program
 	.command("test")
 	.description("tests your code for possible errors using jest")
-	.action(async () => {
-		await testCommand()
+    .option("-w, --watch", "watch for changes to rerun tests", false)
+    .action(async (options: { watch: boolean }) => {
+		await testCommand(options)
 		console.info("")
 	})
 

@@ -2,7 +2,13 @@ import jest from 'jest';
 import createBabelPresetOptions from "../util/createBabelPresetOptions"
 import { loadPackageJson } from "../util/loadPackageJson"
 
-export async function testCommand(): Promise<void> {
+type TestOptions = {
+    watch: boolean;
+}
+
+export async function testCommand({
+    watch,
+}: TestOptions): Promise<void> {
 	const packageJson = await loadPackageJson();
 	const babelConfig = createBabelPresetOptions({
 		packageJson,
@@ -26,6 +32,10 @@ export async function testCommand(): Promise<void> {
 
 	const args = [];
 	args.push('--config', JSON.stringify(jestConfig));
+	if (watch) {
+	    args.push('--watch');
+    }
+
 	// args.push('--json'); // json output could be used for custom formatting
 
 	await jest.run(args);
