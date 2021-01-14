@@ -27,9 +27,10 @@ export async function testCommand({
 }: TestOptions): Promise<void> {
 	const packageJson = await loadPackageJson();
 	const babelConfig = createBabelPresetOptions({
-		packageJson,
-		transpileModules: 'commonjs',
-	});
+        packageJson,
+        transpileModules: 'commonjs',
+        reactRefreshSupport: false,
+    });
 
 	const jestConfig: JestConfig = {
 		transform: {

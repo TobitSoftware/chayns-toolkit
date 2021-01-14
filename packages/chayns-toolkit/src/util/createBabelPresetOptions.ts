@@ -5,13 +5,15 @@ import { isPackageInstalled } from "./isPackageInstalled"
 import { project } from "./project"
 
 type CreateConfigOptions = {
-	packageJson: PackageJson,
+	packageJson: PackageJson;
 	transpileModules?: false | 'commonjs';
+    reactRefreshSupport?: boolean;
 };
 
 export default function createBabelPresetOptions({
 	packageJson,
 	transpileModules = false,
+    reactRefreshSupport = true,
 }: CreateConfigOptions) {
 	let transformChaynsComponentsImports = false
 
@@ -33,5 +35,6 @@ export default function createBabelPresetOptions({
 		flowSupport: project.hasFile(".flowconfig"),
 		transformChaynsComponentsImports,
 		transpileModules: transpileModules || false,
+        reactRefreshSupport: (reactRefreshSupport !== false),
 	};
 }
