@@ -12,9 +12,21 @@ type TestOptions = {
     setupFile: string;
 }
 
+type BabelPresetOptions = {
+    typescriptSupport: boolean;
+    flowSupport: boolean;
+    transformChaynsComponentsImports: boolean;
+    transpileModules: string | boolean;
+    reactRefreshSupport: boolean;
+};
+
+type BabelTransformOptions = {
+    presets: [string, BabelPresetOptions][];
+};
+
 type JestConfig = Partial<{
     transform: {
-        [glob: string]: [string, any] | string;
+        [glob: string]: [string, BabelTransformOptions] | string;
     };
     moduleFileExtensions: string[];
     testPathIgnorePatterns: string[];
