@@ -17,6 +17,7 @@
 		"extends": "@chayns-toolkit"
 	},
 	"dependencies": {
+		"@testing-library/react": "^11.2.3",
 		"chayns-components": "4.20.11",
 		"react": "^17.0.1",
 		"react-dom": "^17.0.1"
