@@ -43,6 +43,10 @@ export async function testCommand({
 			'js',
 			'jsx',
 		],
+        moduleNameMapper: {
+            '^.+\\.(css|less|scss)$': 'babel-jest',
+            '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': path.resolve(__dirname, 'assets', 'file-mock.js'),
+        },
 		testPathIgnorePatterns: ["^.+\\.eslintrc\\.js$"],
         setupFilesAfterEnv: [
             path.resolve(__dirname, 'assets', 'react-testing-library.setup.js'),
