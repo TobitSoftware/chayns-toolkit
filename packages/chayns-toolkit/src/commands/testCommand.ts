@@ -12,14 +12,17 @@ type TestOptions = {
     setupFile: string;
 }
 
-type JestConfig = {
-    transform?: {
+type JestConfig = Partial<{
+    transform: {
         [glob: string]: [string, any] | string;
     };
-    moduleFileExtensions?: string[];
-    testPathIgnorePatterns?: string[];
-    setupFilesAfterEnv?: string[];
-};
+    moduleFileExtensions: string[];
+    testPathIgnorePatterns: string[];
+    setupFilesAfterEnv: string[];
+    moduleNameMapper: {
+        [glob: string]: string;
+    };
+}>;
 
 export async function testCommand({
     watch,
