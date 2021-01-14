@@ -21,7 +21,7 @@ type BabelPresetOptions = {
 };
 
 type BabelTransformOptions = {
-    presets: [string, BabelPresetOptions][];
+    presets: Array<[string, BabelPresetOptions]>;
 };
 
 type JestConfig = Partial<{
