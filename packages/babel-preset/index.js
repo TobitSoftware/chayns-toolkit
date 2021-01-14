@@ -9,7 +9,8 @@ module.exports = declare((api, options) => {
 		typescriptSupport = false,
 		flowSupport = false,
 		transformChaynsComponentsImports = true,
-		transpileModules = false
+		transpileModules = false,
+        reactRefreshSupport = true,
 	} = options
 
 	if (env === "test") {
@@ -66,7 +67,7 @@ module.exports = declare((api, options) => {
 			],
 			["@babel/proposal-class-properties", { loose: true }],
 			env === "production" && "transform-react-remove-prop-types",
-			env !== "production" && "react-refresh/babel",
+            reactRefreshSupport && env !== "production" && "react-refresh/babel",
 		].filter(Boolean),
 	}
 })
