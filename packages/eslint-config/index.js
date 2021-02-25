@@ -10,7 +10,7 @@ module.exports = {
 		browser: true,
 		es6: true,
 	},
-	extends: ["airbnb", "airbnb/hooks", "prettier", "prettier/react"],
+	extends: ["airbnb", "airbnb/hooks", "prettier"],
 	globals: { chayns: true },
 	rules: { ...sharedRules, ...javascriptRules },
 	parser: "babel-eslint",
@@ -34,8 +34,6 @@ module.exports = {
 				"plugin:@typescript-eslint/recommended",
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
 				"prettier",
-				"prettier/@typescript-eslint",
-				"prettier/react",
 			],
 			rules: {
 				...sharedRules,
