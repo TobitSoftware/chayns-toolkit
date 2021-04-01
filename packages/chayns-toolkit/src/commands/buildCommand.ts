@@ -10,7 +10,6 @@ import {
 import { output } from "../util/output"
 import { StepParams } from "../util/runSteps"
 import { closeCompiler, runCompiler } from "../util/webpackPromises"
-import { BuildStatsJSON } from "./buildStatsJson"
 
 interface BuildOptions {
 	analyze: boolean
@@ -59,7 +58,7 @@ export function buildCommand({
 				console.error(error)
 			})
 		} else {
-			const statsJson = stats?.toJson() as BuildStatsJSON
+			const statsJson = stats?.toJson()
 
 			const { assets } = statsJson
 
