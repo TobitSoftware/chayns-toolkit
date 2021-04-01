@@ -7,6 +7,7 @@ import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
 import semver from "semver"
+import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
 import { Configuration } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
@@ -62,8 +63,8 @@ export async function createWebpackConfig({
 			firstScriptIndex
 		)}\n<!-- The React Devtools connection script -->
     <script src="http://localhost:8097"></script>\n${templateContent.substring(
-			firstScriptIndex
-		)}`
+		firstScriptIndex
+	)}`
 	}
 
 	if (templateContent) {
@@ -154,6 +155,27 @@ export async function createWebpackConfig({
 		)
 		.digest("hex")
 
+	type ResolveConfiguration = Exclude<Configuration["resolve"], undefined>
+
+	const resolvePlugins: Array<
+		Exclude<ResolveConfiguration["plugins"], undefined>
+	> = []
+
+	if (project.hasFile("jsconfig.json")) {
+		resolvePlugins.push(
+			new TsconfigPathsPlugin({
+				configFile: "jsconfig.json",
+				extensions: [".js", ".jsx"],
+			})
+		)
+	} else if (project.hasFile("tsconfig.json")) {
+		resolvePlugins.push(
+			new TsconfigPathsPlugin({
+				extensions: [".js", ".jsx", ".ts", ".tsx"],
+			})
+		)
+	}
+
 	return {
 		entry: project.resolvePath("src/index"),
 		mode,
@@ -172,7 +194,10 @@ export async function createWebpackConfig({
 				packageName,
 			}),
 		},
-		resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+		resolve: {
+			extensions: [".js", ".jsx", ".ts", ".tsx"],
+			plugins: resolvePlugins,
+		},
 		module: {
 			rules: [
 				{
@@ -211,7 +236,9 @@ export async function createWebpackConfig({
 										[
 											"postcss-preset-env",
 											{
-												autoprefixer: { flexbox: "no-2009" },
+												autoprefixer: {
+													flexbox: "no-2009",
+												},
 												stage: 2,
 											},
 										],
@@ -232,7 +259,9 @@ export async function createWebpackConfig({
 							limit: singleBundle ? Infinity : 10000,
 							fallback: {
 								loader: require.resolve("file-loader"),
-								options: { name: "static/media/[contenthash:12].[ext]" },
+								options: {
+									name: "static/media/[contenthash:12].[ext]",
+								},
 							},
 						},
 					},
@@ -264,7 +293,10 @@ function getOutputPath({
 }) {
 	const outputPath = singleBundle ? "" : "static/js/"
 
-	const preparedFilename = filename.replace("[package]", paramCase(packageName))
+	const preparedFilename = filename.replace(
+		"[package]",
+		paramCase(packageName)
+	)
 
 	if (mode === "development") {
 		return `${outputPath}[name].bundle.js`
