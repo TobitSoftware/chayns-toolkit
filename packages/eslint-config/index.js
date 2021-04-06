@@ -21,7 +21,7 @@ module.exports = {
 	},
 	settings: {
 		"import/resolver": {
-			node: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+			typescript: { project: "@(jsconfig|tsconfig).json" },
 		},
 		"import/extensions": [".js", ".jsx", ".ts", ".tsx"],
 	},
@@ -34,6 +34,7 @@ module.exports = {
 				"plugin:@typescript-eslint/recommended",
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
 				"prettier",
+				"plugin:import/typescript",
 			],
 			rules: {
 				...sharedRules,

@@ -7,8 +7,9 @@ import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
 import semver from "semver"
+import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
-import { Configuration } from "webpack"
+import { Configuration, ResolveOptions } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import { isPackageInstalled } from "./isPackageInstalled"
@@ -138,6 +139,25 @@ export async function createWebpackConfig({
 		)
 		.digest("hex")
 
+	const resolvePlugins: Exclude<ResolveOptions["plugins"], undefined> = []
+
+	if (project.hasFile("jsconfig.json")) {
+		resolvePlugins.push(
+			// @ts-expect-error: IDK why this type is broken...
+			new TsconfigPathsPlugin({
+				configFile: "jsconfig.json",
+				extensions: [".js", ".jsx"],
+			})
+		)
+	} else if (project.hasFile("tsconfig.json")) {
+		resolvePlugins.push(
+			// @ts-expect-error: IDK why this type is broken...
+			new TsconfigPathsPlugin({
+				extensions: [".js", ".jsx", ".ts", ".tsx"],
+			})
+		)
+	}
+
 	return {
 		entry: project.resolvePath("src/index"),
 		mode,
@@ -156,7 +176,10 @@ export async function createWebpackConfig({
 				packageName,
 			}),
 		},
-		resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+		resolve: {
+			extensions: [".js", ".jsx", ".ts", ".tsx"],
+			plugins: resolvePlugins,
+		},
 		module: {
 			rules: [
 				{
