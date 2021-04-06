@@ -37,6 +37,7 @@ experience when working with [React](https://reactjs.org).
     -   [HMR With `react-refresh` Support](#hmr-with-react-refresh-support)
     -   [Using React Devtools](#using-react-devtools)
     -   [ESLint Configuration](#eslint-configuration)
+    -   [Support for custom path aliases](#support-for-custom-path-aliases)
     -   [Single-File Builds](#single-file-builds)
     -   [Environment Variables](#environment-variables)
     -   [Analyzing Your Bundle](#analyzing-your-bundle)
@@ -125,6 +126,7 @@ We recommend to use our included [ESLint configuration](#eslint-configuration).
 -   [HMR With `react-refresh` Support](#hmr-with-react-refresh-support)
 -   [Using React Devtools](#using-react-devtools)
 -   [ESLint Configuration](#eslint-configuration)
+-   [Support for custom path aliases](#support-for-custom-path-aliases)
 -   [Single-File Builds](#single-file-builds)
 -   [Environment Variables](#environment-variables)
 -   [Analyzing Your Bundle](#analyzing-your-bundle)
@@ -276,6 +278,35 @@ The configuration can also be installed as a standalone package
 If you think a rule should be enabled, disabled or adjusted, please consider
 [opening an issue](https://github.com/TobitSoftware/chayns-toolkit/issues/new)
 to discuss the suggested change instead of changing your local configuration.
+
+### Support for custom path aliases
+
+`chayns-toolkit` supports the `paths` and `baseUrl` options from `tsconfig.json`
+or `jsconfig.json` to create more readable paths.
+
+You can set the `baseUrl` like so:
+
+```json
+// tsconfig.json or jsconfig.json for non-TypeScript projects
+{
+    "compilerOptions": {
+        "baseUrl": "./src"
+    }
+}
+```
+
+Then you can import files based on your `baseUrl`:
+
+```ts
+// Import `MyComponent` from `./src/components/MyComponent`
+import { MyComponent } from "components/MyComponent"
+```
+
+If you want to know more about
+[`baseUrl`](https://www.typescriptlang.org/docs/handbook/module-resolution.html#base-url)
+and
+[`paths`](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping)
+check the TypeScript docs.
 
 ### Single-File Builds
 
