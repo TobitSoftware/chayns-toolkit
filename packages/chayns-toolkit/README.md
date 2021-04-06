@@ -30,6 +30,7 @@ experience when working with [React](https://reactjs.org).
     -   [`chayns-toolkit dev`](#chayns-toolkit-dev)
     -   [`chayns-toolkit build`](#chayns-toolkit-build)
     -   [`chayns-toolkit lint`](#chayns-toolkit-lint)
+    -   [`chayns-toolkit test`](#chayns-toolkit-test)
 -   [Features](#features)
     -   [TypeScript Support](#typescript-support)
     -   [(S)CSS Support](#scss-support)
@@ -116,6 +117,38 @@ Lints your JavaScript and TypeScript source code with
 fix them if possible.
 
 We recommend to use our included [ESLint configuration](#eslint-configuration).
+
+### `chayns-toolkit test`
+
+> This command is currently experimental, meaning that it is not semantically
+> versioned. The API may change at any release.
+
+Uses [Jest](https://jestjs.io/) to run all your test suites. By default it will
+run all files matching the default Jest Glob:
+
+-   Any file ending with `.spec.@(js|jsx|ts|tsx)` or `.test.@(js|jsx|ts|tsx)`
+-   Any JavaScript or TypeScript file in a folder named `__tests__`
+
+The matchers from
+[`@testing-library/jest-dom`](https://testing-library.com/docs/dom-testing-library/intro/)
+will automatically be injected into the Jest environment, so you can write
+assertions on the DOM like this:
+
+```ts
+import { render } from "@testing-library/react"
+import { MyComponent } from "./MyComponent"
+
+test('should have "Click Me!" as its text', () => {
+    const { getByRole } = render(<MyComponent />)
+
+    expect(getByRole("button")).toHaveTextContent("Click Me!")
+})
+```
+
+| Parameters           | Function                                                       |
+| -------------------- | -------------------------------------------------------------- |
+| `-w`, `--watch`      | Runs Jest in [watch mode](https://jestjs.io/docs/cli#--watch)  |
+| `--setupFile <path>` | Executes the setup file specified by `<path>` before any tests |
 
 ## Features
 
