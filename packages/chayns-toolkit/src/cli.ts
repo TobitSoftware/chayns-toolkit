@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 import { Command } from "commander"
 import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
