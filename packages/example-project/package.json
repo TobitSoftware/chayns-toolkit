@@ -9,21 +9,21 @@
 	"scripts": {
 		"build": "chayns-toolkit build",
 		"dev": "chayns-toolkit dev",
+		"jest": "chayns-toolkit test",
 		"lint": "chayns-toolkit lint",
-		"test": "yarn lint",
-		"jest": "chayns-toolkit test"
+		"test": "yarn lint"
 	},
 	"eslintConfig": {
 		"extends": "@chayns-toolkit"
 	},
 	"dependencies": {
 		"chayns-components": "^4.20.25",
-		"@testing-library/react": "^11.2.3",
 		"react": "^17.0.1",
 		"react-dom": "^17.0.1"
 	},
 	"devDependencies": {
 		"@babel/plugin-proposal-pipeline-operator": "^7.12.13",
+		"@testing-library/react": "^11.2.3",
 		"@types/react": "^17.0.3",
 		"@types/react-dom": "^17.0.2",
 		"chayns-toolkit": "^1.5.6",
