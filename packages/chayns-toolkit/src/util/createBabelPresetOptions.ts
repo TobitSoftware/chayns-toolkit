@@ -1,19 +1,19 @@
-import semver from "semver";
-import type { PackageJson } from "type-fest";
+import semver from "semver"
+import type { PackageJson } from "type-fest"
 
 import { isPackageInstalled } from "./isPackageInstalled"
 import { project } from "./project"
 
 type CreateConfigOptions = {
-	packageJson: PackageJson;
-	transpileModules?: false | 'commonjs';
-    reactRefreshSupport?: boolean;
-};
+	packageJson: PackageJson
+	transpileModules?: false | "commonjs"
+	reactRefreshSupport?: boolean
+}
 
 export default function createBabelPresetOptions({
 	packageJson,
 	transpileModules = false,
-    reactRefreshSupport = true,
+	reactRefreshSupport = true,
 }: CreateConfigOptions) {
 	let transformChaynsComponentsImports = false
 
@@ -26,7 +26,7 @@ export default function createBabelPresetOptions({
 			transformChaynsComponentsImports = !semver.gt(
 				minComponentsVersion,
 				"4.19.0"
-			);
+			)
 		}
 	}
 
@@ -35,6 +35,6 @@ export default function createBabelPresetOptions({
 		flowSupport: project.hasFile(".flowconfig"),
 		transformChaynsComponentsImports,
 		transpileModules: transpileModules || false,
-        reactRefreshSupport: (reactRefreshSupport !== false),
-	};
+		reactRefreshSupport: reactRefreshSupport !== false,
+	}
 }

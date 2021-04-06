@@ -40,7 +40,11 @@ export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 		if (shouldContinue) {
 			for (const step of sequence) {
 				// eslint-disable-next-line no-await-in-loop
-				const result = await step({ config, packageJson, packageManager })
+				const result = await step({
+					config,
+					packageJson,
+					packageManager,
+				})
 
 				if (result) {
 					shouldContinue = false

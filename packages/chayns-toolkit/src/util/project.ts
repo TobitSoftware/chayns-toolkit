@@ -19,7 +19,9 @@ export const project = {
 		const absolutePath = this.resolvePath(relativePath)
 
 		try {
-			const content = await readFileAsync(absolutePath, { encoding: "utf-8" })
+			const content = await readFileAsync(absolutePath, {
+				encoding: "utf-8",
+			})
 
 			return content
 		} catch (error: unknown) {

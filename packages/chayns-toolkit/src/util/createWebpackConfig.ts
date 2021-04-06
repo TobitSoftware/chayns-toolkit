@@ -63,8 +63,8 @@ export async function createWebpackConfig({
 			firstScriptIndex
 		)}\n<!-- The React Devtools connection script -->
     <script src="http://localhost:8097"></script>\n${templateContent.substring(
-			firstScriptIndex
-		)}`
+		firstScriptIndex
+	)}`
 	}
 
 	if (templateContent) {
@@ -124,7 +124,7 @@ export async function createWebpackConfig({
 
 	const babelPresetOptions = createBabelPresetOptions({
 		packageJson,
-	});
+	})
 
 	const babelCacheIdentifier = crypto
 		.createHash("md5")
@@ -195,7 +195,9 @@ export async function createWebpackConfig({
 										[
 											"postcss-preset-env",
 											{
-												autoprefixer: { flexbox: "no-2009" },
+												autoprefixer: {
+													flexbox: "no-2009",
+												},
 												stage: 2,
 											},
 										],
@@ -216,7 +218,9 @@ export async function createWebpackConfig({
 							limit: singleBundle ? Infinity : 10000,
 							fallback: {
 								loader: require.resolve("file-loader"),
-								options: { name: "static/media/[contenthash:12].[ext]" },
+								options: {
+									name: "static/media/[contenthash:12].[ext]",
+								},
 							},
 						},
 					},
@@ -248,7 +252,10 @@ function getOutputPath({
 }) {
 	const outputPath = singleBundle ? "" : "static/js/"
 
-	const preparedFilename = filename.replace("[package]", paramCase(packageName))
+	const preparedFilename = filename.replace(
+		"[package]",
+		paramCase(packageName)
+	)
 
 	if (mode === "development") {
 		return `${outputPath}[name].bundle.js`

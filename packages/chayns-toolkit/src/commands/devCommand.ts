@@ -57,7 +57,9 @@ export function devCommand({
 					)}.\n`
 				)
 				process.exit(1)
-			} else if (!("react-devtools" in (packageJson.devDependencies || {}))) {
+			} else if (
+				!("react-devtools" in (packageJson.devDependencies || {}))
+			) {
 				output.error(
 					`You need to install the ${fm.code`react-devtools`} package to use the ${fm.command`--devtools`} option.`
 				)
@@ -71,7 +73,12 @@ export function devCommand({
 				process.exit(1)
 			}
 
-			exec(`node ${path.join(require.resolve("react-devtools"), "../bin.js")}`)
+			exec(
+				`node ${path.join(
+					require.resolve("react-devtools"),
+					"../bin.js"
+				)}`
+			)
 		}
 
 		const compiler = webpack(webpackConfig)
