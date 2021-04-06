@@ -9,7 +9,7 @@ import { paramCase } from "param-case"
 import semver from "semver"
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
-import { Configuration } from "webpack"
+import { Configuration, ResolveOptions } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import { isPackageInstalled } from "./isPackageInstalled"
@@ -155,14 +155,11 @@ export async function createWebpackConfig({
 		)
 		.digest("hex")
 
-	type ResolveConfiguration = Exclude<Configuration["resolve"], undefined>
-
-	const resolvePlugins: Array<
-		Exclude<ResolveConfiguration["plugins"], undefined>
-	> = []
+	const resolvePlugins: Exclude<ResolveOptions["plugins"], undefined> = []
 
 	if (project.hasFile("jsconfig.json")) {
 		resolvePlugins.push(
+			// @ts-expect-error: IDK why this type is broken...
 			new TsconfigPathsPlugin({
 				configFile: "jsconfig.json",
 				extensions: [".js", ".jsx"],
@@ -170,6 +167,7 @@ export async function createWebpackConfig({
 		)
 	} else if (project.hasFile("tsconfig.json")) {
 		resolvePlugins.push(
+			// @ts-expect-error: IDK why this type is broken...
 			new TsconfigPathsPlugin({
 				extensions: [".js", ".jsx", ".ts", ".tsx"],
 			})
