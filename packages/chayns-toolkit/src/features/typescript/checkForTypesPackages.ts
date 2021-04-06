@@ -1,8 +1,8 @@
-import { usesPackage } from "@chayns-toolkit/utilities"
 import { fm } from "../../util/format"
 import { PackageManager } from "../../util/getPackageManager"
 import { output } from "../../util/output"
 import { pkgCommands } from "../../util/pkgCommands"
+import { usesPackage } from "../../util/usesPackage"
 
 export async function checkForTypesPackages(
 	packageManager: PackageManager | undefined

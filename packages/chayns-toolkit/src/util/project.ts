@@ -8,7 +8,7 @@ const unlinkAsync = promisify(fs.unlink)
 
 export const project = {
 	resolvePath(relativePath: string): string {
-		return path.resolve(process.cwd(), relativePath)
+		return path.resolve(relativePath)
 	},
 
 	hasFile(relativePath: string): boolean {
