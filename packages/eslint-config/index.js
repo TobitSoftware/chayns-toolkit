@@ -14,11 +14,6 @@ module.exports = {
 	globals: { chayns: true },
 	rules: { ...sharedRules, ...javascriptRules },
 	parser: "babel-eslint",
-	parserOptions: {
-		babelOptions: {
-			extends: "@chayns-toolkit",
-		},
-	},
 	settings: {
 		"import/resolver": {
 			typescript: { project: "@(jsconfig|tsconfig).json" },
