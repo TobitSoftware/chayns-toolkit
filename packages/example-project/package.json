@@ -9,6 +9,7 @@
 	"scripts": {
 		"build": "chayns-toolkit build",
 		"dev": "chayns-toolkit dev",
+		"jest": "chayns-toolkit test",
 		"lint": "chayns-toolkit lint",
 		"test": "yarn lint"
 	},
@@ -22,6 +23,7 @@
 	},
 	"devDependencies": {
 		"@babel/plugin-proposal-pipeline-operator": "^7.12.13",
+		"@testing-library/react": "^11.2.3",
 		"@types/react": "^17.0.3",
 		"@types/react-dom": "^17.0.2",
 		"chayns-toolkit": "^1.5.6",

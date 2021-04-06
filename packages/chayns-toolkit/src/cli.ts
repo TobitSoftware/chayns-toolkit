@@ -2,6 +2,7 @@ import { Command } from "commander"
 import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
+import { testCommand } from "./commands/testCommand"
 import { convertConfigFile } from "./features/config-file/convertConfigFile"
 import { checkPackages } from "./features/extraneous-packages/checkPackages"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
@@ -49,6 +50,20 @@ program
 	.description("lints your code for possible errors")
 	.action(async () => {
 		await lintCommand()
+		console.info("")
+	})
+
+program
+	.command("test")
+	.description("executes all Jest tests for this project")
+	.option("-w, --watch", "watch for changes to rerun tests", false)
+	.option(
+		"--setupFile <path>",
+		"file that should be executed before the tests are initialized",
+		""
+	)
+	.action(async (options: { watch: boolean; setupFile: string }) => {
+		await testCommand(options)
 		console.info("")
 	})
 

@@ -25,7 +25,9 @@ export function isPackageInstalled(
 	if (Array.isArray(query)) {
 		return packageList.filter((packageName) =>
 			query.some((matcher) =>
-				isRegExp(matcher) ? matcher.test(packageName) : matcher === packageName
+				isRegExp(matcher)
+					? matcher.test(packageName)
+					: matcher === packageName
 			)
 		)
 	}

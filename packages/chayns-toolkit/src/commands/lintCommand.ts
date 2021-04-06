@@ -33,7 +33,9 @@ export async function lintCommand(): Promise<void> {
 		if (errorCount + warningCount === 0) {
 			output.info(`No linting errors were found.\n`)
 		} else {
-			output.warn(`${errorCount} errors and ${warningCount} were found:\n`)
+			output.warn(
+				`${errorCount} errors and ${warningCount} were found:\n`
+			)
 			console.log(formattedResults)
 		}
 	} catch (e: unknown) {

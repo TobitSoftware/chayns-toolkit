@@ -9,7 +9,8 @@ export async function loadConfig(): Promise<ToolkitConfig> {
 	if (project.hasFile(JS_CONFIG_FILENAME)) {
 		config = await import(project.resolvePath(JS_CONFIG_FILENAME))
 	} else if (project.hasFile(JSON_CONFIG_FILENAME)) {
-		const configString = (await project.readFile(JSON_CONFIG_FILENAME)) ?? "{}"
+		const configString =
+			(await project.readFile(JSON_CONFIG_FILENAME)) ?? "{}"
 
 		config = JSON.parse(configString) as JsonValue
 	}

@@ -9,6 +9,8 @@ module.exports = declare((api, options) => {
 		typescriptSupport = false,
 		flowSupport = false,
 		transformChaynsComponentsImports = true,
+		transpileModules = false,
+		reactRefreshSupport = true,
 	} = options
 
 	if (env === "test") {
@@ -21,7 +23,7 @@ module.exports = declare((api, options) => {
 				"@babel/env",
 				{
 					bugfixes: true,
-					modules: false,
+					modules: transpileModules,
 					exclude: ["transform-typeof-symbol"],
 					useBuiltIns: "usage",
 					corejs: 3,
@@ -65,7 +67,9 @@ module.exports = declare((api, options) => {
 			],
 			["@babel/proposal-class-properties", { loose: true }],
 			env === "production" && "transform-react-remove-prop-types",
-			env !== "production" && "react-refresh/babel",
+			reactRefreshSupport &&
+				env !== "production" &&
+				"react-refresh/babel",
 		].filter(Boolean),
 	}
 })
