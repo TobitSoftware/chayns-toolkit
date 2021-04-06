@@ -10,6 +10,7 @@
 		"lib": ["DOM", "ESNext"],
 		"noEmit": true,
 		"skipLibCheck": true,
-		"strict": true
+		"strict": true,
+		"baseUrl": "src/"
 	}
 }

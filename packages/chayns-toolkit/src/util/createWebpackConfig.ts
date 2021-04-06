@@ -6,12 +6,12 @@ import DotenvWebpackPlugin from "dotenv-webpack"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
-import semver from "semver"
+import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
-import { Configuration } from "webpack"
+import { Configuration, ResolveOptions } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
-import { isPackageInstalled } from "./isPackageInstalled"
+import createBabelPresetOptions from "./createBabelPresetOptions"
 import { project } from "./project"
 
 type Mode = "development" | "production"
@@ -62,8 +62,8 @@ export async function createWebpackConfig({
 			firstScriptIndex
 		)}\n<!-- The React Devtools connection script -->
     <script src="http://localhost:8097"></script>\n${templateContent.substring(
-			firstScriptIndex
-		)}`
+		firstScriptIndex
+	)}`
 	}
 
 	if (templateContent) {
@@ -121,26 +121,9 @@ export async function createWebpackConfig({
 
 	const shouldUseSourceMaps = mode !== "production"
 
-	let transformChaynsComponentsImports = false
-
-	const componentsVersion = packageJson.dependencies?.["chayns-components"]
-
-	if (componentsVersion) {
-		const minComponentsVersion = semver.minVersion(componentsVersion)
-
-		if (minComponentsVersion) {
-			transformChaynsComponentsImports = !semver.gt(
-				minComponentsVersion,
-				"4.19.0"
-			)
-		}
-	}
-
-	const babelPresetOptions = {
-		typescriptSupport: isPackageInstalled(packageJson, "typescript"),
-		flowSupport: project.hasFile(".flowconfig"),
-		transformChaynsComponentsImports,
-	}
+	const babelPresetOptions = createBabelPresetOptions({
+		packageJson,
+	})
 
 	const babelCacheIdentifier = crypto
 		.createHash("md5")
@@ -153,6 +136,25 @@ export async function createWebpackConfig({
 			].join("--")
 		)
 		.digest("hex")
+
+	const resolvePlugins: Exclude<ResolveOptions["plugins"], undefined> = []
+
+	if (project.hasFile("jsconfig.json")) {
+		resolvePlugins.push(
+			// @ts-expect-error: IDK why this type is broken...
+			new TsconfigPathsPlugin({
+				configFile: "jsconfig.json",
+				extensions: [".js", ".jsx"],
+			})
+		)
+	} else if (project.hasFile("tsconfig.json")) {
+		resolvePlugins.push(
+			// @ts-expect-error: IDK why this type is broken...
+			new TsconfigPathsPlugin({
+				extensions: [".js", ".jsx", ".ts", ".tsx"],
+			})
+		)
+	}
 
 	return {
 		entry: project.resolvePath("src/index"),
@@ -172,7 +174,10 @@ export async function createWebpackConfig({
 				packageName,
 			}),
 		},
-		resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+		resolve: {
+			extensions: [".js", ".jsx", ".ts", ".tsx"],
+			plugins: resolvePlugins,
+		},
 		module: {
 			rules: [
 				{
@@ -211,7 +216,9 @@ export async function createWebpackConfig({
 										[
 											"postcss-preset-env",
 											{
-												autoprefixer: { flexbox: "no-2009" },
+												autoprefixer: {
+													flexbox: "no-2009",
+												},
 												stage: 2,
 											},
 										],
@@ -232,7 +239,9 @@ export async function createWebpackConfig({
 							limit: singleBundle ? Infinity : 10000,
 							fallback: {
 								loader: require.resolve("file-loader"),
-								options: { name: "static/media/[contenthash:12].[ext]" },
+								options: {
+									name: "static/media/[contenthash:12].[ext]",
+								},
 							},
 						},
 					},
@@ -264,7 +273,10 @@ function getOutputPath({
 }) {
 	const outputPath = singleBundle ? "" : "static/js/"
 
-	const preparedFilename = filename.replace("[package]", paramCase(packageName))
+	const preparedFilename = filename.replace(
+		"[package]",
+		paramCase(packageName)
+	)
 
 	if (mode === "development") {
 		return `${outputPath}[name].bundle.js`

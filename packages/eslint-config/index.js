@@ -1,9 +1,15 @@
-const { usesPackageSync } = require("@chayns-toolkit/utilities")
+const path = require("path")
 const javascriptRules = require("./rules/javascriptRules")
 const sharedRules = require("./rules/sharedRules")
 const typescriptRules = require("./rules/typescriptRules")
 
-const usesTypeScript = usesPackageSync("typescript")
+// eslint-disable-next-line import/no-dynamic-require
+const packageJson = require(path.resolve("package.json"))
+
+const usesTypeScript = Object.keys({
+	...packageJson.dependencies,
+	...packageJson.devDependencies,
+}).includes("typescript")
 
 module.exports = {
 	env: {
@@ -14,14 +20,9 @@ module.exports = {
 	globals: { chayns: true },
 	rules: { ...sharedRules, ...javascriptRules },
 	parser: "babel-eslint",
-	parserOptions: {
-		babelOptions: {
-			extends: "@chayns-toolkit",
-		},
-	},
 	settings: {
 		"import/resolver": {
-			node: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+			typescript: { project: "@(jsconfig|tsconfig).json" },
 		},
 		"import/extensions": [".js", ".jsx", ".ts", ".tsx"],
 	},
@@ -34,6 +35,7 @@ module.exports = {
 				"plugin:@typescript-eslint/recommended",
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
 				"prettier",
+				"plugin:import/typescript",
 			],
 			rules: {
 				...sharedRules,

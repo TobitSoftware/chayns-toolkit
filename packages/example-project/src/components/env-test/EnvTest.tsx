@@ -8,7 +8,11 @@ function EnvTest(): JSX.Element {
 				The current username is{" "}
 				<code
 					className="chayns__background-color--101"
-					style={{ padding: "2px 6px", borderRadius: 4, fontSize: "0.9em" }}
+					style={{
+						padding: "2px 6px",
+						borderRadius: 4,
+						fontSize: "0.9em",
+					}}
 				>
 					{process.env.USERNAME}
 				</code>
@@ -18,7 +22,11 @@ function EnvTest(): JSX.Element {
 				The current NODE_ENV is{" "}
 				<code
 					className="chayns__background-color--101"
-					style={{ padding: "2px 6px", borderRadius: 4, fontSize: "0.9em" }}
+					style={{
+						padding: "2px 6px",
+						borderRadius: 4,
+						fontSize: "0.9em",
+					}}
 				>
 					{process.env.NODE_ENV}
 				</code>

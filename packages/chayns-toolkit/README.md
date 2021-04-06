@@ -30,6 +30,7 @@ experience when working with [React](https://reactjs.org).
     -   [`chayns-toolkit dev`](#chayns-toolkit-dev)
     -   [`chayns-toolkit build`](#chayns-toolkit-build)
     -   [`chayns-toolkit lint`](#chayns-toolkit-lint)
+    -   [`chayns-toolkit test`](#chayns-toolkit-test)
 -   [Features](#features)
     -   [TypeScript Support](#typescript-support)
     -   [(S)CSS Support](#scss-support)
@@ -37,6 +38,7 @@ experience when working with [React](https://reactjs.org).
     -   [HMR With `react-refresh` Support](#hmr-with-react-refresh-support)
     -   [Using React Devtools](#using-react-devtools)
     -   [ESLint Configuration](#eslint-configuration)
+    -   [Support for custom path aliases](#support-for-custom-path-aliases)
     -   [Single-File Builds](#single-file-builds)
     -   [Environment Variables](#environment-variables)
     -   [Analyzing Your Bundle](#analyzing-your-bundle)
@@ -117,6 +119,38 @@ fix them if possible.
 
 We recommend to use our included [ESLint configuration](#eslint-configuration).
 
+### `chayns-toolkit test`
+
+> This command is currently experimental, meaning that it is not semantically
+> versioned. The API may change at any release.
+
+Uses [Jest](https://jestjs.io/) to run all your test suites. By default it will
+run all files matching the default Jest Glob:
+
+-   Any file ending with `.spec.@(js|jsx|ts|tsx)` or `.test.@(js|jsx|ts|tsx)`
+-   Any JavaScript or TypeScript file in a folder named `__tests__`
+
+The matchers from
+[`@testing-library/jest-dom`](https://testing-library.com/docs/dom-testing-library/intro/)
+will automatically be injected into the Jest environment, so you can write
+assertions on the DOM like this:
+
+```ts
+import { render } from "@testing-library/react"
+import { MyComponent } from "./MyComponent"
+
+test('should have "Click Me!" as its text', () => {
+    const { getByRole } = render(<MyComponent />)
+
+    expect(getByRole("button")).toHaveTextContent("Click Me!")
+})
+```
+
+| Parameters           | Function                                                       |
+| -------------------- | -------------------------------------------------------------- |
+| `-w`, `--watch`      | Runs Jest in [watch mode](https://jestjs.io/docs/cli#--watch)  |
+| `--setupFile <path>` | Executes the setup file specified by `<path>` before any tests |
+
 ## Features
 
 -   [TypeScript Support](#typescript-support)
@@ -125,6 +159,7 @@ We recommend to use our included [ESLint configuration](#eslint-configuration).
 -   [HMR With `react-refresh` Support](#hmr-with-react-refresh-support)
 -   [Using React Devtools](#using-react-devtools)
 -   [ESLint Configuration](#eslint-configuration)
+-   [Support for custom path aliases](#support-for-custom-path-aliases)
 -   [Single-File Builds](#single-file-builds)
 -   [Environment Variables](#environment-variables)
 -   [Analyzing Your Bundle](#analyzing-your-bundle)
@@ -276,6 +311,35 @@ The configuration can also be installed as a standalone package
 If you think a rule should be enabled, disabled or adjusted, please consider
 [opening an issue](https://github.com/TobitSoftware/chayns-toolkit/issues/new)
 to discuss the suggested change instead of changing your local configuration.
+
+### Support for custom path aliases
+
+`chayns-toolkit` supports the `paths` and `baseUrl` options from `tsconfig.json`
+or `jsconfig.json` to create more readable paths.
+
+You can set the `baseUrl` like so:
+
+```json
+// tsconfig.json or jsconfig.json for non-TypeScript projects
+{
+    "compilerOptions": {
+        "baseUrl": "./src"
+    }
+}
+```
+
+Then you can import files based on your `baseUrl`:
+
+```ts
+// Import `MyComponent` from `./src/components/MyComponent`
+import { MyComponent } from "components/MyComponent"
+```
+
+If you want to know more about
+[`baseUrl`](https://www.typescriptlang.org/docs/handbook/module-resolution.html#base-url)
+and
+[`paths`](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping)
+check the TypeScript docs.
 
 ### Single-File Builds
 

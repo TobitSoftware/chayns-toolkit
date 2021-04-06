@@ -8,7 +8,7 @@ const unlinkAsync = promisify(fs.unlink)
 
 export const project = {
 	resolvePath(relativePath: string): string {
-		return path.resolve(process.cwd(), relativePath)
+		return path.resolve(relativePath)
 	},
 
 	hasFile(relativePath: string): boolean {
@@ -19,7 +19,9 @@ export const project = {
 		const absolutePath = this.resolvePath(relativePath)
 
 		try {
-			const content = await readFileAsync(absolutePath, { encoding: "utf-8" })
+			const content = await readFileAsync(absolutePath, {
+				encoding: "utf-8",
+			})
 
 			return content
 		} catch (error: unknown) {

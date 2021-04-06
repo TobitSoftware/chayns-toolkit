@@ -3,7 +3,8 @@ module.exports = {
 	output: {},
 	webpack(config) {
 		const babelRule = config.module.rules.find(
-			(rule) => rule.use.loader && rule.use.loader.includes("babel-loader")
+			(rule) =>
+				rule.use.loader && rule.use.loader.includes("babel-loader")
 		)
 
 		if (!babelRule) return config
