@@ -17,15 +17,15 @@
 		"extends": "@chayns-toolkit"
 	},
 	"dependencies": {
-		"chayns-components": "^4.20.25",
-		"react": "^17.0.1",
-		"react-dom": "^17.0.1"
+		"chayns-components": "^4.21.1",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2"
 	},
 	"devDependencies": {
 		"@babel/plugin-proposal-pipeline-operator": "^7.12.13",
-		"@testing-library/react": "^11.2.3",
+		"@testing-library/react": "^11.2.6",
 		"@types/react": "^17.0.3",
-		"@types/react-dom": "^17.0.2",
+		"@types/react-dom": "^17.0.3",
 		"chayns-toolkit": "^1.5.6",
 		"react-devtools": "^4.10.1",
 		"typescript": "^4.2.3"
