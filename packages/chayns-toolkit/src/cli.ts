@@ -6,7 +6,6 @@ import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
 import { testCommand } from "./commands/testCommand"
 import { convertConfigFile } from "./features/config-file/convertConfigFile"
-import { checkPackages } from "./features/extraneous-packages/checkPackages"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
 import { waitForPort } from "./features/wait-for-port/waitForPort"
@@ -24,7 +23,6 @@ program
 		await runSteps(
 			[
 				convertConfigFile,
-				checkPackages,
 				checkForTypeScript,
 				checkSSLConfig,
 				waitForPort,
