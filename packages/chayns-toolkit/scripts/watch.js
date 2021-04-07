@@ -1,4 +1,4 @@
-const copyAssets = require("./copy-assets")
+const copyAssets = require("./copyAssets")
 const esbuildConfig = require("./esbuildConfig")
 
 copyAssets()
