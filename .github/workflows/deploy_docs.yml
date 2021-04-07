@@ -19,10 +19,12 @@ jobs:
                   node-version: 14.16
 
             - name: Install dependencies
-              run: yarn install
+              run: npm install
+              working-directory: ./docs
 
             - name: Build Storybook
-              run: yarn build-docs
+              run: npm run build
+              working-directory: ./docs
 
             - name: Deploy to GitHub Pages
               uses: peaceiris/actions-gh-pages@v3
