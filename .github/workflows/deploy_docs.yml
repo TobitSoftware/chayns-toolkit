@@ -17,8 +17,8 @@ jobs:
               with:
                   node-version: 14.16
 
-            - name: Install deps (with cache)
-              uses: bahmutov/npm-install@v1
+            - name: Install dependencies
+              run: yarn install
 
             - name: Build Storybook
               run: yarn build-docs
