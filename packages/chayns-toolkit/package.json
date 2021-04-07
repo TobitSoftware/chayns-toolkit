@@ -34,7 +34,7 @@
 		"dev": "node ./scripts/watch",
 		"lint": "eslint src/ --ext js,jsx,ts,tsx",
 		"prepublishOnly": "yarn build",
-		"test": "yarn check-types && yarn lint"
+		"test": "jest"
 	},
 	"dependencies": {
 		"@babel/core": "^7.13.14",
@@ -72,6 +72,8 @@
 		"webpack-dev-server": "^3.11.2"
 	},
 	"devDependencies": {
+		"@babel/preset-env": "^7.13.12",
+		"@babel/preset-typescript": "^7.13.0",
 		"@types/cli-table": "^0.3.0",
 		"@types/cssnano": "^4.0.0",
 		"@types/dotenv-webpack": "^7.0.1",
@@ -93,6 +95,7 @@
 		"cross-env": "^7.0.3",
 		"esbuild": "^0.11.5",
 		"fast-glob": "^3.2.5",
+		"fs-extra": "^9.1.0",
 		"jest": "^26.6.3",
 		"mock-fs": "^4.13.0",
 		"param-case": "^3.0.4",
