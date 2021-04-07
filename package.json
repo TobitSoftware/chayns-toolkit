@@ -6,10 +6,11 @@
 	"repository": "github:TobitSoftware/chayns-toolkit",
 	"license": "MIT",
 	"workspaces": [
+		"docs",
+		"example",
 		"packages/babel-preset",
 		"packages/chayns-toolkit",
-		"packages/eslint-config",
-		"example"
+		"packages/eslint-config"
 	],
 	"scripts": {
 		"bootstrap": "lerna bootstrap",
