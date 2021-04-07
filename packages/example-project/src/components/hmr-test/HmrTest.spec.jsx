@@ -1,5 +1,7 @@
+import { render } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import React from "react"
-import { render, screen, fireEvent } from "@testing-library/react"
+import HmrTest from "./HmrTest"
 
 global.window.chayns = {
 	env: {
@@ -7,22 +9,16 @@ global.window.chayns = {
 		site: {
 			color: "#000000",
 		},
+		parameters: {},
 	},
 }
 
-const HmrTest = require("./HmrTest").default
+test("should increase count after clicking", () => {
+	const { getByText } = render(<HmrTest />)
 
-const test = true
+	const node = getByText("I've been clicked 0 times.")
 
-// checking if counter is working
-it("HmrTest - click", () => {
-	render(<HmrTest />)
+	userEvent.click(node)
 
-	screen.debug()
-
-	const node = screen.getByText("I've been clicked 0 times.")
-	fireEvent.click(node)
-	screen.getByText("I've been clicked 1 times.")
-
-	expect(test).toBe(true)
+	expect(getByText("I've been clicked 1 times.")).toBeInTheDocument()
 })

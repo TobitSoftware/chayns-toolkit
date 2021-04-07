@@ -1,6 +1,4 @@
-import React from "react"
+import * as fs from "fs"
 
-const test = true
-
-// checking that all is fine and component has been rendered
-it("true", () => expect(test).toBe(true))
+test("should be true", () =>
+	expect(typeof fs.readFile === "function").toBe(true))
