@@ -1,20 +1,30 @@
 {
 	"name": "root",
+	"version": "0.0.0-development",
 	"private": true,
 	"description": "A zero-config toolchain for chayns-developers.",
+	"repository": "github:TobitSoftware/chayns-toolkit",
 	"license": "MIT",
 	"workspaces": [
 		"packages/**"
 	],
 	"scripts": {
 		"bootstrap": "lerna bootstrap",
-		"dev": "lerna run dev --parallel --no-private",
+		"check-format": "prettier . --list-different --ignore-path .gitignore",
+		"check-types": "lerna run check-types --no-bail",
+		"dev": "lerna run dev --no-private",
 		"format": "prettier . --write",
-		"test": "lerna run test --no-bail --stream"
+		"lint": "lerna run lint --no-bail",
+		"prepare": "husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks",
+		"test": "lerna run test --no-bail",
+		"validate": "yarn check-format && yarn lint && yarn check-types && yarn test"
 	},
 	"devDependencies": {
+		"husky": "^6.0.0",
 		"lerna": "^4.0.0",
 		"prettier": "^2.2.1",
-		"prettier-plugin-packagejson": "^2.2.10"
+		"prettier-plugin-packagejson": "^2.2.10",
+		"pretty-quick": "^3.1.0",
+		"shx": "^0.3.3"
 	}
 }

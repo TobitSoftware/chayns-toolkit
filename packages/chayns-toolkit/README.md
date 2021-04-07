@@ -4,9 +4,15 @@
     </h1>
     <p align="center">A zero-config toolchain for developing chayns® apps.</p>
     <p align="center">
-        <img src="https://img.shields.io/github/license/TobitSoftware/chayns-toolkit?style=for-the-badge" alt="" />
-        <img src="https://img.shields.io/npm/v/chayns-toolkit?style=for-the-badge" alt="" />
-        <img src="https://img.shields.io/github/last-commit/TobitSoftware/chayns-toolkit?style=for-the-badge" alt="" />
+        <a href="https://github.com/TobitSoftware/chayns-toolkit/blob/master/LICENSE" target="_blank">
+            <img src="https://img.shields.io/github/license/TobitSoftware/chayns-toolkit?style=for-the-badge" alt="" />
+        </a>
+        <a href="https://www.npmjs.com/package/chayns-toolkit" target="_blank">
+            <img src="https://img.shields.io/npm/v/chayns-toolkit?style=for-the-badge" alt="" />
+        </a>
+        <a href="https://github.com/TobitSoftware/chayns-toolkit/branches" target="_blank">
+            <img src="https://img.shields.io/github/last-commit/TobitSoftware/chayns-toolkit?style=for-the-badge" alt="" />
+        </a>
     </p>
 </div>
 
