@@ -1,6 +1,5 @@
 import semver from "semver"
 import type { PackageJson } from "type-fest"
-
 import { isPackageInstalled } from "./isPackageInstalled"
 import { project } from "./project"
 
@@ -10,11 +9,19 @@ type CreateConfigOptions = {
 	reactRefreshSupport?: boolean
 }
 
+type BabelPresetOptions = {
+	typescriptSupport: boolean
+	flowSupport: boolean
+	transformChaynsComponentsImports: boolean
+	transpileModules: boolean | "commonjs"
+	reactRefreshSupport: boolean
+}
+
 export default function createBabelPresetOptions({
 	packageJson,
 	transpileModules = false,
 	reactRefreshSupport = true,
-}: CreateConfigOptions) {
+}: CreateConfigOptions): BabelPresetOptions {
 	let transformChaynsComponentsImports = false
 
 	const componentsVersion = packageJson.dependencies?.["chayns-components"]

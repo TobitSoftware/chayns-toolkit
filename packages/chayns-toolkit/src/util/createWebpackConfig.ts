@@ -141,7 +141,6 @@ export async function createWebpackConfig({
 
 	if (project.hasFile("jsconfig.json")) {
 		resolvePlugins.push(
-			// @ts-expect-error: IDK why this type is broken...
 			new TsconfigPathsPlugin({
 				configFile: "jsconfig.json",
 				extensions: [".js", ".jsx"],
@@ -149,7 +148,6 @@ export async function createWebpackConfig({
 		)
 	} else if (project.hasFile("tsconfig.json")) {
 		resolvePlugins.push(
-			// @ts-expect-error: IDK why this type is broken...
 			new TsconfigPathsPlugin({
 				extensions: [".js", ".jsx", ".ts", ".tsx"],
 			})
