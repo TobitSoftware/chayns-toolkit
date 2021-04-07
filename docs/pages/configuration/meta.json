@@ -1,0 +1,5 @@
+{
+	"development": "Development",
+	"output": "Build Output",
+	"webpack": "Customizing Webpack"
+}

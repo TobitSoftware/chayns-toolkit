@@ -3,7 +3,7 @@ export default {
 	docsRepository: "https://github.com/TobitSoftware/chayns-toolkit", // docs repo
 	branch: "master", // branch of docs
 	path: "/", // path of docs
-	titleSuffix: " – chayns Toolkit",
+	titleSuffix: " – chayns-toolkit",
 	nextLinks: true,
 	prevLinks: true,
 	search: true,
@@ -12,19 +12,18 @@ export default {
 	footer: true,
 	footerText: "MIT 2021 © Tobit Software Laboratories AG",
 	footerEditOnGitHubLink: true, // will link to the docs repo
-	logo: (
-		<>
-			<img src="logo.png" style={{ height: 32 }} alt="chayns-toolkit" />
-		</>
-	),
+	logo: <img src="/logo.png" style={{ height: 32 }} alt="chayns-toolkit" />,
 	head: (
 		<>
 			<meta
 				name="viewport"
 				content="width=device-width, initial-scale=1.0"
 			/>
-			<meta name="description" content="Nextra: the next docs builder" />
-			<meta name="og:title" content="Nextra: the next docs builder" />
+			<meta
+				name="description"
+				content="A zero-config toolchain for developing chayns® apps."
+			/>
+			<meta name="og:title" content="chayns-toolkit" />
 		</>
 	),
 }

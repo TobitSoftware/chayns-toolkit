@@ -1,0 +1,8 @@
+{
+	"typescript": "TypeScript",
+	"css": "(S)CSS Support",
+	"assets": "Images and Assets",
+	"devtools": "React Devtools",
+	"eslint": "ESLint Integration",
+	"environment": "Environment Variables"
+}
