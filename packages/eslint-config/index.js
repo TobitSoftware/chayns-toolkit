@@ -1,6 +1,15 @@
+const path = require("path")
 const javascriptRules = require("./rules/javascriptRules")
 const sharedRules = require("./rules/sharedRules")
 const typescriptRules = require("./rules/typescriptRules")
+
+// eslint-disable-next-line import/no-dynamic-require
+const packageJson = require(path.resolve("package.json"))
+
+const usesTypeScript = Object.keys({
+	...packageJson.dependencies,
+	...packageJson.devDependencies,
+}).includes("typescript")
 
 module.exports = {
 	env: {
@@ -18,7 +27,7 @@ module.exports = {
 		"import/extensions": [".js", ".jsx", ".ts", ".tsx"],
 	},
 	overrides: [
-		{
+		usesTypeScript && {
 			files: ["**/*.ts?(x)"],
 			extends: [
 				"airbnb-typescript",
