@@ -15,7 +15,8 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/TobitSoftware/chayns-toolkit.git"
+		"url": "https://github.com/TobitSoftware/chayns-toolkit.git",
+		"directory": "packages/chayns-toolkit"
 	},
 	"license": "MIT",
 	"author": {

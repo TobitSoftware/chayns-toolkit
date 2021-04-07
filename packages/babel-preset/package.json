@@ -17,7 +17,8 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/TobitSoftware/chayns-toolkit.git"
+		"url": "https://github.com/TobitSoftware/chayns-toolkit.git",
+		"directory": "packages/babel-preset"
 	},
 	"license": "MIT",
 	"author": {
