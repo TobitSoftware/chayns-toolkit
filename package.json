@@ -10,13 +10,14 @@
 	],
 	"scripts": {
 		"bootstrap": "lerna bootstrap",
+		"check-format": "prettier . --list-different --ignore-path .gitignore",
 		"check-types": "lerna run check-types --no-bail",
 		"dev": "lerna run dev --no-private",
 		"format": "prettier . --write",
 		"lint": "lerna run lint --no-bail",
 		"prepare": "husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks",
 		"test": "lerna run test --no-bail",
-		"validate": "yarn lint && yarn check-types && yarn test"
+		"validate": "yarn check-format && yarn lint && yarn check-types && yarn test"
 	},
 	"devDependencies": {
 		"husky": "^6.0.0",
