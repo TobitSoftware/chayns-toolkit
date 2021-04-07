@@ -1,6 +1,11 @@
 {
 	"npmClient": "yarn",
-	"packages": ["packages/*"],
+	"packages": [
+		"packages/babel-preset",
+		"packages/chayns-toolkit",
+		"packages/eslint-config",
+		"example"
+	],
 	"useWorkspaces": true,
 	"version": "1.6.1"
 }
