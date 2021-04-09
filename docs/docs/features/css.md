@@ -1,5 +1,5 @@
 ---
-title: (S)CSS Support
+title: CSS & Sass Support
 slug: css
 ---
 
@@ -24,5 +24,9 @@ export function MyComponent() {
 }
 ```
 
-> For more information on CSS Modules check out
-> [this article](https://css-tricks.com/css-modules-part-1-need/).
+:::info Learn More
+
+For more information on CSS Modules check out
+[this article](https://css-tricks.com/css-modules-part-1-need/).
+
+:::

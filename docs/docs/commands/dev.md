@@ -19,7 +19,7 @@ see them in real time.
 You can configure SSL certificates, host and port in the `toolkit.config.js`
 configuration file:
 
-```js highlight=3,4,5,6
+```js {3,4,5,6} title="/toolkit.config.js"
 module.exports = {
     development: {
         host: "123.4.5.6",
@@ -31,9 +31,13 @@ module.exports = {
 }
 ```
 
-> To achieve faster (re-)build times during development this command only
-> transpiles your code to work with the latest versions of Chrome, Safari and
-> Firefox.
+:::info
+
+To achieve faster (re-)build times during development this command only
+transpiles your code to work with the latest versions of Chrome, Safari and
+Firefox.
+
+:::
 
 ## Parameters
 

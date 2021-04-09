@@ -9,9 +9,7 @@ These options configure your development server started with
 
 All options aswell as the `toolkit.config.js` file itself are optional.
 
-```js
-// toolkit.config.js
-
+```js title="/toolkit.config.js"
 module.exports = {
     development: {
         /**

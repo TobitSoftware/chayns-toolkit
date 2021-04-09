@@ -13,9 +13,13 @@ root of your project.
 The next time you start the `chayns-toolkit dev` command, we will automatically
 populate the `tsconfig.json`-file with our recommended configuration.
 
-> Even though you can use `.ts` or `.tsx` files without a `tsconfig.json` it is
-> highly recommended to set it up. This will give you better editor support and
-> ESLint warnings.
+:::note
+
+Even though you can use `.ts` or `.tsx` files without a `tsconfig.json` it is
+highly recommended to set it up. This will give you better editor support and
+ESLint warnings.
+
+:::
 
 🎉 **Congrats!** You are now ready to use TypeScript in your `.ts` and `.tsx`
 files!
@@ -45,7 +49,7 @@ or `jsconfig.json` to create more readable paths.
 
 You can set the `baseUrl` like so in your `tsconfig.json` or `jsconfig.json`:
 
-```json highlight=3
+```json {3} title="/tsconfig.json"
 {
     "compilerOptions": {
         "baseUrl": "./src"

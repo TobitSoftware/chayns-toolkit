@@ -11,7 +11,7 @@ your code under `process.env.VAR_NAME`.
 
 Your `.env.local` file would look something like this:
 
-```
+```env title="/.env.local"
 GOOGLE_MAPS_API_KEY=1bc29b36f623ba82aaf6724fd3b16718
 OTHER_IMPORTANT_API_KEY=ca794fb2d950acf25c964ecc35f2d7e2
 ... other values ...

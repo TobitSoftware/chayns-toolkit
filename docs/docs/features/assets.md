@@ -19,11 +19,20 @@ export function MyImage() {
 The filename of the image will be changed and it will be output into the build
 directory.
 
-> To improve loading times, small images (< 10 KB) will be inlined into the
-> JavaScript code with data-urls and therefore won't appear as files in your
-> output.
+:::info
 
-> When single-file mode is activated, all images will be inlined.
+To improve loading times, small images (< 10 KB) will be inlined into the
+JavaScript code with data-urls and therefore won't appear as files in your
+output.
+
+:::
+
+:::tip
+
+When [single-file mode](../configuration/output#single-file-builds) is
+activated, all images will be inlined.
+
+:::
 
 ## SVG Support
 

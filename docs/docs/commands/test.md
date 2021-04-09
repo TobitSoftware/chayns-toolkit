@@ -8,8 +8,12 @@ sidebar_label: Test
 chayns-toolkit test
 ```
 
-> This command is currently experimental. It is not semantically versioned and
-> its API may change during any release.
+:::caution
+
+This command is currently experimental. It is not semantically versioned and its
+API may change during any release.
+
+:::
 
 Runs all of your [Jest](https://jestjs.io/) test suites. Files matching one of
 the following schemas are identified as test files:

@@ -14,9 +14,7 @@ Use the `webpack` property of the configuration object to specify a function
 that receives the default webpack configuration along with some other
 information. This modifier function has to return the modified configuration.
 
-```js
-// toolkit.config.js
-
+```js {5} title="/toolkit.config.js"
 module.exports = {
     webpack(config, options) {
         // ... do some modifications...
@@ -60,7 +58,7 @@ This example shows how to add
 [`@babel/plugin-proposal-pipeline-operator`](https://babeljs.io/docs/en/babel-plugin-proposal-pipeline-operator)
 to `babel-loader`:
 
-```js
+```js title="/toolkit.config.js"
 module.exports = {
     webpack(config) {
         const babelRule = config.module.rules.find(
@@ -93,7 +91,7 @@ module.exports = {
 This example shows how to polyfill the Node.js `crypto` module using a
 [resolve fallback](https://webpack.js.org/configuration/resolve/#resolvefallback):
 
-```js
+```js title="/toolkit.config.js"
 module.exports = {
     webpack(config) {
         config.resolve.fallback.crypto = require.resolve("crypto-browserify")
