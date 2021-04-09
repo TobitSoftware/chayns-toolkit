@@ -4,6 +4,7 @@ module.exports = {
 		{
 			type: "category",
 			label: "Features",
+			collapsed: false,
 			items: [
 				"features/typescript",
 				"features/css",
@@ -16,6 +17,7 @@ module.exports = {
 		{
 			type: "category",
 			label: "Commands",
+			collapsed: false,
 			items: [
 				"commands/dev",
 				"commands/build",
@@ -26,6 +28,7 @@ module.exports = {
 		{
 			type: "category",
 			label: "Configuration",
+			collapsed: false,
 			items: [
 				"configuration/development",
 				"configuration/output",
