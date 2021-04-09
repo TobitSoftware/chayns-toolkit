@@ -1,6 +1,0 @@
-{
-	"dev": "Dev",
-	"build": "Build",
-	"lint": "Lint",
-	"test": "Test"
-}

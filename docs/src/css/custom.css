@@ -1,0 +1,20 @@
+@import url("https://rsms.me/inter/inter.css");
+
+:root {
+	--ifm-font-family-base: "Inter var", system-ui, sans-serif;
+	--ifm-color-primary: #6366f1;
+	--ifm-color-primary-dark: #4f46e5;
+	--ifm-color-primary-darker: #4338ca;
+	--ifm-color-primary-darkest: #3730a3;
+	--ifm-color-primary-light: #818cf8;
+	--ifm-color-primary-lighter: #a5b4fc;
+	--ifm-color-primary-lightest: #c7d2fe;
+	--ifm-code-font-size: 95%;
+}
+
+.docusaurus-highlight-code-line {
+	background-color: rgb(72, 77, 91);
+	display: block;
+	margin: 0 calc(-1 * var(--ifm-pre-padding));
+	padding: 0 var(--ifm-pre-padding);
+}
