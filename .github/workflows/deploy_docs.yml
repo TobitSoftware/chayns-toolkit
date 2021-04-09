@@ -1,0 +1,33 @@
+name: Deploy Docs to GitHub Pages
+
+on:
+    push:
+        paths:
+            - "docs/**"
+    workflow_dispatch:
+
+jobs:
+    deploy:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v2
+
+            - name: Use Node 14.16
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14.16
+
+            - name: Install dependencies
+              run: npm install
+              working-directory: ./docs
+
+            - name: Build
+              run: npm run build
+              working-directory: ./docs
+
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v3
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./docs/build

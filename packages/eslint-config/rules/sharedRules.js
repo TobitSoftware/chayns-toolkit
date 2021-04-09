@@ -26,6 +26,7 @@ const sharedRules = {
 			name: "chayns-components/lib",
 		},
 	],
+	"react/no-danger": "off",
 }
 
 module.exports = sharedRules

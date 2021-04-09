@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap");
+
+:root {
+	--ifm-font-family-base: "Barlow", system-ui, sans-serif;
+	--ifm-font-family-monospace: "JetBrains Mono", system-mono, sans-serif;
+	--ifm-color-primary: #6366f1;
+	--ifm-color-primary-dark: #4f46e5;
+	--ifm-color-primary-darker: #4338ca;
+	--ifm-color-primary-darkest: #3730a3;
+	--ifm-color-primary-light: #818cf8;
+	--ifm-color-primary-lighter: #a5b4fc;
+	--ifm-color-primary-lightest: #c7d2fe;
+	--ifm-code-font-size: 95%;
+
+	--ifm-color-info: #0ea5e9;
+	--ifm-color-success: #10b981;
+	--ifm-color-secondary: #f4f4f5;
+	--ifm-color-warning: #f59e0b;
+	--ifm-color-info: #0ea5e9;
+}
+
+.docusaurus-highlight-code-line {
+	background-color: #e4e4e7;
+	display: block;
+	margin: 0 calc(-1 * var(--ifm-pre-padding));
+	padding: 0 var(--ifm-pre-padding);
+}
+
+html[data-theme="dark"] .docusaurus-highlight-code-line {
+	background-color: #374151;
+}

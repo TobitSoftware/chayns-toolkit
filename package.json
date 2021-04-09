@@ -6,7 +6,10 @@
 	"repository": "github:TobitSoftware/chayns-toolkit",
 	"license": "MIT",
 	"workspaces": [
-		"packages/**"
+		"example",
+		"packages/babel-preset",
+		"packages/chayns-toolkit",
+		"packages/eslint-config"
 	],
 	"scripts": {
 		"bootstrap": "lerna bootstrap",
@@ -17,7 +20,8 @@
 		"lint": "lerna run lint --no-bail",
 		"prepare": "husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks",
 		"test": "lerna run test --no-bail",
-		"validate": "yarn check-format && yarn lint && yarn check-types && yarn test"
+		"validate": "yarn check-format && yarn lint && yarn check-types && yarn test",
+		"build-docs": "lerna run build --scope docs"
 	},
 	"devDependencies": {
 		"husky": "^6.0.0",
