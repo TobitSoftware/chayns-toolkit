@@ -19,11 +19,11 @@ jobs:
                   node-version: 14.16
 
             - name: Install dependencies
-              run: yarn install
+              run: npm install
               working-directory: ./docs
 
             - name: Build
-              run: yarn build
+              run: npm run build
               working-directory: ./docs
 
             - name: Deploy to GitHub Pages
