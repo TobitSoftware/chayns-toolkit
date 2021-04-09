@@ -10,6 +10,13 @@ module.exports = {
 	organizationName: "TobitSoftware", // Usually your GitHub org/user name.
 	projectName: "chayns-toolkit", // Usually your repo name.
 	themeConfig: {
+		colorMode: {
+			respectPrefersColorScheme: true,
+			switchConfig: {
+				darkIcon: "🌑",
+				lightIcon: "💡",
+			},
+		},
 		navbar: {
 			logo: {
 				alt: "chayns-toolkit Logo",
@@ -30,9 +37,11 @@ module.exports = {
 			],
 		},
 		footer: {
-			style: "light",
-
 			copyright: `Copyright © ${new Date().getFullYear()} Tobit Software Laboratories AG. Built with Docusaurus.`,
+		},
+		prism: {
+			theme: require("prism-react-renderer/themes/github"),
+			darkTheme: require("prism-react-renderer/themes/oceanicNext"),
 		},
 	},
 	presets: [
