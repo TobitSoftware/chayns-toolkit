@@ -9,7 +9,7 @@ import styles from "./styles.module.css"
 const features = [
 	{
 		title: "Zero Config",
-		imageUrl: "img/undraw_To_the_stars_qhyy.svg",
+		imageUrl: "../img/undraw_To_the_stars_qhyy.svg",
 		description: (
 			<>
 				Automatic compilation and bundling. Optimized for production
@@ -19,12 +19,12 @@ const features = [
 	},
 	{
 		title: "TypeScript support",
-		imageUrl: "img/undraw_Security_on_ff2u.svg",
+		imageUrl: "../img/undraw_Security_on_ff2u.svg",
 		description: <>Automatic TypeScript configuration and compilation.</>,
 	},
 	{
 		title: "Fast Refresh",
-		imageUrl: "img/undraw_fast_loading_0lbh.svg",
+		imageUrl: "../img/undraw_fast_loading_0lbh.svg",
 		description: (
 			<>
 				Fast, reliable live-editing experience, as proven at Facebook

@@ -3,10 +3,10 @@ module.exports = {
 	title: "chayns-toolkit",
 	tagline: "A zero-config toolchain for developing chayns® apps.",
 	url: "https://tobitsoftware.github.io/chayns-toolkit",
-	baseUrl: "/",
+	baseUrl: "/chayns-toolkit/",
 	onBrokenLinks: "warn",
 	onBrokenMarkdownLinks: "warn",
-	favicon: "img/favicon.ico",
+	favicon: "/img/favicon.ico",
 	organizationName: "TobitSoftware", // Usually your GitHub org/user name.
 	projectName: "chayns-toolkit", // Usually your repo name.
 	themeConfig: {
