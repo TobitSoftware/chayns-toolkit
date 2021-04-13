@@ -43,6 +43,10 @@ module.exports = {
 			theme: require("prism-react-renderer/themes/github"),
 			darkTheme: require("prism-react-renderer/themes/oceanicNext"),
 		},
+        algolia: {
+            apiKey: 'd32ad728937f5e05637e7bcb70ae6171',
+            indexName: 'tobitsoftware',
+        }
 	},
 	presets: [
 		[
