@@ -22,6 +22,7 @@ module.exports = declare((api, options) => {
 			[
 				"@babel/env",
 				{
+					loose: true,
 					bugfixes: true,
 					modules: transpileModules,
 					exclude: ["transform-typeof-symbol"],
@@ -65,7 +66,6 @@ module.exports = declare((api, options) => {
 				"@babel/proposal-decorators",
 				{ legacy: true },
 			],
-			["@babel/proposal-class-properties", { loose: true }],
 			env === "production" && "transform-react-remove-prop-types",
 			reactRefreshSupport &&
 				env !== "production" &&
