@@ -26,8 +26,8 @@
 	"devDependencies": {
 		"husky": "^6.0.0",
 		"lerna": "^4.0.0",
-		"prettier": "^2.2.1",
-		"prettier-plugin-packagejson": "^2.2.10",
+		"prettier": "^2.3.0",
+		"prettier-plugin-packagejson": "^2.2.11",
 		"pretty-quick": "^3.1.0",
 		"shx": "^0.3.3"
 	}
