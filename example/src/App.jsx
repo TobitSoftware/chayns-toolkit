@@ -1,3 +1,4 @@
+import { Test } from "class-properties-test"
 import CorejsTest from "components/corejs-test/CorejsTest"
 import CssModules from "components/css-modules/CssModules"
 import EnvTest from "components/env-test/EnvTest"
@@ -15,6 +16,8 @@ const LazyComponent = React.lazy(() =>
 )
 
 export default function App() {
+	console.log(new Test().getTest())
+
 	return (
 		<div>
 			<CssModules />

@@ -171,6 +171,7 @@ export async function createWebpackConfig({
 				singleBundle,
 				packageName,
 			}),
+			assetModuleFilename: "static/media/[hash][ext][query]",
 		},
 		resolve: {
 			extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -231,17 +232,9 @@ export async function createWebpackConfig({
 				},
 				{
 					test: /\.(png|jpe?g|gif|webp)$/i,
-					use: {
-						loader: require.resolve("url-loader"),
-						options: {
-							limit: singleBundle ? Infinity : 10000,
-							fallback: {
-								loader: require.resolve("file-loader"),
-								options: {
-									name: "static/media/[contenthash:12].[ext]",
-								},
-							},
-						},
+					type: "asset",
+					parser: {
+						dataUrlCondition: { maxSize: 10 * 1024 },
 					},
 				},
 				{

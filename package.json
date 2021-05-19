@@ -6,28 +6,28 @@
 	"repository": "github:TobitSoftware/chayns-toolkit",
 	"license": "MIT",
 	"workspaces": [
+		"docs",
 		"example",
 		"packages/babel-preset",
 		"packages/chayns-toolkit",
 		"packages/eslint-config"
 	],
 	"scripts": {
-		"bootstrap": "lerna bootstrap",
 		"check-format": "prettier . --list-different --ignore-path .gitignore",
-		"check-types": "lerna run check-types --no-bail",
-		"dev": "lerna run dev --no-private",
+		"check-types": "npm run check-types --workspaces --if-present",
 		"format": "prettier . --write",
-		"lint": "lerna run lint --no-bail",
+		"lint": "npm run lint --workspaces --if-present",
 		"prepare": "husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks",
-		"test": "lerna run test --no-bail",
-		"validate": "yarn check-format && yarn lint && yarn check-types && yarn test",
-		"build-docs": "lerna run build --scope docs"
+		"test": "npm run test --workspaces --if-present",
+		"validate": "run-s check-format lint check-types test",
+		"build-docs": "npm run build -w docs"
 	},
 	"devDependencies": {
 		"husky": "^6.0.0",
 		"lerna": "^4.0.0",
-		"prettier": "^2.2.1",
-		"prettier-plugin-packagejson": "^2.2.10",
+		"npm-run-all": "^4.1.5",
+		"prettier": "^2.3.0",
+		"prettier-plugin-packagejson": "^2.2.11",
 		"pretty-quick": "^3.1.0",
 		"shx": "^0.3.3"
 	}
