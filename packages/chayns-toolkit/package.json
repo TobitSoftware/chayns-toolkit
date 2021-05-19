@@ -24,10 +24,11 @@
 		"email": "leonhard.driesch@tobit.com"
 	},
 	"bin": {
-		"chayns-toolkit": "./lib/cli.js"
+		"chayns-toolkit": "./cli.js"
 	},
 	"files": [
-		"lib/*"
+		"lib/*",
+		"cli.js"
 	],
 	"scripts": {
 		"build": "node ./scripts/build",
