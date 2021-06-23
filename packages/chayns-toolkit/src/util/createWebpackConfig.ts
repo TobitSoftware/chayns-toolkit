@@ -206,7 +206,18 @@ export async function createWebpackConfig({
 						mode === "development" || singleBundle
 							? require.resolve("style-loader")
 							: MiniCssExtractPlugin.loader,
-						require.resolve("css-loader"),
+						{
+							loader: require.resolve("css-loader"),
+							options: {
+								modules: {
+									auto: true,
+									localIdentName:
+										mode === "development"
+											? "[path][name]__[local]"
+											: "[hash:base64]",
+								},
+							},
+						},
 						{
 							loader: require.resolve("postcss-loader"),
 							options: {
