@@ -215,6 +215,7 @@ export async function createWebpackConfig({
 										mode === "development"
 											? "[path][name]__[local]"
 											: "[hash:base64]",
+									exportLocalsConvention: "camelCase",
 								},
 							},
 						},
