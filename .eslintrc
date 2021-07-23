@@ -1,6 +1,24 @@
 {
-	"extends": "@chayns-toolkit",
+	"extends": "./eslint",
+	"globals": {
+		"__PKG_VERSION__": true
+	},
 	"rules": {
-		"import/no-unresolved": ["error", { "ignore": ["type-fest"] }]
+		"import/no-extraneous-dependencies": [
+			"error",
+			{
+				"devDependencies": true,
+				"optionalDependencies": false,
+				"peerDependencies": false
+			}
+		],
+		"import/no-unresolved": [
+			"error",
+			{
+				"ignore": ["type-fest"]
+			}
+		],
+		"no-console": "off",
+		"no-restricted-syntax": "off"
 	}
 }

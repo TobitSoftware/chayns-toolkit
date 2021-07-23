@@ -13,7 +13,7 @@
 		"test": "chayns-toolkit test"
 	},
 	"eslintConfig": {
-		"extends": "@chayns-toolkit"
+		"extends": "chayns-toolkit/eslint"
 	},
 	"dependencies": {
 		"chayns-components": "^4.21.12",
@@ -26,7 +26,7 @@
 		"@testing-library/user-event": "^13.1.9",
 		"@types/react": "^17.0.6",
 		"@types/react-dom": "^17.0.5",
-		"chayns-toolkit": "^1.6.2",
+		"chayns-toolkit": "file:..",
 		"react-devtools": "^4.13.2",
 		"typescript": "^4.2.4"
 	}
