@@ -1,1 +1,1 @@
-module.exports = require("./eslint/index")
+module.exports = require("./lib/eslint")

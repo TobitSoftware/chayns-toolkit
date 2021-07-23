@@ -28,7 +28,6 @@
 	},
 	"files": [
 		"lib/*",
-		"eslint/*",
 		"cli.js",
 		"babel.js",
 		"eslint.js"
@@ -38,7 +37,7 @@
 		"check-types": "tsc --noEmit",
 		"dev": "node ./scripts/watch",
 		"lint": "eslint src/ --ext js,jsx,ts,tsx",
-		"prepublishOnly": "yarn build",
+		"prepublishOnly": "npm run build",
 		"test": "jest",
 		"format": "prettier . --write",
 		"prepare": "husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks"
