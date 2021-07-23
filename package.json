@@ -40,7 +40,8 @@
 		"prepublishOnly": "npm run build",
 		"test": "jest",
 		"format": "prettier . --write",
-		"prepare": "husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks"
+		"prepare": "husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks",
+		"build-docs": "npm --prefix website i && npm --prefix website run build"
 	},
 	"dependencies": {
 		"@babel/core": "^7.14.8",
