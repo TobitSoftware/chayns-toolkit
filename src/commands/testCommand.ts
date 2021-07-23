@@ -33,6 +33,7 @@ type JestConfig = Partial<{
 	moduleNameMapper: {
 		[glob: string]: string
 	}
+	testEnvironment: "jsdom" | "node"
 }>
 
 export async function testCommand({
@@ -65,6 +66,7 @@ export async function testCommand({
 		setupFilesAfterEnv: [
 			path.resolve(__dirname, "assets", "react-testing-library.setup.js"),
 		],
+		testEnvironment: "jsdom",
 	}
 
 	if (setupFile) {
