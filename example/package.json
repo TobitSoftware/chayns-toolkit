@@ -13,7 +13,7 @@
 		"test": "chayns-toolkit test"
 	},
 	"eslintConfig": {
-		"extends": "@chayns-toolkit"
+		"extends": "chayns-toolkit/eslint"
 	},
 	"dependencies": {
 		"chayns-components": "^4.21.12",
@@ -21,13 +21,13 @@
 		"react-dom": "^17.0.2"
 	},
 	"devDependencies": {
-		"@babel/plugin-proposal-pipeline-operator": "^7.12.13",
-		"@testing-library/react": "^11.2.7",
-		"@testing-library/user-event": "^13.1.9",
-		"@types/react": "^17.0.6",
-		"@types/react-dom": "^17.0.5",
-		"chayns-toolkit": "^1.6.2",
-		"react-devtools": "^4.13.2",
-		"typescript": "^4.2.4"
+		"@babel/plugin-proposal-pipeline-operator": "^7.14.8",
+		"@testing-library/react": "^12.0.0",
+		"@testing-library/user-event": "^13.2.0",
+		"@types/react": "^17.0.14",
+		"@types/react-dom": "^17.0.9",
+		"chayns-toolkit": "file:..",
+		"react-devtools": "^4.14.0",
+		"typescript": "^4.3.5"
 	}
 }
