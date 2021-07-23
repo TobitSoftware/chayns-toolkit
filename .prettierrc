@@ -2,6 +2,7 @@
 	"semi": false,
 	"useTabs": true,
 	"proseWrap": "always",
+	"endOfLine": "lf",
 	"overrides": [
 		{
 			"files": "*.md",
