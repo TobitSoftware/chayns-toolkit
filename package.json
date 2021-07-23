@@ -28,9 +28,9 @@
 	},
 	"files": [
 		"lib/*",
+		"eslint/*",
 		"cli.js",
-		"babel.js",
-		"eslint.js"
+		"babel.js"
 	],
 	"scripts": {
 		"build": "node ./scripts/build",
