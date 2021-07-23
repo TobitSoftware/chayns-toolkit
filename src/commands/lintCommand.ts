@@ -8,6 +8,7 @@ export async function lintCommand(): Promise<void> {
 		const eslint = new ESLint({
 			fix: true,
 			extensions: ["js", "jsx", "ts", "tsx"],
+			baseConfig: { extends: "./node_modules/chayns-toolkit/eslint" },
 		})
 
 		const results = await eslint.lintFiles(["./src"])
