@@ -1,7 +1,7 @@
 const path = require("path")
-const javascriptRules = require("./rules/javascriptRules")
-const sharedRules = require("./rules/sharedRules")
-const typescriptRules = require("./rules/typescriptRules")
+const javascriptRules = require("./javascriptRules")
+const sharedRules = require("./sharedRules")
+const typescriptRules = require("./typescriptRules")
 
 // eslint-disable-next-line import/no-dynamic-require
 const packageJson = require(path.resolve("package.json"))
