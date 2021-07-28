@@ -62,3 +62,29 @@ The general rule for testing frontend components is:
 | -------------------- | -------------------------------------------------------------- |
 | `-w`, `--watch`      | Runs Jest in [watch mode](https://jestjs.io/docs/cli#--watch)  |
 | `--setupFile <path>` | Executes the setup file specified by `<path>` before any tests |
+
+## Customizing jest-Config
+
+Even though the included jest configuration will handle most cases, we also
+provide the ability to modify it.
+
+> Please note that the jest configuration does not follow semantic versioning
+> and can change with any release.
+
+Use the `jest` property of the configuration object to specify a function that
+receives the default jest configuration. Unlike the webpack function it
+(currently) does not receive additional information about the build. This
+modifier function has to return the modified configuration.
+
+```js title="/toolkit.config.js"
+module.exports = {
+    jest(config) {
+        config.transformIgnorePatterns = [
+            // required for node_modules with es6 syntax
+            "/node_modules/(?!lodash-es).+\\.js$",
+        ]
+
+        return config
+    },
+}
+```
