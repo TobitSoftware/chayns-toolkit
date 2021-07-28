@@ -2,9 +2,9 @@ import fs from "fs"
 import jest from "jest"
 import path from "path"
 import createBabelPresetOptions from "../util/createBabelPresetOptions"
-import { loadPackageJson } from "../util/loadPackageJson"
 import { output } from "../util/output"
 import { project } from "../util/project"
+import type { StepParams } from "../util/runSteps"
 
 type TestOptions = {
 	watch: boolean
@@ -36,63 +36,74 @@ type JestConfig = Partial<{
 	testEnvironment: "jsdom" | "node"
 }>
 
-export async function testCommand({
+export function testCommand({
 	watch,
 	setupFile,
-}: TestOptions): Promise<void> {
-	const packageJson = await loadPackageJson()
-	const babelConfig = createBabelPresetOptions({
-		packageJson,
-		transpileModules: "commonjs",
-		reactRefreshSupport: false,
-	})
+}: TestOptions): (stepParams: StepParams) => Promise<void> {
+	return async ({ config, packageJson, packageManager }) => {
+		const babelConfig = createBabelPresetOptions({
+			packageJson,
+			transpileModules: "commonjs",
+			reactRefreshSupport: false,
+		})
 
-	const jestConfig: JestConfig = {
-		transform: {
-			"\\.[jt]sx?$": [
-				"babel-jest",
-				{
-					presets: [["chayns-toolkit/babel", babelConfig]],
-				},
+		let jestConfig: JestConfig = {
+			transform: {
+				"\\.[jt]sx?$": [
+					"babel-jest",
+					{
+						presets: [["chayns-toolkit/babel", babelConfig]],
+					},
+				],
+			},
+			moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
+			moduleNameMapper: {
+				"^.+\\.(css|less|scss)$": "babel-jest",
+				"\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
+					path.resolve(__dirname, "assets", "file-mock.js"),
+			},
+			testPathIgnorePatterns: ["^.+\\.eslintrc\\.js$"],
+			setupFilesAfterEnv: [
+				path.resolve(
+					__dirname,
+					"assets",
+					"react-testing-library.setup.js"
+				),
 			],
-		},
-		moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
-		moduleNameMapper: {
-			"^.+\\.(css|less|scss)$": "babel-jest",
-			"\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
-				path.resolve(__dirname, "assets", "file-mock.js"),
-		},
-		testPathIgnorePatterns: ["^.+\\.eslintrc\\.js$"],
-		setupFilesAfterEnv: [
-			path.resolve(__dirname, "assets", "react-testing-library.setup.js"),
-		],
-		testEnvironment: "jsdom",
-	}
+			testEnvironment: "jsdom",
+		}
 
-	if (setupFile) {
-		const setupFilePath = project.resolvePath(setupFile)
+		if (typeof config.jest === "function") {
+			const modifier = config.jest as (config: JestConfig) => JestConfig
 
-		const warningText = `The specified setup file for the tests (${setupFilePath}) could not be found.`
-		try {
-			if (fs.existsSync(setupFilePath)) {
-				if (jestConfig.setupFilesAfterEnv) {
-					jestConfig.setupFilesAfterEnv.push(setupFilePath)
+			jestConfig = modifier(jestConfig)
+		}
+
+		if (setupFile) {
+			const setupFilePath = project.resolvePath(setupFile)
+
+			const warningText = `The specified setup file for the tests (${setupFilePath}) could not be found.`
+			try {
+				if (fs.existsSync(setupFilePath)) {
+					if (jestConfig.setupFilesAfterEnv) {
+						jestConfig.setupFilesAfterEnv.push(setupFilePath)
+					}
+				} else {
+					output.warn(warningText)
 				}
-			} else {
+			} catch (ex) {
 				output.warn(warningText)
 			}
-		} catch (ex) {
-			output.warn(warningText)
 		}
+
+		const args = []
+		args.push("--config", JSON.stringify(jestConfig))
+		if (watch) {
+			args.push("--watch")
+		}
+
+		// args.push('--json'); // json output could be used for custom formatting
+
+		await jest.run(args)
 	}
-
-	const args = []
-	args.push("--config", JSON.stringify(jestConfig))
-	if (watch) {
-		args.push("--watch")
-	}
-
-	// args.push('--json'); // json output could be used for custom formatting
-
-	await jest.run(args)
 }

@@ -61,7 +61,12 @@ program
 		""
 	)
 	.action(async (options: { watch: boolean; setupFile: string }) => {
-		await testCommand(options)
+		try {
+			await runSteps([testCommand(options)])
+		} catch (e) {
+			output.error(e)
+		}
+
 		console.info("")
 	})
 
