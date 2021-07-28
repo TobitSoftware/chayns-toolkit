@@ -19,7 +19,7 @@ module.exports = {
 	extends: ["airbnb", "airbnb/hooks", "prettier"],
 	globals: { chayns: true },
 	rules: { ...sharedRules, ...javascriptRules },
-	parser: "babel-eslint",
+	parser: "@babel/eslint-parser",
 	settings: {
 		"import/resolver": {
 			typescript: { project: "@(jsconfig|tsconfig).json" },
