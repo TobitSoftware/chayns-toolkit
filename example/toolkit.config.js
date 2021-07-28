@@ -24,4 +24,12 @@ module.exports = {
 
 		return config
 	},
+	jest(config) {
+		config.transformIgnorePatterns = [
+			// required for node_modules with es6 syntax
+			"/node_modules/(?!lodash-es).+\\.js$",
+		]
+
+		return config
+	},
 }
