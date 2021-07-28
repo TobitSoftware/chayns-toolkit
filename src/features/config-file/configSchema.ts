@@ -33,6 +33,16 @@ export const configSchema = yup
 				"${path} is not a function or null",
 				(value) => typeof value === "function" || value === null
 			),
+		jest: yup
+			.mixed()
+			.notRequired()
+			.default(null)
+			.test(
+				"is-function-or-null",
+				// eslint-disable-next-line no-template-curly-in-string
+				"${path} is not a function or null",
+				(value) => typeof value === "function" || value === null
+			),
 	})
 	.required()
 	.noUnknown()

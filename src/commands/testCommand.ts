@@ -47,7 +47,7 @@ export function testCommand({
 			reactRefreshSupport: false,
 		})
 
-		const jestConfig: JestConfig = {
+		let jestConfig: JestConfig = {
 			transform: {
 				"\\.[jt]sx?$": [
 					"babel-jest",
@@ -71,6 +71,12 @@ export function testCommand({
 				),
 			],
 			testEnvironment: "jsdom",
+		}
+
+		if (typeof config.jest === "function") {
+			const modifier = config.jest as (config: JestConfig) => JestConfig
+
+			jestConfig = modifier(jestConfig)
 		}
 
 		if (setupFile) {
