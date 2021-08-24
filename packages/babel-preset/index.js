@@ -70,6 +70,12 @@ module.exports = declare((api, options) => {
 			reactRefreshSupport &&
 				env !== "production" &&
 				"react-refresh/babel",
+			[
+				"@babel/plugin-transform-spread",
+				{
+					loose: false,
+				},
+			],
 		].filter(Boolean),
 	}
 })
