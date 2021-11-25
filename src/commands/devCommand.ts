@@ -83,26 +83,39 @@ export function devCommand({
 
 		const compiler = webpack(webpackConfig)
 
-		const devServer = new WebpackDevServer(compiler, {
-			historyApiFallback: true,
-			compress: true,
-			disableHostCheck: true,
-			clientLogLevel: "none",
-			host,
-			port,
-			stats: { all: false, colors: true, errors: true, warnings: true },
-			https: Boolean(cert && key) && { key, cert },
-			hot: true,
-			headers: {
-				"Access-Control-Allow-Origin": "*",
-				"Access-Control-Allow-Methods":
-					"GET, POST, PUT, DELETE, PATCH, OPTIONS",
-				"Access-Control-Allow-Headers":
-					"X-Requested-With, content-type, Authorization",
+		const devServer = new WebpackDevServer(
+			{
+				historyApiFallback: true,
+				compress: true,
+				allowedHosts: "all",
+				host,
+				port,
+				client: {
+					logging: "none",
+					overlay: false,
+				},
+				devMiddleware: {
+					stats: {
+						all: false,
+						colors: true,
+						errors: true,
+						warnings: true,
+					},
+				},
+				https: Boolean(cert && key) && { key, cert },
+				hot: true,
+				headers: {
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods":
+						"GET, POST, PUT, DELETE, PATCH, OPTIONS",
+					"Access-Control-Allow-Headers":
+						"X-Requested-With, content-type, Authorization",
+				},
 			},
-		})
+			compiler
+		)
 
-		devServer.listen(port, host, (err) => {
+		devServer.startCallback((err) => {
 			if (err) output.error(err.message)
 		})
 	}

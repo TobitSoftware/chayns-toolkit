@@ -102,7 +102,7 @@ export async function createWebpackConfig({
 	setBrowserslistEnvironment(mode)
 
 	if (mode === "development") {
-		plugins.push(new ReactRefreshWebpackPlugin())
+		plugins.push(new ReactRefreshWebpackPlugin({ overlay: false }))
 	}
 
 	const packageName = packageJson.name
