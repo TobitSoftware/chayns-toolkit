@@ -120,6 +120,5 @@ dist
 .pnp.*
 
 # Lock files
-/package-lock.json
 /yarn.lock
-/example/package-lock.json
+.idea/
