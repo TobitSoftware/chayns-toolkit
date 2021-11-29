@@ -95,7 +95,7 @@ export function devCommand({
 					overlay: false,
 				},
 				server: {
-					type: Boolean(cert && key) ? "https" : "http",
+					type: cert && key ? "https" : "http",
 					options: {
 						key,
 						cert,

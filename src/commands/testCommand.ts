@@ -40,7 +40,7 @@ export function testCommand({
 	watch,
 	setupFile,
 }: TestOptions): (stepParams: StepParams) => Promise<void> {
-	return async ({ config, packageJson, packageManager }) => {
+	return async ({ config, packageJson }) => {
 		const babelConfig = createBabelPresetOptions({
 			packageJson,
 			transpileModules: "commonjs",

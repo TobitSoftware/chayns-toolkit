@@ -1,5 +1,5 @@
 {
-	"extends": "./eslint",
+	"extends": "@chayns-toolkit",
 	"globals": {
 		"__PKG_VERSION__": true
 	},
