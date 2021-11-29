@@ -94,6 +94,13 @@ export function devCommand({
 					logging: "none",
 					overlay: false,
 				},
+				server: {
+					type: Boolean(cert && key) ? "https" : "http",
+					options: {
+						key,
+						cert,
+					},
+				},
 				devMiddleware: {
 					stats: {
 						all: false,
@@ -102,7 +109,6 @@ export function devCommand({
 						warnings: true,
 					},
 				},
-				https: Boolean(cert && key) && { key, cert },
 				hot: true,
 				headers: {
 					"Access-Control-Allow-Origin": "*",
@@ -115,8 +121,6 @@ export function devCommand({
 			compiler
 		)
 
-		devServer.startCallback((err) => {
-			if (err) output.error(err.message)
-		})
+		devServer.startCallback(() => {})
 	}
 }
