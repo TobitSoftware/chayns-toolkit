@@ -343,7 +343,8 @@ export async function createWebpackConfig({
 		},
 		plugins,
 		optimization: {
-			splitChunks: singleBundle ? false : { chunks: "all" },
+			splitChunks:
+				exposeModules || singleBundle ? false : { chunks: "all" },
 		},
 		performance: false,
 	}
