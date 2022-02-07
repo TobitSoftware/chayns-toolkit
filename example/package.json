@@ -17,6 +17,7 @@
 	},
 	"dependencies": {
 		"@types/lodash-es": "^4.17.4",
+		"chayns-api": "0.0.22",
 		"chayns-components": "^4.21.12",
 		"lodash-es": "^4.17.21",
 		"react": "^17.0.2",

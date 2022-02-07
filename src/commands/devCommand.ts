@@ -32,6 +32,10 @@ export function devCommand({
 			singleBundle: config.output.singleBundle,
 			packageJson,
 			injectDevtoolsScript: devtools,
+			prefixCss: config.output.prefixCss,
+			injectCssInPage: config.output.injectCssInPage,
+			injectChaynsCss: config.output.injectChaynsCss,
+			exposeModules: config.output.exposeModules,
 		})
 
 		if (typeof config.webpack === "function") {

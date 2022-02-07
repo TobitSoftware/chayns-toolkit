@@ -29,6 +29,8 @@ export function buildCommand({
 			singleBundle: config.output.singleBundle,
 			path: config.output.path,
 			packageJson,
+			prefixCss: config.output.prefixCss,
+			injectCssInPage: config.output.injectCssInPage,
 		})
 
 		if (typeof config.webpack === "function") {

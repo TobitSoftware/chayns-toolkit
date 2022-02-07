@@ -8,7 +8,6 @@ module.exports = declare((api, options) => {
 	const {
 		typescriptSupport = false,
 		flowSupport = false,
-		transformChaynsComponentsImports = true,
 		transpileModules = false,
 		reactRefreshSupport = true,
 	} = options
@@ -41,16 +40,6 @@ module.exports = declare((api, options) => {
 			typescriptSupport && "@babel/typescript",
 		].filter(Boolean),
 		plugins: [
-			transformChaynsComponentsImports && [
-				"transform-imports",
-				{
-					"chayns-components": {
-						// eslint-disable-next-line global-require
-						transform: require("chayns-components/lib/utils/babel/resolveAbsoluteImport"),
-						preventFullImport: true,
-					},
-				},
-			],
 			"macros",
 			"optimize-clsx",
 			[

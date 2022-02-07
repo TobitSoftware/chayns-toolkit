@@ -15,6 +15,10 @@ const outputSchema = yup
 		singleBundle: yup.boolean().default(false).required(),
 		filename: yup.string().default("[package].[contenthash].js").required(),
 		path: yup.string().notRequired(),
+		injectCssInPage: yup.boolean().notRequired(),
+		prefixCss: yup.boolean().notRequired(),
+		exposeModules: yup.object().notRequired(),
+		injectChaynsCss: yup.boolean().notRequired(),
 	})
 	.required()
 	.noUnknown()

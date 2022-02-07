@@ -1,6 +1,12 @@
 module.exports = {
 	development: {},
-	output: {},
+	output: {
+		prefixCss: true,
+		injectCssInPage: true,
+		exposeModules: {
+			"./AppWrapper": "./src/AppWrapper",
+		},
+	},
 	webpack(config) {
 		const babelRule = config.module.rules.find(
 			(rule) =>

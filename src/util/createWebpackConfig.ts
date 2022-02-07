@@ -8,11 +8,14 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
-import { Configuration, ResolveOptions } from "webpack"
+import { Configuration, ResolveOptions, container } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import createBabelPresetOptions from "./createBabelPresetOptions"
 import { project } from "./project"
+import { loadCss } from "./loadChaynsCss"
+
+const { ModuleFederationPlugin } = container
 
 type Mode = "development" | "production"
 
@@ -24,6 +27,10 @@ interface CreateConfigOptions {
 	path?: string
 	packageJson: PackageJson
 	injectDevtoolsScript?: boolean
+	prefixCss?: boolean
+	injectCssInPage?: boolean
+	exposeModules?: {}
+	injectChaynsCss?: boolean
 }
 
 export async function createWebpackConfig({
@@ -34,12 +41,34 @@ export async function createWebpackConfig({
 	path: outputPath,
 	packageJson,
 	injectDevtoolsScript = false,
+	prefixCss = false,
+	injectCssInPage = false,
+	exposeModules,
+	injectChaynsCss = true,
 }: CreateConfigOptions): Promise<Configuration> {
+	const packageName = packageJson.name
 	const plugins = [
 		new DotenvWebpackPlugin({
 			path: "./.env.local",
 			systemvars: true,
 			silent: true,
+		}),
+		new ModuleFederationPlugin({
+			name: packageName?.split("-").join("_"),
+			filename: exposeModules ? "remoteEntry.js" : undefined,
+			exposes: exposeModules || undefined,
+			shared: {
+				react: {
+					requiredVersion:
+						packageJson.peerDependencies?.react ||
+						packageJson?.dependencies?.react,
+				},
+				"react-dom": {
+					requiredVersion:
+						packageJson.peerDependencies?.["react-dom"] ||
+						packageJson?.dependencies?.["react-dom"],
+				},
+			},
 		}),
 	]
 
@@ -67,6 +96,22 @@ export async function createWebpackConfig({
 	}
 
 	if (templateContent) {
+		if (
+			!templateContent?.includes("api.chayns.net/css") &&
+			injectChaynsCss
+		) {
+			const firstScriptIndex = templateContent.indexOf("</head")
+
+			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+			templateContent = `${templateContent.substring(
+				0,
+				firstScriptIndex
+			)}\n
+              <script>(${loadCss})();</script>\n${templateContent.substring(
+				firstScriptIndex
+			)}`
+		}
+
 		const minify =
 			mode === "production"
 				? {
@@ -104,8 +149,6 @@ export async function createWebpackConfig({
 	if (mode === "development") {
 		plugins.push(new ReactRefreshWebpackPlugin({ overlay: false }))
 	}
-
-	const packageName = packageJson.name
 
 	if (!packageName)
 		throw Error("The name field in package.json has to be provided.")
@@ -206,7 +249,42 @@ export async function createWebpackConfig({
 					test: /\.(css|scss)/,
 					use: [
 						mode === "development" || singleBundle
-							? require.resolve("style-loader")
+							? {
+									loader: require.resolve("style-loader"),
+									options: injectCssInPage
+										? {
+												insert: (
+													element: HTMLElement
+												) => {
+													// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+													// @ts-ignore
+													// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+													const $moduleCss =
+														document.querySelector(
+															".module-css:not(.injected)"
+														)
+
+													if ($moduleCss) {
+														// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+														$moduleCss.appendChild(
+															element
+														)
+														// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+														$moduleCss.classList.add(
+															"injected"
+														)
+													} else {
+														// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+														// @ts-ignore
+														// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+														document.head.appendChild(
+															element
+														)
+													}
+												},
+										  }
+										: undefined,
+							  }
 							: MiniCssExtractPlugin.loader,
 						{
 							loader: require.resolve("css-loader"),
@@ -237,6 +315,12 @@ export async function createWebpackConfig({
 										],
 										"postcss-flexbugs-fixes",
 										mode === "production" && "cssnano",
+										prefixCss && [
+											"postcss-prefix-selector",
+											{
+												prefix: `.${packageName}`,
+											},
+										],
 									].filter(Boolean),
 								},
 							},

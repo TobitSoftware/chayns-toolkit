@@ -14,7 +14,6 @@ type TestOptions = {
 type BabelPresetOptions = {
 	typescriptSupport: boolean
 	flowSupport: boolean
-	transformChaynsComponentsImports: boolean
 	transpileModules: string | boolean
 	reactRefreshSupport: boolean
 }
