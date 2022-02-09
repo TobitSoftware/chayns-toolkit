@@ -20,6 +20,9 @@ module.exports = {
 	globals: { chayns: true },
 	rules: { ...sharedRules, ...javascriptRules },
 	parser: "@babel/eslint-parser",
+	parserOptions: {
+		requireConfigFile: false,
+	},
 	settings: {
 		"import/resolver": {
 			typescript: { project: "@(jsconfig|tsconfig).json" },
