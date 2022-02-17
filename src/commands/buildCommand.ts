@@ -31,6 +31,8 @@ export function buildCommand({
 			packageJson,
 			prefixCss: config.output.prefixCss,
 			injectCssInPage: config.output.injectCssInPage,
+			injectChaynsCss: config.output.injectChaynsCss,
+			exposeModules: config.output.exposeModules,
 		})
 
 		if (typeof config.webpack === "function") {
