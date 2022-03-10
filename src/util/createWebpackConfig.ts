@@ -8,7 +8,7 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
-import { Configuration, ResolveOptions, container } from "webpack"
+import { Configuration, ResolveOptions, container, DefinePlugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import createBabelPresetOptions from "./createBabelPresetOptions"
@@ -69,6 +69,12 @@ export async function createWebpackConfig({
 						packageJson?.dependencies?.["react-dom"],
 				},
 			},
+		}),
+		new DefinePlugin({
+			__REQUIRED_REACT_VERSION__: JSON.stringify(
+				packageJson.peerDependencies?.react ||
+					packageJson?.dependencies?.react
+			),
 		}),
 	]
 
