@@ -1,11 +1,12 @@
 module.exports = {
 	development: {},
 	output: {
-		prefixCss: true,
-		injectCssInPage: true,
-		exposeModules: {
-			"./AppWrapper": "./src/AppWrapper",
-		},
+		// prefixCss: true,
+		// injectCssInPage: true,
+		// exposeModules: {
+		// 	"./AppWrapper": "./src/AppWrapper",
+		// },
+		// apiVersion: 5
 	},
 	webpack(config) {
 		const babelRule = config.module.rules.find(
@@ -36,6 +37,9 @@ module.exports = {
 			"/node_modules/(?!lodash-es).+\\.js$",
 		]
 
+		return config
+	},
+	webpackDev(config) {
 		return config
 	},
 }

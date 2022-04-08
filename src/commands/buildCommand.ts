@@ -33,6 +33,7 @@ export function buildCommand({
 			injectCssInPage: config.output.injectCssInPage,
 			injectChaynsCss: config.output.injectChaynsCss,
 			exposeModules: config.output.exposeModules,
+			apiVersion: config.output.apiVersion,
 		})
 
 		if (typeof config.webpack === "function") {

@@ -13,6 +13,7 @@ export function modifyWebpackConfig({
 	dev,
 	modifier,
 }: ModifyWebpackConfigOptions): Configuration {
+	if (!modifier) return config
 	const modifiedWebpackConfig = modifier(config, {
 		webpack,
 		dev,

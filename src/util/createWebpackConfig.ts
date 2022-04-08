@@ -31,6 +31,7 @@ interface CreateConfigOptions {
 	injectCssInPage?: boolean
 	exposeModules?: {}
 	injectChaynsCss?: boolean
+	apiVersion?: number
 }
 
 export async function createWebpackConfig({
@@ -45,6 +46,7 @@ export async function createWebpackConfig({
 	injectCssInPage = false,
 	exposeModules,
 	injectChaynsCss = true,
+	apiVersion = null,
 }: CreateConfigOptions): Promise<Configuration> {
 	const packageName = packageJson.name
 	const plugins = [
@@ -53,23 +55,6 @@ export async function createWebpackConfig({
 			systemvars: true,
 			silent: true,
 		}),
-		new ModuleFederationPlugin({
-			name: packageName?.split("-").join("_"),
-			filename: exposeModules ? "remoteEntry.js" : undefined,
-			exposes: exposeModules || undefined,
-			shared: {
-				react: {
-					requiredVersion:
-						packageJson.peerDependencies?.react ||
-						packageJson?.dependencies?.react,
-				},
-				"react-dom": {
-					requiredVersion:
-						packageJson.peerDependencies?.["react-dom"] ||
-						packageJson?.dependencies?.["react-dom"],
-				},
-			},
-		}),
 		new DefinePlugin({
 			__REQUIRED_REACT_VERSION__: JSON.stringify(
 				packageJson.peerDependencies?.react ||
@@ -77,6 +62,27 @@ export async function createWebpackConfig({
 			),
 		}),
 	]
+	if (apiVersion) {
+		plugins.push(
+			new ModuleFederationPlugin({
+				name: packageName?.split("-").join("_"),
+				filename: exposeModules ? "remoteEntry.js" : undefined,
+				exposes: exposeModules || undefined,
+				shared: {
+					react: {
+						requiredVersion:
+							packageJson.peerDependencies?.react ||
+							packageJson?.dependencies?.react,
+					},
+					"react-dom": {
+						requiredVersion:
+							packageJson.peerDependencies?.["react-dom"] ||
+							packageJson?.dependencies?.["react-dom"],
+					},
+				},
+			})
+		)
+	}
 
 	let templateContent: string | null = null
 

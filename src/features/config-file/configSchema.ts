@@ -19,6 +19,7 @@ const outputSchema = yup
 		prefixCss: yup.boolean().notRequired(),
 		exposeModules: yup.object().notRequired(),
 		injectChaynsCss: yup.boolean().notRequired(),
+		apiVersion: yup.number().notRequired(),
 	})
 	.required()
 	.noUnknown()
@@ -47,6 +48,7 @@ export const configSchema = yup
 				"${path} is not a function or null",
 				(value) => typeof value === "function" || value === null
 			),
+		webpackDev: yup.mixed().notRequired().default(null),
 	})
 	.required()
 	.noUnknown()

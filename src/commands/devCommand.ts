@@ -36,6 +36,7 @@ export function devCommand({
 			injectCssInPage: config.output.injectCssInPage,
 			injectChaynsCss: config.output.injectChaynsCss,
 			exposeModules: config.output.exposeModules,
+			apiVersion: config.output.apiVersion,
 		})
 
 		if (typeof config.webpack === "function") {
@@ -87,43 +88,47 @@ export function devCommand({
 
 		const compiler = webpack(webpackConfig)
 
-		const devServer = new WebpackDevServer(
-			{
-				historyApiFallback: true,
-				compress: true,
-				allowedHosts: "all",
-				host,
-				port,
-				client: {
-					logging: "none",
-					overlay: false,
-				},
-				server: {
-					type: cert && key ? "https" : "http",
-					options: {
-						key,
-						cert,
-					},
-				},
-				devMiddleware: {
-					stats: {
-						all: false,
-						colors: true,
-						errors: true,
-						warnings: true,
-					},
-				},
-				hot: true,
-				headers: {
-					"Access-Control-Allow-Origin": "*",
-					"Access-Control-Allow-Methods":
-						"GET, POST, PUT, DELETE, PATCH, OPTIONS",
-					"Access-Control-Allow-Headers":
-						"X-Requested-With, content-type, Authorization",
+		const baseWebpackDevServerConfig = {
+			historyApiFallback: true,
+			compress: true,
+			allowedHosts: "all",
+			host,
+			port,
+			client: {
+				logging: "none",
+				overlay: false,
+			},
+			server: {
+				type: cert && key ? "https" : "http",
+				options: {
+					key,
+					cert,
 				},
 			},
-			compiler
-		)
+			devMiddleware: {
+				stats: {
+					all: false,
+					colors: true,
+					errors: true,
+					warnings: true,
+				},
+			},
+			hot: true,
+			headers: {
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods":
+					"GET, POST, PUT, DELETE, PATCH, OPTIONS",
+				"Access-Control-Allow-Headers":
+					"X-Requested-With, content-type, Authorization",
+			},
+		}
+
+		const webPackDevServerConfig = modifyWebpackConfig({
+			config: baseWebpackDevServerConfig,
+			dev: true,
+			modifier: config.webpackDev,
+		})
+		const devServer = new WebpackDevServer(webPackDevServerConfig, compiler)
 
 		devServer.startCallback(() => {})
 	}
