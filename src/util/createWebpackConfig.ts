@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { version as babelVersion } from "@babel/core"
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
 import { CleanWebpackPlugin } from "clean-webpack-plugin"
@@ -57,8 +58,7 @@ export async function createWebpackConfig({
 		}),
 		new DefinePlugin({
 			__REQUIRED_REACT_VERSION__: JSON.stringify(
-				packageJson.peerDependencies?.react ||
-					packageJson?.dependencies?.react
+				packageJson.peerDependencies?.react || packageJson?.dependencies?.react
 			),
 		}),
 	]
@@ -71,8 +71,7 @@ export async function createWebpackConfig({
 				shared: {
 					react: {
 						requiredVersion:
-							packageJson.peerDependencies?.react ||
-							packageJson?.dependencies?.react,
+							packageJson.peerDependencies?.react || packageJson?.dependencies?.react,
 					},
 					"react-dom": {
 						requiredVersion:
@@ -102,26 +101,16 @@ export async function createWebpackConfig({
 			0,
 			firstScriptIndex
 		)}\n<!-- The React Devtools connection script -->
-    <script src="http://localhost:8097"></script>\n${templateContent.substring(
-		firstScriptIndex
-	)}`
+    <script src="http://localhost:8097"></script>\n${templateContent.substring(firstScriptIndex)}`
 	}
 
 	if (templateContent) {
-		if (
-			!templateContent?.includes("api.chayns.net/css") &&
-			injectChaynsCss
-		) {
+		if (!templateContent?.includes("api.chayns.net/css") && injectChaynsCss) {
 			const firstScriptIndex = templateContent.indexOf("</head")
 
 			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-			templateContent = `${templateContent.substring(
-				0,
-				firstScriptIndex
-			)}\n
-              <script>(${loadCss})();</script>\n${templateContent.substring(
-				firstScriptIndex
-			)}`
+			templateContent = `${templateContent.substring(0, firstScriptIndex)}\n
+              <script>(${loadCss})();</script>\n${templateContent.substring(firstScriptIndex)}`
 		}
 
 		const minify =
@@ -162,14 +151,28 @@ export async function createWebpackConfig({
 		plugins.push(new ReactRefreshWebpackPlugin({ overlay: false }))
 	}
 
-	if (!packageName)
-		throw Error("The name field in package.json has to be provided.")
+	if (!packageName) throw Error("The name field in package.json has to be provided.")
 
+	// could be a problem with multiple chunks
 	if (!singleBundle && mode !== "development") {
 		plugins.push(
 			new MiniCssExtractPlugin({
 				filename: `static/css/${packageName}.[contenthash].css`,
 				chunkFilename: `static/css/${packageName}.[chunkhash].chunk.css`,
+				insert: injectCssInPage
+					? function (element: any) {
+							// @ts-expect-error
+							const $moduleCss = document.querySelector(".module-css:not(.injected)")
+
+							if ($moduleCss) {
+								$moduleCss.appendChild(element)
+								$moduleCss.classList.add("injected")
+							} else {
+								// @ts-expect-error
+								document.head.appendChild(element)
+							}
+					  }
+					: undefined,
 			})
 		)
 	}
@@ -244,9 +247,7 @@ export async function createWebpackConfig({
 					use: {
 						loader: require.resolve("babel-loader"),
 						options: {
-							presets: [
-								["chayns-toolkit/babel", babelPresetOptions],
-							],
+							presets: [["chayns-toolkit/babel", babelPresetOptions]],
 							babelrc: false,
 							configFile: false,
 							compact: mode === "production",
@@ -265,33 +266,22 @@ export async function createWebpackConfig({
 									loader: require.resolve("style-loader"),
 									options: injectCssInPage
 										? {
-												insert: (
-													element: HTMLElement
-												) => {
-													// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-													// @ts-ignore
-													// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+												insert: function (element: any) {
+													// @ts-expect-error
 													const $moduleCss =
+														this.domAPI.moduleCss ||
 														document.querySelector(
 															".module-css:not(.injected)"
 														)
+													// @ts-expect-error
+													this.domAPI.moduleCss = $moduleCss
 
 													if ($moduleCss) {
-														// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-														$moduleCss.appendChild(
-															element
-														)
-														// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-														$moduleCss.classList.add(
-															"injected"
-														)
+														$moduleCss.appendChild(element)
+														$moduleCss.classList.add("injected")
 													} else {
-														// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-														// @ts-ignore
-														// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-														document.head.appendChild(
-															element
-														)
+														// @ts-expect-error
+														document.head.appendChild(element)
 													}
 												},
 										  }
@@ -355,8 +345,7 @@ export async function createWebpackConfig({
 		},
 		plugins,
 		optimization: {
-			splitChunks:
-				exposeModules || singleBundle ? false : { chunks: "all" },
+			splitChunks: exposeModules || singleBundle ? false : { chunks: "all" },
 		},
 		performance: false,
 	}
@@ -375,10 +364,7 @@ function getOutputPath({
 }) {
 	const outputPath = singleBundle ? "" : "static/js/"
 
-	const preparedFilename = filename.replace(
-		"[package]",
-		paramCase(packageName)
-	)
+	const preparedFilename = filename.replace("[package]", paramCase(packageName))
 
 	if (mode === "development") {
 		return `${outputPath}[name].bundle.js`

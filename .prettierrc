@@ -3,6 +3,7 @@
 	"useTabs": true,
 	"proseWrap": "always",
 	"endOfLine": "lf",
+	"printWidth": 100,
 	"overrides": [
 		{
 			"files": "*.md",

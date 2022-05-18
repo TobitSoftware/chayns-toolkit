@@ -1,36 +1,42 @@
 {
-	"name": "example-project",
-	"version": "1.6.2",
-	"private": true,
-	"description": "An example of using chayns-toolkit.",
-	"homepage": "https://github.com/TobitSoftware/chayns-toolkit#readme",
-	"license": "MIT",
-	"author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
-	"scripts": {
-		"build": "chayns-toolkit build",
-		"dev": "chayns-toolkit dev",
-		"lint": "chayns-toolkit lint",
-		"test": "chayns-toolkit test"
-	},
-	"eslintConfig": {
-		"extends": "chayns-toolkit/eslint"
-	},
-	"dependencies": {
-		"@types/lodash-es": "^4.17.4",
-		"chayns-api": "0.0.35",
-		"chayns-components": "^4.21.12",
-		"lodash-es": "^4.17.21",
-		"react": "^17.0.2",
-		"react-dom": "^17.0.2"
-	},
-	"devDependencies": {
-		"@babel/plugin-proposal-pipeline-operator": "^7.14.8",
-		"@testing-library/react": "^12.0.0",
-		"@testing-library/user-event": "^13.2.0",
-		"@types/react": "^17.0.14",
-		"@types/react-dom": "^17.0.9",
-		"chayns-toolkit": "file:..",
-		"react-devtools": "^4.14.0",
-		"typescript": "^4.3.5"
-	}
+    "name": "example-project",
+    "version": "1.6.2",
+    "private": true,
+    "description": "An example of using chayns-toolkit.",
+    "homepage": "https://github.com/TobitSoftware/chayns-toolkit#readme",
+    "license": "MIT",
+    "author": "Leonhard Driesch <leonhard.driesch@tobit.software>",
+    "scripts": {
+        "build": "chayns-toolkit build",
+        "dev": "chayns-toolkit dev",
+        "lint": "chayns-toolkit lint",
+        "test": "chayns-toolkit test"
+    },
+    "prettier": {
+        "printWidth": 100,
+        "proseWrap": "always",
+        "singleQuote": true,
+        "tabWidth": 4
+    },
+    "eslintConfig": {
+        "extends": "chayns-toolkit/eslint"
+    },
+    "dependencies": {
+        "@types/lodash-es": "^4.17.4",
+        "chayns-api": "0.0.35",
+        "chayns-components": "^4.21.12",
+        "lodash-es": "^4.17.21",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2"
+    },
+    "devDependencies": {
+        "@babel/plugin-proposal-pipeline-operator": "^7.14.8",
+        "@testing-library/react": "^12.0.0",
+        "@testing-library/user-event": "^13.2.0",
+        "@types/react": "^17.0.14",
+        "@types/react-dom": "^17.0.9",
+        "chayns-toolkit": "file:..",
+        "react-devtools": "^4.14.0",
+        "typescript": "^4.3.5"
+    }
 }
