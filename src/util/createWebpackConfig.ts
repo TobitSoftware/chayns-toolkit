@@ -230,6 +230,12 @@ export async function createWebpackConfig({
 				packageName,
 			}),
 			assetModuleFilename: "static/media/[hash][ext][query]",
+			chunkLoadingGlobal:
+				apiVersion && exposeModules
+					? `webpackChunk${packageName?.split("-").join("_")}__${
+							process.env.BUILD_ENV || process.env.NODE_ENV
+					  }__${process.env.VERSION}`
+					: undefined,
 		},
 		resolve: {
 			extensions: [".js", ".jsx", ".ts", ".tsx"],
