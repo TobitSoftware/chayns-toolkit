@@ -68,17 +68,21 @@ export async function createWebpackConfig({
 				name: packageName?.split("-").join("_"),
 				filename: exposeModules ? "remoteEntry.js" : undefined,
 				exposes: exposeModules || undefined,
-				shared: {
-					react: {
-						requiredVersion:
-							packageJson.peerDependencies?.react || packageJson?.dependencies?.react,
-					},
-					"react-dom": {
-						requiredVersion:
-							packageJson.peerDependencies?.["react-dom"] ||
-							packageJson?.dependencies?.["react-dom"],
-					},
-				},
+				shared:
+					mode !== "development" || !exposeModules
+						? {
+								react: {
+									requiredVersion:
+										packageJson.peerDependencies?.react ||
+										packageJson?.dependencies?.react,
+								},
+								"react-dom": {
+									requiredVersion:
+										packageJson.peerDependencies?.["react-dom"] ||
+										packageJson?.dependencies?.["react-dom"],
+								},
+						  }
+						: undefined,
 			})
 		)
 	}
