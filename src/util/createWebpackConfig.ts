@@ -218,7 +218,12 @@ export async function createWebpackConfig({
 
 	return {
 		entry:
-			!apiVersion || !exposeModules || project.hasFile("src/index")
+			!apiVersion ||
+			!exposeModules ||
+			project.hasFile("src/index.js") ||
+			project.hasFile("src/index.jsx") ||
+			project.hasFile("src/index.ts") ||
+			project.hasFile("src/index.tsx")
 				? project.resolvePath("src/index")
 				: {},
 		mode,
