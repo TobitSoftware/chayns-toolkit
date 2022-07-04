@@ -217,7 +217,10 @@ export async function createWebpackConfig({
 	}
 
 	return {
-		entry: project.resolvePath("src/index"),
+		entry:
+			!apiVersion || !exposeModules || project.hasFile("src/index")
+				? project.resolvePath("src/index")
+				: {},
 		mode,
 		// `webpack-dev-server` does not yet pick up `browserslist` as a web
 		// target, so HMR does not work.
