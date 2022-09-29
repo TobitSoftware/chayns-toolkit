@@ -51,14 +51,15 @@ module.exports = declare((api, options) => {
 					regenerator: true,
 				},
 			],
-			typescriptSupport && [
-				"@babel/proposal-decorators",
-				{ legacy: true },
+			[
+				"@babel/plugin-transform-classes",
+				{
+					loose: true,
+				},
 			],
+			typescriptSupport && ["@babel/proposal-decorators", { legacy: true }],
 			env === "production" && "transform-react-remove-prop-types",
-			reactRefreshSupport &&
-				env !== "production" &&
-				"react-refresh/babel",
+			reactRefreshSupport && env !== "production" && "react-refresh/babel",
 			[
 				"@babel/plugin-transform-spread",
 				{
