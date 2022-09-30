@@ -58,7 +58,7 @@ module.exports = declare((api, options) => {
 					loose: true,
 				},
 			],
-			"@babel/plugin-proposal-private-property-in-object",
+			["@babel/plugin-proposal-private-property-in-object", { loose: true }],
 			typescriptSupport && ["@babel/proposal-decorators", { legacy: true }],
 			env === "production" && "transform-react-remove-prop-types",
 			reactRefreshSupport && env !== "production" && "react-refresh/babel",
