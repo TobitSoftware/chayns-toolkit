@@ -4,8 +4,12 @@
 // Replaced compatibility script
 // Should be removed when styles are in chayns-components and/or in static style css
 export const loadCss = () => {
-	const apiUrl = "https://api.chayns.net/css/"
+	const apiUrl = new URL("https://api.chayns.net/css/")
 	const parameters = new URLSearchParams(window.location.search.toLowerCase())
+
+	if (!apiUrl.searchParams.has("siteId")) {
+		apiUrl.searchParams.set("siteId", parameters.get("siteid") || "")
+	}
 
 	document.documentElement.style.visibility = "hidden"
 	document.documentElement.style.overflow = "hidden"
@@ -15,7 +19,7 @@ export const loadCss = () => {
 
 	link.rel = "stylesheet"
 	link.type = "text/css"
-	link.href = apiUrl + (parameters.get("siteid") || "")
+	link.href = apiUrl.toString()
 	link.onload = () => {
 		document.documentElement.style.visibility = "visible"
 	}
