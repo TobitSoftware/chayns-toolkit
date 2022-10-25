@@ -224,7 +224,7 @@ export async function createWebpackConfig({
 			project.hasFile("src/index.jsx") ||
 			project.hasFile("src/index.ts") ||
 			project.hasFile("src/index.tsx")
-				? project.resolvePath("src/index")
+				? { index: project.resolvePath("src/index") }
 				: {},
 		mode,
 		// `webpack-dev-server` does not yet pick up `browserslist` as a web
