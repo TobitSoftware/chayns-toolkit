@@ -57,11 +57,20 @@ export function devCommand({
 			)
 				return webpackPlugin
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-			if (webpackPlugin.userOptions?.templateContent || webpackPlugin.userOptions?.template) {
+			if (webpackPlugin.userOptions?.template) {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign
 				webpackPlugin.userOptions.templateParameters = {
 					CHAYNS_TOOLKIT_CSS_TAG: `<script>(${loadCss.toString()})()</script>`,
 				}
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+			} else if (webpackPlugin.userOptions?.templateContent) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign,@typescript-eslint/no-unsafe-assignment
+				webpackPlugin.userOptions.templateContent =
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+					webpackPlugin.userOptions.templateContent.replace(
+						"<%= CHAYNS_TOOLKIT_CSS_TAG %>",
+						`<script>(${loadCss.toString()})()</script>`
+					)
 			}
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 			return webpackPlugin
