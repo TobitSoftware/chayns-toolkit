@@ -14,11 +14,10 @@ import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import createBabelPresetOptions from "./createBabelPresetOptions"
 import { project } from "./project"
-import { loadCss } from "./loadChaynsCss"
 
 const { ModuleFederationPlugin } = container
 
-type Mode = "development" | "production"
+type Mode = "development" | "production" | "none"
 
 interface CreateConfigOptions {
 	mode: Mode
@@ -47,7 +46,7 @@ export async function createWebpackConfig({
 	injectCssInPage = false,
 	exposeModules,
 	injectChaynsCss = true,
-	apiVersion = null,
+	apiVersion = null!,
 }: CreateConfigOptions): Promise<Configuration> {
 	const packageName = packageJson.name
 	const plugins = [
@@ -109,14 +108,6 @@ export async function createWebpackConfig({
 	}
 
 	if (templateContent) {
-		if (!templateContent?.includes("api.chayns.net/css") && injectChaynsCss) {
-			const firstScriptIndex = templateContent.indexOf("</head")
-
-			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-			templateContent = `${templateContent.substring(0, firstScriptIndex)}\n
-              <script>(${loadCss})();</script>\n${templateContent.substring(firstScriptIndex)}`
-		}
-
 		const minify =
 			mode === "production"
 				? {
@@ -163,20 +154,6 @@ export async function createWebpackConfig({
 			new MiniCssExtractPlugin({
 				filename: `static/css/${packageName}.[contenthash].css`,
 				chunkFilename: `static/css/${packageName}.[chunkhash].chunk.css`,
-				insert: injectCssInPage
-					? function (element: any) {
-							// @ts-expect-error
-							const $moduleCss = document.querySelector(".module-css:not(.injected)")
-
-							if ($moduleCss) {
-								$moduleCss.appendChild(element)
-								$moduleCss.classList.add("injected")
-							} else {
-								// @ts-expect-error
-								document.head.appendChild(element)
-							}
-					  }
-					: undefined,
 			})
 		)
 	}
@@ -214,6 +191,22 @@ export async function createWebpackConfig({
 				extensions: [".js", ".jsx", ".ts", ".tsx"],
 			})
 		)
+	}
+
+	function injectCssStyleLoader(element: any) {
+		// @ts-expect-error
+		const $moduleCss =
+			this.domAPI.moduleCss || document.querySelector(".module-css:not(.injected)")
+		// @ts-expect-error
+		this.domAPI.moduleCss = $moduleCss
+
+		if ($moduleCss) {
+			$moduleCss.appendChild(element)
+			$moduleCss.classList.add("injected")
+		} else {
+			// @ts-expect-error
+			document.head.appendChild(element)
+		}
 	}
 
 	return {
@@ -283,26 +276,7 @@ export async function createWebpackConfig({
 							? {
 									loader: require.resolve("style-loader"),
 									options: injectCssInPage
-										? {
-												insert: function (element: any) {
-													// @ts-expect-error
-													const $moduleCss =
-														this.domAPI.moduleCss ||
-														document.querySelector(
-															".module-css:not(.injected)"
-														)
-													// @ts-expect-error
-													this.domAPI.moduleCss = $moduleCss
-
-													if ($moduleCss) {
-														$moduleCss.appendChild(element)
-														$moduleCss.classList.add("injected")
-													} else {
-														// @ts-expect-error
-														document.head.appendChild(element)
-													}
-												},
-										  }
+										? { insert: injectCssStyleLoader }
 										: undefined,
 							  }
 							: MiniCssExtractPlugin.loader,

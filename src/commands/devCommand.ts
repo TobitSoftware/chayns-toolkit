@@ -1,16 +1,14 @@
 import { exec } from "child_process"
 import * as path from "path"
-import webpack from "webpack"
+import webpack, { Configuration } from "webpack"
 import WebpackDevServer from "webpack-dev-server"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
-import {
-	modifyWebpackConfig,
-	WebpackModifierFunction,
-} from "../util/modifyWebpackConfig"
+import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
 import { pkgCommands } from "../util/pkgCommands"
 import { StepParams } from "../util/runSteps"
+import { loadCss } from "../util/loadChaynsCss"
 
 interface DevCommandArgs {
 	devtools: boolean
@@ -27,7 +25,7 @@ export function devCommand({
 
 		let webpackConfig = await createWebpackConfig({
 			analyze: false,
-			mode: "development",
+			mode: "development" as const,
 			outputFilename: config.output.filename,
 			singleBundle: config.output.singleBundle,
 			packageJson,
@@ -49,11 +47,27 @@ export function devCommand({
 			})
 		}
 
+		webpackConfig.plugins = webpackConfig.plugins?.map((webpackPlugin) => {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+			if (
+				typeof webpackPlugin === "object" &&
+				typeof webpackPlugin.userOptions === "object" &&
+				webpackPlugin?.userOptions?.templateContent
+			) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign,@typescript-eslint/no-unsafe-call
+				webpackPlugin.userOptions.templateContent =
+					webpackPlugin.userOptions.templateContent.replace(
+						"<%= CHAYNS_TOOLKIT_CSS_TAG %>",
+						`<script>(${loadCss.toString()})()</script>`
+					)
+			}
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+			return webpackPlugin
+		})
+
 		if (devtools) {
 			if ("react-devtools" in (packageJson.dependencies || {})) {
-				output.error(
-					`You added ${fm.code`react-devtools`} as a regular dependency.`
-				)
+				output.error(`You added ${fm.code`react-devtools`} as a regular dependency.`)
 				output.blank(
 					`Install it under ${fm.code`devDependencies`} by running ${pkgCommands.move(
 						packageManager,
@@ -62,9 +76,7 @@ export function devCommand({
 					)}.\n`
 				)
 				process.exit(1)
-			} else if (
-				!("react-devtools" in (packageJson.devDependencies || {}))
-			) {
+			} else if (!("react-devtools" in (packageJson.devDependencies || {}))) {
 				output.error(
 					`You need to install the ${fm.code`react-devtools`} package to use the ${fm.command`--devtools`} option.`
 				)
@@ -78,12 +90,7 @@ export function devCommand({
 				process.exit(1)
 			}
 
-			exec(
-				`node ${path.join(
-					require.resolve("react-devtools"),
-					"../bin.js"
-				)}`
-			)
+			exec(`node ${path.join(require.resolve("react-devtools"), "../bin.js")}`)
 		}
 
 		const compiler = webpack(webpackConfig)
@@ -116,19 +123,20 @@ export function devCommand({
 			hot: true,
 			headers: {
 				"Access-Control-Allow-Origin": "*",
-				"Access-Control-Allow-Methods":
-					"GET, POST, PUT, DELETE, PATCH, OPTIONS",
-				"Access-Control-Allow-Headers":
-					"X-Requested-With, content-type, Authorization",
+				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+				"Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization",
 			},
 		}
 
 		const webPackDevServerConfig = modifyWebpackConfig({
-			config: baseWebpackDevServerConfig,
+			config: baseWebpackDevServerConfig as Configuration,
 			dev: true,
-			modifier: config.webpackDev,
+			modifier: config.webpackDev as WebpackModifierFunction,
 		})
-		const devServer = new WebpackDevServer(webPackDevServerConfig, compiler)
+		const devServer = new WebpackDevServer(
+			webPackDevServerConfig as WebpackDevServer.Configuration,
+			compiler
+		)
 
 		devServer.startCallback(() => {})
 	}
