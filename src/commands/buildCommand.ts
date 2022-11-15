@@ -3,21 +3,17 @@ import Table from "cli-table"
 import webpack from "webpack"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
-import {
-	modifyWebpackConfig,
-	WebpackModifierFunction,
-} from "../util/modifyWebpackConfig"
+import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
 import { StepParams } from "../util/runSteps"
 import { closeCompiler, runCompiler } from "../util/webpackPromises"
+import { loadCss } from "../util/loadChaynsCss"
 
 interface BuildOptions {
 	analyze: boolean
 }
 
-export function buildCommand({
-	analyze,
-}: BuildOptions): (stepParams: StepParams) => Promise<void> {
+export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson }) => {
 		process.env.BABEL_ENV = "production"
 		process.env.NODE_ENV = "production"
@@ -45,6 +41,25 @@ export function buildCommand({
 				modifier,
 			})
 		}
+
+		webpackConfig.plugins = webpackConfig.plugins?.map((webpackPlugin) => {
+			if (
+				!(
+					typeof webpackPlugin === "object" &&
+					typeof webpackPlugin.userOptions === "object"
+				)
+			)
+				return webpackPlugin
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+			if (webpackPlugin.userOptions?.templateContent || webpackPlugin.userOptions?.template) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign
+				webpackPlugin.userOptions.templateParameters = {
+					CHAYNS_TOOLKIT_CSS_TAG: `<script>(${loadCss.toString()})()</script>`,
+				}
+			}
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+			return webpackPlugin
+		})
 
 		const compiler = webpack(webpackConfig)
 

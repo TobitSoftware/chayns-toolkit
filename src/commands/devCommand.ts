@@ -1,6 +1,6 @@
 import { exec } from "child_process"
 import * as path from "path"
-import webpack, { Configuration } from "webpack"
+import webpack, { Configuration, web } from "webpack"
 import WebpackDevServer from "webpack-dev-server"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
@@ -9,6 +9,7 @@ import { output } from "../util/output"
 import { pkgCommands } from "../util/pkgCommands"
 import { StepParams } from "../util/runSteps"
 import { loadCss } from "../util/loadChaynsCss"
+import { project } from "../util/project"
 
 interface DevCommandArgs {
 	devtools: boolean
@@ -48,18 +49,19 @@ export function devCommand({
 		}
 
 		webpackConfig.plugins = webpackConfig.plugins?.map((webpackPlugin) => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 			if (
-				typeof webpackPlugin === "object" &&
-				typeof webpackPlugin.userOptions === "object" &&
-				webpackPlugin?.userOptions?.templateContent
-			) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign,@typescript-eslint/no-unsafe-call
-				webpackPlugin.userOptions.templateContent =
-					webpackPlugin.userOptions.templateContent.replace(
-						"<%= CHAYNS_TOOLKIT_CSS_TAG %>",
-						`<script>(${loadCss.toString()})()</script>`
-					)
+				!(
+					typeof webpackPlugin === "object" &&
+					typeof webpackPlugin.userOptions === "object"
+				)
+			)
+				return webpackPlugin
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+			if (webpackPlugin.userOptions?.templateContent || webpackPlugin.userOptions?.template) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign
+				webpackPlugin.userOptions.templateParameters = {
+					CHAYNS_TOOLKIT_CSS_TAG: `<script>(${loadCss.toString()})()</script>`,
+				}
 			}
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 			return webpackPlugin
