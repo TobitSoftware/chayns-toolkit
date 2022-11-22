@@ -4,15 +4,22 @@
 // Replaced compatibility script
 // Should be removed when styles are in chayns-components and/or in static style css
 export const loadCss = () => {
-	const apiUrl = new URL("https://api.chayns.net/css/")
+	// url encoded to prevent append url parameters from cloud worker
+	const apiUrl = new URL("https://$.chayns.net/css/".replace("$", "api"))
 	const parameters = new URLSearchParams(window.location.search.toLowerCase())
 
-	if (!apiUrl.searchParams.has("siteId")) {
-		apiUrl.searchParams.set("siteId", parameters.get("siteid") || "")
+	apiUrl.searchParams.set("siteId", parameters.get("siteid") || "")
+	if (parameters.has("colormode")) {
+		apiUrl.searchParams.set("colormode", parameters.get("colormode") || "")
 	}
 
-	document.documentElement.style.visibility = "hidden"
-	document.documentElement.style.overflow = "hidden"
+	const hidden = "hidden"
+
+	const setVisibility = (v) => {
+		document.documentElement.style.visibility = v ? "" : hidden
+		document.documentElement.style.overflow = v ? "" : hidden
+	}
+	setVisibility(false)
 
 	const head = document.getElementsByTagName("HEAD")[0]
 	const link = document.createElement("link")
@@ -20,11 +27,12 @@ export const loadCss = () => {
 	link.rel = "stylesheet"
 	link.type = "text/css"
 	link.href = apiUrl.toString()
+
 	link.onload = () => {
-		document.documentElement.style.visibility = "visible"
+		setVisibility(true)
 	}
 	link.onerror = () => {
-		document.documentElement.style.visibility = "visible"
+		setVisibility(true)
 	}
 
 	head.appendChild(link)
