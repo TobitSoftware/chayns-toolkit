@@ -1,10 +1,10 @@
 export const devBrowsers = [
-	"last 1 chrome version",
-	"last 1 firefox version",
-	"last 1 safari version",
+	"last 3 chrome version",
+	"last 3 firefox version",
+	"last 3 safari version",
 ].join()
 
-export const prodBrowsers = [">0.5%", "not dead", "not op_mini all"].join()
+export const prodBrowsers = ["cover 90%", "not dead", "not op_mini all", "Firefox ESR"].join()
 
 export function setBrowserslistEnvironment(mode: "development" | "production" | "none"): void {
 	if (mode === "development") {
