@@ -41,7 +41,7 @@ module.exports = {
 
         const babelOptions = babelRule.use.options;
 
-        const pipelinePlugin = ['@babel/plugin-proposal-pipeline-operator', { proposal: 'smart' }];
+        const pipelinePlugin = ['@babel/plugin-proposal-pipeline-operator', { proposal: 'hack' }];
 
         if (Array.isArray(babelOptions.plugins)) {
             babelOptions.plugins.push(pipelinePlugin);
