@@ -8,9 +8,15 @@ export const loadCss = () => {
 	const apiUrl = new URL("https://domain.chayns.net/css/".replace("domain", "api"))
 	const parameters = new URLSearchParams(window.location.search.toLowerCase())
 
-	apiUrl.searchParams.set("siteId", parameters.get("siteid") || "")
+	apiUrl.searchParams.set(
+		"siteId",
+		parameters.get("stylesiteid") || parameters.get("siteid") || ""
+	)
 	if (parameters.has("colormode")) {
 		apiUrl.searchParams.set("colormode", parameters.get("colormode") || "")
+	}
+	if (parameters.has("color")) {
+		apiUrl.searchParams.set("color", parameters.get("color") || "")
 	}
 
 	const hidden = "hidden"
