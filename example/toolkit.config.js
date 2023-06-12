@@ -41,13 +41,13 @@ module.exports = {
 
         const babelOptions = babelRule.use.options;
 
-        const pipelinePlugin = ['@babel/plugin-proposal-pipeline-operator', { proposal: 'smart' }];
-
-        if (Array.isArray(babelOptions.plugins)) {
-            babelOptions.plugins.push(pipelinePlugin);
-        } else {
-            babelOptions.plugins = [pipelinePlugin];
-        }
+        // const pipelinePlugin = ['@babel/plugin-proposal-pipeline-operator', { proposal: 'hack' }];
+        //
+        // if (Array.isArray(babelOptions.plugins)) {
+        //     babelOptions.plugins.push(pipelinePlugin);
+        // } else {
+        //     babelOptions.plugins = [pipelinePlugin];
+        // }
 
         return config;
     },

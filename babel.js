@@ -65,7 +65,7 @@ module.exports = declare((api, options) => {
 			[
 				"@babel/plugin-transform-spread",
 				{
-					loose: true,
+					loose: false, // fix map and set spreading
 				},
 			],
 		].filter(Boolean),

@@ -53,9 +53,12 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 			if (webpackPlugin.userOptions?.template) {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign
-				webpackPlugin.userOptions.templateParameters = {
-					CHAYNS_TOOLKIT_CSS_TAG: `<script>(${loadCss.toString()})()</script>`,
+				if (typeof webpackPlugin.userOptions.templateParameters !== "object") {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
+					webpackPlugin.userOptions.templateParameters = {}
 				}
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
+				webpackPlugin.userOptions.templateParameters.CHAYNS_TOOLKIT_CSS_TAG = `<script>(${loadCss.toString()})()</script>`
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 			} else if (webpackPlugin.userOptions?.templateContent) {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign,@typescript-eslint/no-unsafe-assignment
