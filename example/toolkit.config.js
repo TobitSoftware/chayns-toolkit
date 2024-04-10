@@ -2,14 +2,20 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ROOT_PATH = path.resolve('./');
 module.exports = {
-    development: {},
+    development: {
+        ports: {
+            server: 4200,
+            client: 4201,
+        },
+    },
     output: {
         // prefixCss: true,
         // injectCssInPage: true,
-        // exposeModules: {
-        // 	"./AppWrapper": "./src/AppWrapper",
-        // },
-        // apiVersion: 5
+        exposeModules: {
+            './AppWrapper': './src/AppWrapper',
+        },
+        apiVersion: 5,
+        buildServer: true,
     },
     webpack(config) {
         config.entry = {

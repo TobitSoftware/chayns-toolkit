@@ -18,126 +18,140 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 		process.env.BABEL_ENV = "production"
 		process.env.NODE_ENV = "production"
 
-		let webpackConfig = await createWebpackConfig({
-			mode: "production",
-			analyze,
-			outputFilename: config.output.filename,
-			singleBundle: config.output.singleBundle,
-			path: config.output.path,
-			packageJson,
-			prefixCss: config.output.prefixCss,
-			injectCssInPage: config.output.injectCssInPage,
-			injectChaynsCss: config.output.injectChaynsCss,
-			exposeModules: config.output.exposeModules,
-			apiVersion: config.output.apiVersion,
-		})
+		const targets = config.output.buildServer
+			? (["server", "client"] as const)
+			: ([null] as const)
 
-		if (typeof config.webpack === "function") {
-			const modifier = config.webpack as WebpackModifierFunction
-
-			webpackConfig = modifyWebpackConfig({
-				config: webpackConfig,
-				dev: false,
-				modifier,
+		for (const target of targets) {
+			// eslint-disable-next-line no-await-in-loop
+			let webpackConfig = await createWebpackConfig({
+				mode: "production",
+				analyze,
+				outputFilename: config.output.filename,
+				singleBundle: config.output.singleBundle,
+				path:
+					config.output.path && target
+						? `${config.output.path}/${target}`
+						: config.output.path,
+				packageJson,
+				prefixCss: config.output.prefixCss,
+				injectCssInPage: config.output.injectCssInPage,
+				injectChaynsCss: config.output.injectChaynsCss,
+				exposeModules: config.output.exposeModules,
+				apiVersion: config.output.apiVersion,
+				target,
 			})
-		}
 
-		webpackConfig.plugins = webpackConfig.plugins?.map((webpackPlugin) => {
-			if (
-				!(
-					typeof webpackPlugin === "object" &&
-					typeof webpackPlugin.userOptions === "object"
-				)
-			)
-				return webpackPlugin
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-			if (webpackPlugin.userOptions?.template) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign
-				if (typeof webpackPlugin.userOptions.templateParameters !== "object") {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
-					webpackPlugin.userOptions.templateParameters = {}
-				}
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
-				webpackPlugin.userOptions.templateParameters.CHAYNS_TOOLKIT_CSS_TAG = `<script>(${loadCss.toString()})()</script>`
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-			} else if (webpackPlugin.userOptions?.templateContent) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign,@typescript-eslint/no-unsafe-assignment
-				webpackPlugin.userOptions.templateContent =
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-					webpackPlugin.userOptions.templateContent.replace(
-						"<%= CHAYNS_TOOLKIT_CSS_TAG %>",
-						`<script>(${loadCss.toString()})()</script>`
-					)
+			if (typeof config.webpack === "function") {
+				const modifier = config.webpack as WebpackModifierFunction
+
+				webpackConfig = modifyWebpackConfig({
+					config: webpackConfig,
+					dev: false,
+					modifier,
+					target: target ?? "client",
+				})
 			}
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-			return webpackPlugin
-		})
 
-		const compiler = webpack(webpackConfig)
-
-		const startTime = Date.now()
-		output.info(`Bundling your code...`)
-
-		const stats = await runCompiler(compiler)
-		const buildTime = (Date.now() - startTime) / 1000
-
-		await closeCompiler(compiler)
-
-		if (stats?.hasErrors()) {
-			output.error("Compilation failed.\n")
-
-			stats.compilation.errors.forEach((error: Error) => {
-				console.error(error)
+			webpackConfig.plugins = webpackConfig.plugins?.map((webpackPlugin) => {
+				if (
+					!(
+						typeof webpackPlugin === "object" &&
+						typeof webpackPlugin.userOptions === "object"
+					)
+				)
+					return webpackPlugin
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+				if (webpackPlugin.userOptions?.template) {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign
+					if (typeof webpackPlugin.userOptions.templateParameters !== "object") {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
+						webpackPlugin.userOptions.templateParameters = {}
+					}
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
+					webpackPlugin.userOptions.templateParameters.CHAYNS_TOOLKIT_CSS_TAG = `<script>(${loadCss.toString()})()</script>`
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+				} else if (webpackPlugin.userOptions?.templateContent) {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign,@typescript-eslint/no-unsafe-assignment
+					webpackPlugin.userOptions.templateContent =
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+						webpackPlugin.userOptions.templateContent.replace(
+							"<%= CHAYNS_TOOLKIT_CSS_TAG %>",
+							`<script>(${loadCss.toString()})()</script>`
+						)
+				}
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+				return webpackPlugin
 			})
-		} else {
-			const statsJson = stats?.toJson()
 
-			const { assets } = statsJson
+			const compiler = webpack(webpackConfig)
 
-			output.info(
-				`Finished build in ${fm.number(
-					buildTime.toFixed(2)
-				)} seconds. These files were emitted:`
-			)
+			const startTime = Date.now()
+			output.info(`Bundling your code...`)
 
-			console.info("")
+			// eslint-disable-next-line no-await-in-loop
+			const stats = await runCompiler(compiler)
+			const buildTime = (Date.now() - startTime) / 1000
 
-			if (assets) {
-				const table = new Table({
-					...tableStyles,
-					colAligns: ["left", "right"],
+			// eslint-disable-next-line no-await-in-loop
+			await closeCompiler(compiler)
+
+			if (stats?.hasErrors()) {
+				output.error("Compilation failed.\n")
+
+				stats.compilation.errors.forEach((error: Error) => {
+					console.error(error)
 				})
+			} else {
+				const statsJson = stats?.toJson()
 
-				assets.forEach((asset) => {
-					let unit = "B"
-					let amount = asset.size
+				const { assets } = statsJson
 
-					if (asset.size > 1_000_000) {
-						unit = "mB"
-						amount = asset.size / 1_000_000
-					} else if (asset.size > 1_000) {
-						unit = "kB"
-						amount = asset.size / 1_000
-					}
+				output.info(
+					`Finished build in ${fm.number(
+						buildTime.toFixed(2)
+					)} seconds. These files were emitted:`
+				)
 
-					const size = `${amount.toLocaleString("en-US", {
-						maximumFractionDigits: 2,
-					})} ${unit}`
+				console.info("")
 
-					let symbol = " "
+				if (assets) {
+					const table = new Table({
+						...tableStyles,
+						colAligns: ["left", "right"],
+					})
 
-					if (asset.size > 500_000) {
-						symbol = chalk.yellow("!")
-					}
+					assets.forEach((asset) => {
+						let unit = "B"
+						let amount = asset.size
 
-					if (asset.size > 1_000_000) {
-						symbol = chalk.redBright("!")
-					}
+						if (asset.size > 1_000_000) {
+							unit = "mB"
+							amount = asset.size / 1_000_000
+						} else if (asset.size > 1_000) {
+							unit = "kB"
+							amount = asset.size / 1_000
+						}
 
-					table.push([asset.name, size, symbol])
-				})
+						const size = `${amount.toLocaleString("en-US", {
+							maximumFractionDigits: 2,
+						})} ${unit}`
 
-				console.info(table.toString())
+						let symbol = " "
+
+						if (asset.size > 500_000) {
+							symbol = chalk.yellow("!")
+						}
+
+						if (asset.size > 1_000_000) {
+							symbol = chalk.redBright("!")
+						}
+
+						table.push([asset.name, size, symbol])
+					})
+
+					console.info(table.toString())
+				}
 			}
 		}
 	}

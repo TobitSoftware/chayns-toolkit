@@ -5,17 +5,20 @@ import { fm } from "./format"
 interface ModifyWebpackConfigOptions {
 	config: Configuration
 	modifier: WebpackModifierFunction
+	target: "server" | "client"
 	dev: boolean
 }
 
 export function modifyWebpackConfig({
 	config,
 	dev,
+	target,
 	modifier,
 }: ModifyWebpackConfigOptions): Configuration {
 	if (!modifier) return config
 	const modifiedWebpackConfig = modifier(config, {
 		webpack,
+		target,
 		dev,
 	})
 
@@ -39,5 +42,5 @@ export function modifyWebpackConfig({
 
 export type WebpackModifierFunction = (
 	config: webpack.Configuration,
-	options: { webpack: typeof webpack; dev: boolean }
+	options: { webpack: typeof webpack; dev: boolean; target: "client" | "server" }
 ) => webpack.Configuration

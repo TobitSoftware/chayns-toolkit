@@ -11,6 +11,7 @@ import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
 import { Configuration, ResolveOptions, container, DefinePlugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
+import { NodeFederationPlugin, StreamingTargetPlugin } from "@module-federation/node"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import createBabelPresetOptions from "./createBabelPresetOptions"
 import { project } from "./project"
@@ -32,6 +33,7 @@ interface CreateConfigOptions {
 	exposeModules?: {}
 	injectChaynsCss?: boolean
 	apiVersion?: number
+	target: "client" | "server" | null
 }
 
 export async function createWebpackConfig({
@@ -47,6 +49,7 @@ export async function createWebpackConfig({
 	exposeModules,
 	injectChaynsCss = true,
 	apiVersion = null!,
+	target = null,
 }: CreateConfigOptions): Promise<Configuration> {
 	const packageName = packageJson.name
 	const plugins = [
@@ -54,6 +57,7 @@ export async function createWebpackConfig({
 			path: "./.env.local",
 			systemvars: true,
 			silent: true,
+			ignoreStub: target === "server" ? true : undefined,
 		}),
 		new DefinePlugin({
 			__REQUIRED_REACT_VERSION__: JSON.stringify(
@@ -62,28 +66,45 @@ export async function createWebpackConfig({
 		}),
 	]
 	if (apiVersion) {
-		plugins.push(
-			new ModuleFederationPlugin({
-				name: packageName?.split("-").join("_"),
-				filename: exposeModules ? "remoteEntry.js" : undefined,
-				exposes: exposeModules || undefined,
-				shared:
-					mode !== "development" || !exposeModules
-						? {
-								react: {
-									requiredVersion:
-										packageJson.peerDependencies?.react ||
-										packageJson?.dependencies?.react,
-								},
-								"react-dom": {
-									requiredVersion:
-										packageJson.peerDependencies?.["react-dom"] ||
-										packageJson?.dependencies?.["react-dom"],
-								},
-						  }
-						: undefined,
-			})
-		)
+		const baseConfig = {
+			name: packageName?.split("-").join("_"),
+			filename: exposeModules ? "remoteEntry.js" : undefined,
+			exposes: exposeModules || undefined,
+			shared:
+				mode !== "development" || !exposeModules
+					? {
+							react: {
+								requiredVersion:
+									packageJson.peerDependencies?.react ||
+									packageJson?.dependencies?.react,
+							},
+							"react-dom": {
+								requiredVersion:
+									packageJson.peerDependencies?.["react-dom"] ||
+									packageJson?.dependencies?.["react-dom"],
+							},
+					  }
+					: undefined,
+		}
+
+		if (target === "server") {
+			plugins.push(
+				new NodeFederationPlugin({
+					...baseConfig,
+					remoteType: "script",
+					library: { type: "commonjs-module" },
+				})
+			)
+			plugins.push(
+				new StreamingTargetPlugin({
+					name: baseConfig.name,
+					remoteType: "script",
+					library: { type: "commonjs-module" },
+				})
+			)
+		} else {
+			plugins.push(new ModuleFederationPlugin(baseConfig))
+		}
 	}
 
 	let templateContent: string | null = null
@@ -209,6 +230,13 @@ export async function createWebpackConfig({
 		}
 	}
 
+	let pathSuffix = ""
+	if (target === "client") {
+		pathSuffix = "client/"
+	} else if (target === "server") {
+		pathSuffix = "server/"
+	}
+
 	return {
 		entry:
 			!apiVersion ||
@@ -222,18 +250,22 @@ export async function createWebpackConfig({
 		mode,
 		// `webpack-dev-server` does not yet pick up `browserslist` as a web
 		// target, so HMR does not work.
-		target: mode === "development" ? "web" : "browserslist",
+		target: target === "server" ? false : mode === "development" ? "web" : "browserslist",
 		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
 		context: project.resolvePath("."),
 		output: {
-			path: outputPath ?? project.resolvePath("build/"),
+			path: outputPath ?? project.resolvePath("build/" + pathSuffix),
 			hashDigestLength: 12,
-			filename: getOutputPath({
-				mode,
-				filename: outputFilename,
-				singleBundle,
-				packageName,
-			}),
+			filename:
+				target === "server"
+					? "[name]-[contenthash].js"
+					: getOutputPath({
+							mode,
+							filename: outputFilename,
+							singleBundle,
+							packageName,
+					  }),
+			libraryTarget: target === "server" ? "commonjs-module" : undefined,
 			assetModuleFilename: "static/media/[hash][ext][query]",
 			chunkLoadingGlobal:
 				apiVersion && exposeModules

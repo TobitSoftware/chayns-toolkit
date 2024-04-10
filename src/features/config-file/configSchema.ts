@@ -4,6 +4,12 @@ const developmentSchema = yup
 	.object({
 		host: yup.string().max(255).default("adaptive").required(),
 		port: yup.number().positive().max(65535).default(1234).required(),
+		ports: yup
+			.object({
+				client: yup.number().positive().max(65535).default(1234).required(),
+				server: yup.number().positive().max(65535).default(1234).required(),
+			})
+			.notRequired(),
 		cert: yup.string().notRequired(),
 		key: yup.string().notRequired(),
 	})
@@ -20,6 +26,7 @@ const outputSchema = yup
 		exposeModules: yup.object().notRequired(),
 		injectChaynsCss: yup.boolean().notRequired(),
 		apiVersion: yup.number().notRequired(),
+		buildServer: yup.boolean().notRequired(),
 	})
 	.required()
 	.noUnknown()
