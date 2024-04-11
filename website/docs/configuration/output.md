@@ -35,6 +35,24 @@ module.exports = {
          * @type {string}
          */
         path: "//my-qa-server/example-project",
+        /**
+         * Setting apiVersion to 5 enables features required for module federation
+         * @type undefined | 5
+         */
+        apiVersion: 5,
+        /**
+         * The exported entries used for module federation
+         * @type {{ [key: string]: string }}
+         */
+        exposeModules: {
+            "./AppWrapper": "./src/AppWrapper",
+        },
+        /**
+         * Enables build which targets server. Only relevant for federated modules which
+         * should be rendered by a server.
+         * @type {boolean}
+         */
+        serverSideRendering: false,
     },
     // ... other options ...
 }
@@ -42,6 +60,6 @@ module.exports = {
 
 ## Single File Builds
 
-In single-file build mode, the compiler will inline all assets (CSS, images,
-etc.) together with all JavaScript into a single bundle. This can be useful when
-building smaller fragments of a UI, e.g. some kind of plugin.
+In single-file build mode, the compiler will inline all assets (CSS, images, etc.) together with all
+JavaScript into a single bundle. This can be useful when building smaller fragments of a UI, e.g.
+some kind of plugin.

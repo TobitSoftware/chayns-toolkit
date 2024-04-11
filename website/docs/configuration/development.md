@@ -4,8 +4,7 @@ slug: development
 sidebar_label: Development
 ---
 
-These options configure your development server started with
-`chayns-toolkit dev`.
+These options configure your development server started with `chayns-toolkit dev`.
 
 All options aswell as the `toolkit.config.js` file itself are optional.
 
@@ -26,6 +25,14 @@ module.exports = {
          * @type {number}
          */
         port: 1337,
+
+        /**
+         * The ports the development servers will run on. Only used when
+         * output.serverSideRendering is true.
+         * Defaults to { client: 1234, server: 1235 }.
+         * @type {{ client: number, server: number }}
+         */
+        ports: { client: 4001, server: 4002 },
 
         /**
          * The path to a SSL certificate file for your development server. Not
