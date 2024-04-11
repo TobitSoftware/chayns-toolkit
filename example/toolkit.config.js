@@ -15,7 +15,7 @@ module.exports = {
             './AppWrapper': './src/AppWrapper',
         },
         apiVersion: 5,
-        buildServer: true,
+        serverSideRendering: true,
     },
     webpack(config) {
         config.entry = {

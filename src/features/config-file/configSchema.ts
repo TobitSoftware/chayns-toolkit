@@ -26,7 +26,7 @@ const outputSchema = yup
 		exposeModules: yup.object().notRequired(),
 		injectChaynsCss: yup.boolean().notRequired(),
 		apiVersion: yup.number().notRequired(),
-		buildServer: yup.boolean().notRequired(),
+		serverSideRendering: yup.boolean().notRequired(),
 	})
 	.required()
 	.noUnknown()

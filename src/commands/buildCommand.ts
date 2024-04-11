@@ -18,7 +18,7 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 		process.env.BABEL_ENV = "production"
 		process.env.NODE_ENV = "production"
 
-		const targets = config.output.buildServer
+		const targets = config.output.serverSideRendering
 			? (["server", "client"] as const)
 			: ([null] as const)
 

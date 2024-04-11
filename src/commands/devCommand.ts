@@ -22,7 +22,7 @@ export function devCommand({
 		process.env.BABEL_ENV = "development"
 		process.env.NODE_ENV = "development"
 
-		const targets = config.output.buildServer
+		const targets = config.output.serverSideRendering
 			? (["server", "client"] as const)
 			: ([null] as const)
 
@@ -122,7 +122,7 @@ export function devCommand({
 				compress: true,
 				allowedHosts: "all",
 				host,
-				port: ports ? ports[target ?? "client"] : port,
+				port: target ? (ports ?? { client: 1234, server: 1235 })[target] : port,
 				client: {
 					logging: "none",
 					overlay: false,
