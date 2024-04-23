@@ -63,6 +63,7 @@ export async function createWebpackConfig({
 			__REQUIRED_REACT_VERSION__: JSON.stringify(
 				packageJson.peerDependencies?.react || packageJson?.dependencies?.react
 			),
+			__PACKAGE_NAME__: packageJson.name?.replace(/-/g, "_"),
 		}),
 	]
 	if (apiVersion) {
