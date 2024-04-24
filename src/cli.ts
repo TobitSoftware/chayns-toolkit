@@ -2,6 +2,7 @@ import { Command } from "commander"
 import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
+import { serveCommand } from "./commands/serveCommand"
 import { testCommand } from "./commands/testCommand"
 import { convertConfigFile } from "./features/config-file/convertConfigFile"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
@@ -19,12 +20,7 @@ program
 	.option("-d, --devtools", "open react-devtools in a separate window", false)
 	.action(async (options: { devtools: boolean }) => {
 		await runSteps(
-			[
-				convertConfigFile,
-				checkForTypeScript,
-				checkSSLConfig,
-				waitForPort,
-			],
+			[convertConfigFile, checkForTypeScript, checkSSLConfig, waitForPort],
 			[devCommand({ devtools: options.devtools })]
 		)
 	})
@@ -41,6 +37,17 @@ program
 		}
 
 		console.info("")
+	})
+
+program
+	.command("serve")
+	.description("serves the files from a local build folder")
+	.action(async () => {
+		try {
+			await runSteps([serveCommand()])
+		} catch (e) {
+			output.error(e)
+		}
 	})
 
 program
