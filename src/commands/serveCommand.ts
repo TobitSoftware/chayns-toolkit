@@ -1,3 +1,4 @@
+import chalk from "chalk"
 import http from "http"
 import https from "https"
 import handler from "serve-handler"
@@ -18,10 +19,19 @@ export function serveCommand(): (stepParams: StepParams) => Promise<void> {
 		}
 		const shouldUseHttps = Boolean(cert && key)
 
-		const requestHandler: http.RequestListener = (request, response) => {
-			handler(request, response, {
+		const requestHandler: http.RequestListener = async (request, response) => {
+			const start = Date.now()
+			await handler(request, response, {
 				public: config.output.path ?? "build",
 			})
+			console.log(request.method, request.url)
+			console.log(
+				"Returned",
+				(response.statusCode === 200 ? chalk.green : chalk.red)(response.statusCode),
+				"in",
+				Date.now() - start,
+				"ms"
+			)
 		}
 
 		const server = shouldUseHttps
