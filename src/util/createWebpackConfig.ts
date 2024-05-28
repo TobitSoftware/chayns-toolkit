@@ -9,14 +9,13 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
-import { Configuration, ResolveOptions, container, DefinePlugin } from "webpack"
+import { Configuration, ResolveOptions, DefinePlugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 import { NodeFederationPlugin, StreamingTargetPlugin } from "@module-federation/node"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import createBabelPresetOptions from "./createBabelPresetOptions"
 import { project } from "./project"
-
-const { ModuleFederationPlugin } = container
+import { ModuleFederationPlugin } from "@module-federation/enhanced/webpack"
 
 type Mode = "development" | "production" | "none"
 
@@ -31,9 +30,9 @@ interface CreateConfigOptions {
 	prefixCss?: boolean
 	injectCssInPage?: boolean
 	exposeModules?: {}
-	injectChaynsCss?: boolean
 	apiVersion?: number
 	target: "client" | "server" | null
+	shareScope: string | "default"
 }
 
 export async function createWebpackConfig({
@@ -47,9 +46,9 @@ export async function createWebpackConfig({
 	prefixCss = false,
 	injectCssInPage = false,
 	exposeModules,
-	injectChaynsCss = true,
 	apiVersion = null!,
 	target = null,
+	shareScope = "default",
 }: CreateConfigOptions): Promise<Configuration> {
 	const packageName = packageJson.name
 	const plugins = [
@@ -71,6 +70,7 @@ export async function createWebpackConfig({
 			name: packageName?.split("-").join("_"),
 			filename: exposeModules ? "remoteEntry.js" : undefined,
 			exposes: exposeModules || undefined,
+			shareScope,
 			shared:
 				mode !== "development" || target === "server" || !exposeModules
 					? {
