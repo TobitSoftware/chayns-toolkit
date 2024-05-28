@@ -40,6 +40,7 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 				exposeModules: config.output.exposeModules,
 				apiVersion: config.output.apiVersion,
 				target,
+				shareScope: config.output.shareScope,
 			})
 
 			if (typeof config.webpack === "function") {
