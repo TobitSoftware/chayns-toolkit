@@ -52,12 +52,6 @@ module.exports = declare((api, options) => {
 				},
 			],
 			["@babel/plugin-proposal-class-properties", { loose: true }],
-			[
-				"@babel/plugin-transform-classes",
-				{
-					loose: true,
-				},
-			],
 			["@babel/plugin-proposal-private-property-in-object", { loose: true }],
 			typescriptSupport && ["@babel/proposal-decorators", { legacy: true }],
 			env === "production" && "transform-react-remove-prop-types",
