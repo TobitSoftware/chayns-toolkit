@@ -1,5 +1,6 @@
 import chalk from "chalk"
 import Table from "cli-table"
+import dotenv from "dotenv"
 import webpack from "webpack"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
@@ -17,6 +18,13 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 	return async ({ config, packageJson }) => {
 		process.env.BABEL_ENV = "production"
 		process.env.NODE_ENV = "production"
+
+		const buildEnv = process.env.BUILD_ENV || "production"
+
+		dotenv.config({ path: `.env.${buildEnv}.local` })
+		dotenv.config({ path: `.env.local` })
+		dotenv.config({ path: `.env.${buildEnv}` })
+		dotenv.config({ path: ".env" })
 
 		let webpackConfig = await createWebpackConfig({
 			mode: "production",

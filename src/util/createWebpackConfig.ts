@@ -49,9 +49,25 @@ export async function createWebpackConfig({
 	apiVersion = null!,
 }: CreateConfigOptions): Promise<Configuration> {
 	const packageName = packageJson.name
+	const buildEnv = mode === "production" ? process.env.BUILD_ENV || "production" : "development"
 	const plugins = [
 		new DotenvWebpackPlugin({
+			path: `./.env.${buildEnv}.local`,
+			systemvars: true,
+			silent: true,
+		}),
+		new DotenvWebpackPlugin({
 			path: "./.env.local",
+			systemvars: true,
+			silent: true,
+		}),
+		new DotenvWebpackPlugin({
+			path: `./.env.${buildEnv}`,
+			systemvars: true,
+			silent: true,
+		}),
+		new DotenvWebpackPlugin({
+			path: "./.env",
 			systemvars: true,
 			silent: true,
 		}),

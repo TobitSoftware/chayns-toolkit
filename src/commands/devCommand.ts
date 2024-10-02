@@ -1,5 +1,6 @@
 import { exec } from "child_process"
 import * as path from "path"
+import dotenv from "dotenv"
 import webpack, { Configuration, web } from "webpack"
 import WebpackDevServer from "webpack-dev-server"
 import { createWebpackConfig } from "../util/createWebpackConfig"
@@ -21,6 +22,11 @@ export function devCommand({
 	return async ({ config, packageJson, packageManager }) => {
 		process.env.BABEL_ENV = "development"
 		process.env.NODE_ENV = "development"
+
+		dotenv.config({ path: `.env.development.local` })
+		dotenv.config({ path: `.env.local` })
+		dotenv.config({ path: `.env.development` })
+		dotenv.config({ path: ".env" })
 
 		const { port, host, cert, key } = config.development
 
