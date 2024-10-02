@@ -152,8 +152,8 @@ export async function createWebpackConfig({
 	if (!singleBundle && mode !== "development") {
 		plugins.push(
 			new MiniCssExtractPlugin({
-				filename: `static/css/${packageName}.[contenthash].css`,
-				chunkFilename: `static/css/${packageName}.[chunkhash].chunk.css`,
+				filename: `static/css/${packageName}.[contenthash].im.css`,
+				chunkFilename: `static/css/${packageName}.[chunkhash].chunk.im.css`,
 			})
 		)
 	}
@@ -234,7 +234,7 @@ export async function createWebpackConfig({
 				singleBundle,
 				packageName,
 			}),
-			assetModuleFilename: "static/media/[hash][ext][query]",
+			assetModuleFilename: "static/media/[hash].im[ext][query]",
 			chunkLoadingGlobal:
 				apiVersion && exposeModules
 					? `webpackChunk${packageName?.split("-").join("_")}__${

@@ -13,7 +13,7 @@ const developmentSchema = yup
 const outputSchema = yup
 	.object({
 		singleBundle: yup.boolean().default(false).required(),
-		filename: yup.string().default("[package].[contenthash].js").required(),
+		filename: yup.string().default("[package].[contenthash].im.js").required(),
 		path: yup.string().notRequired(),
 		injectCssInPage: yup.boolean().notRequired(),
 		prefixCss: yup.boolean().notRequired(),
