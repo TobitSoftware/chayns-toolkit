@@ -97,6 +97,7 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 			stats.compilation.errors.forEach((error: Error) => {
 				console.error(error)
 			})
+			output.exit(1)
 		} else {
 			const statsJson = stats?.toJson()
 
