@@ -87,7 +87,10 @@ export async function createWebpackConfig({
 								singleton: target === "server",
 							},
 					  }
-					: undefined,
+					: {},
+		}
+		baseConfig.shared["@module-federation/runtime"] = {
+			singleton: true,
 		}
 
 		if (target === "server") {
