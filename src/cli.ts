@@ -4,6 +4,7 @@ import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
 import { testCommand } from "./commands/testCommand"
 import { convertConfigFile } from "./features/config-file/convertConfigFile"
+import { loadEnvironment } from "./features/environment/loadEnvironment"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
 import { waitForPort } from "./features/wait-for-port/waitForPort"
@@ -18,13 +19,9 @@ program
 	.description("start up a development server with hot module replacement")
 	.option("-d, --devtools", "open react-devtools in a separate window", false)
 	.action(async (options: { devtools: boolean }) => {
+		loadEnvironment(true)
 		await runSteps(
-			[
-				convertConfigFile,
-				checkForTypeScript,
-				checkSSLConfig,
-				waitForPort,
-			],
+			[convertConfigFile, checkForTypeScript, checkSSLConfig, waitForPort],
 			[devCommand({ devtools: options.devtools })]
 		)
 	})
@@ -35,6 +32,7 @@ program
 	.option("-a, --analyze", "analyze your bundle size", false)
 	.action(async (options: { analyze: boolean }) => {
 		try {
+			loadEnvironment(false)
 			await runSteps([buildCommand({ analyze: options.analyze })])
 		} catch (e) {
 			output.error(e)

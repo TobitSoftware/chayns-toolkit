@@ -1,7 +1,6 @@
 import { exec } from "child_process"
 import * as path from "path"
-import dotenv from "dotenv"
-import webpack, { Configuration, web } from "webpack"
+import webpack, { Configuration } from "webpack"
 import WebpackDevServer from "webpack-dev-server"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
@@ -10,7 +9,6 @@ import { output } from "../util/output"
 import { pkgCommands } from "../util/pkgCommands"
 import { StepParams } from "../util/runSteps"
 import { loadCss } from "../util/loadChaynsCss"
-import { project } from "../util/project"
 
 interface DevCommandArgs {
 	devtools: boolean
@@ -20,14 +18,6 @@ export function devCommand({
 	devtools,
 }: DevCommandArgs): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson, packageManager }) => {
-		process.env.BABEL_ENV = "development"
-		process.env.NODE_ENV = "development"
-
-		dotenv.config({ path: `.env.development.local` })
-		dotenv.config({ path: `.env.local` })
-		dotenv.config({ path: `.env.development` })
-		dotenv.config({ path: ".env" })
-
 		const { port, host, cert, key } = config.development
 
 		let webpackConfig = await createWebpackConfig({
