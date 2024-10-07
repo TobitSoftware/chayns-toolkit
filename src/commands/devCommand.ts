@@ -1,6 +1,6 @@
 import { exec } from "child_process"
 import * as path from "path"
-import webpack, { Configuration } from "webpack"
+import webpack, { Configuration, web } from "webpack"
 import WebpackDevServer from "webpack-dev-server"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
@@ -9,6 +9,7 @@ import { output } from "../util/output"
 import { pkgCommands } from "../util/pkgCommands"
 import { StepParams } from "../util/runSteps"
 import { loadCss } from "../util/loadChaynsCss"
+import { project } from "../util/project"
 
 interface DevCommandArgs {
 	devtools: boolean
@@ -41,7 +42,6 @@ export function devCommand({
 				injectChaynsCss: config.output.injectChaynsCss,
 				exposeModules: config.output.exposeModules,
 				apiVersion: config.output.apiVersion,
-				shareScope: config.output.shareScope,
 				target,
 			})
 
