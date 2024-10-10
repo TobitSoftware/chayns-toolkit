@@ -1,7 +1,6 @@
 import fs from "fs"
-import jest from "jest"
+import { run } from "jest"
 import path from "path"
-import createBabelPresetOptions from "../util/createBabelPresetOptions"
 import { output } from "../util/output"
 import { project } from "../util/project"
 import type { StepParams } from "../util/runSteps"
@@ -40,18 +39,12 @@ export function testCommand({
 	setupFile,
 }: TestOptions): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson }) => {
-		const babelConfig = createBabelPresetOptions({
-			packageJson,
-			transpileModules: "commonjs",
-			reactRefreshSupport: false,
-		})
-
 		let jestConfig: JestConfig = {
 			transform: {
 				"\\.[jt]sx?$": [
 					"babel-jest",
 					{
-						presets: [["chayns-toolkit/babel", babelConfig]],
+						presets: ["@babel/preset-react", "@babel/preset-env"],
 					},
 				],
 			},
@@ -63,11 +56,7 @@ export function testCommand({
 			},
 			testPathIgnorePatterns: ["^.+\\.eslintrc\\.js$"],
 			setupFilesAfterEnv: [
-				path.resolve(
-					__dirname,
-					"assets",
-					"react-testing-library.setup.js"
-				),
+				path.resolve(__dirname, "assets", "react-testing-library.setup.js"),
 			],
 			testEnvironment: "jsdom",
 		}
@@ -103,6 +92,6 @@ export function testCommand({
 
 		// args.push('--json'); // json output could be used for custom formatting
 
-		await jest.run(args)
+		await run(args)
 	}
 }

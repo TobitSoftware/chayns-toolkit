@@ -4,7 +4,7 @@ const esbuildConfig = {
 	entryPoints: ["src/cli.ts"],
 	bundle: true,
 	platform: "node",
-	target: ["node12"],
+	target: ["node20"],
 	external: [...Object.keys(dependencies), "react-devtools"],
 	outfile: "lib/cli.js",
 	define: {

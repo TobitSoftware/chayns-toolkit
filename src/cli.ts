@@ -3,11 +3,9 @@ import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
 import { testCommand } from "./commands/testCommand"
-import { convertConfigFile } from "./features/config-file/convertConfigFile"
 import { loadEnvironment } from "./features/environment/loadEnvironment"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
-import { waitForPort } from "./features/wait-for-port/waitForPort"
 import { output } from "./util/output"
 import { runSteps } from "./util/runSteps"
 
@@ -21,7 +19,7 @@ program
 	.action(async (options: { devtools: boolean }) => {
 		loadEnvironment(true)
 		await runSteps(
-			[convertConfigFile, checkForTypeScript, checkSSLConfig, waitForPort],
+			[checkForTypeScript, checkSSLConfig],
 			[devCommand({ devtools: options.devtools })]
 		)
 	})

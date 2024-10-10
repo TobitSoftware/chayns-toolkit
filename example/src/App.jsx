@@ -9,6 +9,7 @@ import TsTest from 'components/ts-test/TsTest';
 import UrlLoaderTest from 'components/url-loader-test/UrlLoaderTest';
 import React, { Suspense } from 'react';
 import './App.css';
+import { ChaynsProvider } from 'chayns-api';
 
 const LazyComponent = React.lazy(() =>
     import('./components/code-splitting-test/CodeSplittingTest')
@@ -18,7 +19,7 @@ export default function App() {
     console.log(new Test().getTest());
 
     return (
-        <div>
+        <ChaynsProvider>
             <CssModules />
             <HmrTest />
             <FileLoaderTest />
@@ -31,6 +32,6 @@ export default function App() {
                 <LazyComponent />
             </Suspense>
             {/*<PipelineOperatorTest />*/}
-        </div>
+        </ChaynsProvider>
     );
 }

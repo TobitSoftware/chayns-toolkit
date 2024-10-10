@@ -1,21 +1,15 @@
-import webpack, { Configuration } from "webpack"
 import { JS_CONFIG_FILENAME } from "../features/config-file/loadConfig"
 import { fm } from "./format"
 
 interface ModifyWebpackConfigOptions {
-	config: Configuration
+	config
 	modifier: WebpackModifierFunction
 	dev: boolean
 }
 
-export function modifyWebpackConfig({
-	config,
-	dev,
-	modifier,
-}: ModifyWebpackConfigOptions): Configuration {
+export function modifyWebpackConfig({ config, dev, modifier }: ModifyWebpackConfigOptions) {
 	if (!modifier) return config
 	const modifiedWebpackConfig = modifier(config, {
-		webpack,
 		dev,
 	})
 

@@ -1,17 +1,8 @@
-import type { Compiler, Stats } from "webpack"
+import { Compiler, Stats } from "@rspack/core"
 
-export function runCompiler(compiler: Compiler): Promise<Stats> {
-	return new Promise((resolve, reject) => {
-		compiler.run((error, stats) => {
-			if (error) {
-				reject(error)
-			} else if (!stats) {
-				reject(Error("No stats available."))
-			} else {
-				resolve(stats)
-			}
-		})
-	})
+export async function runCompiler(rsbuild): Promise<Stats> {
+	const result = await rsbuild.build()
+	return result.stats
 }
 
 export function closeCompiler(compiler: Compiler): Promise<void> {

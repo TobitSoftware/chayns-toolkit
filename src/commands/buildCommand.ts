@@ -1,13 +1,9 @@
-import chalk from "chalk"
-import Table from "cli-table"
-import webpack from "webpack"
+import { createRsbuild } from "@rsbuild/core"
 import { createWebpackConfig } from "../util/createWebpackConfig"
-import { fm } from "../util/format"
 import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
 import { StepParams } from "../util/runSteps"
-import { closeCompiler, runCompiler } from "../util/webpackPromises"
-import { loadCss } from "../util/loadChaynsCss"
+import { runCompiler } from "../util/webpackPromises"
 
 interface BuildOptions {
 	analyze: boolean
@@ -23,10 +19,9 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 			path: config.output.path,
 			packageJson,
 			prefixCss: config.output.prefixCss,
-			injectCssInPage: config.output.injectCssInPage,
-			injectChaynsCss: config.output.injectChaynsCss,
 			exposeModules: config.output.exposeModules,
 			apiVersion: config.output.apiVersion,
+			entryPoints: config.output.entryPoints,
 		})
 
 		if (typeof config.webpack === "function") {
@@ -39,46 +34,11 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 			})
 		}
 
-		webpackConfig.plugins = webpackConfig.plugins?.map((webpackPlugin) => {
-			if (
-				!(
-					typeof webpackPlugin === "object" &&
-					typeof webpackPlugin.userOptions === "object"
-				)
-			)
-				return webpackPlugin
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-			if (webpackPlugin.userOptions?.template) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign
-				if (typeof webpackPlugin.userOptions.templateParameters !== "object") {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
-					webpackPlugin.userOptions.templateParameters = {}
-				}
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
-				webpackPlugin.userOptions.templateParameters.CHAYNS_TOOLKIT_CSS_TAG = `<script>(${loadCss.toString()})()</script>`
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-			} else if (webpackPlugin.userOptions?.templateContent) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign,@typescript-eslint/no-unsafe-assignment
-				webpackPlugin.userOptions.templateContent =
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-					webpackPlugin.userOptions.templateContent.replace(
-						"<%= CHAYNS_TOOLKIT_CSS_TAG %>",
-						`<script>(${loadCss.toString()})()</script>`
-					)
-			}
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-			return webpackPlugin
-		})
+		const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
 
-		const compiler = webpack(webpackConfig)
-
-		const startTime = Date.now()
 		output.info(`Bundling your code...`)
 
-		const stats = await runCompiler(compiler)
-		const buildTime = (Date.now() - startTime) / 1000
-
-		await closeCompiler(compiler)
+		const stats = await runCompiler(rsbuild)
 
 		if (stats?.hasErrors()) {
 			output.error("Compilation failed.\n")
@@ -87,77 +47,6 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 				console.error(error)
 			})
 			output.exit(1)
-		} else {
-			const statsJson = stats?.toJson()
-
-			const { assets } = statsJson
-
-			output.info(
-				`Finished build in ${fm.number(
-					buildTime.toFixed(2)
-				)} seconds. These files were emitted:`
-			)
-
-			console.info("")
-
-			if (assets) {
-				const table = new Table({
-					...tableStyles,
-					colAligns: ["left", "right"],
-				})
-
-				assets.forEach((asset) => {
-					let unit = "B"
-					let amount = asset.size
-
-					if (asset.size > 1_000_000) {
-						unit = "mB"
-						amount = asset.size / 1_000_000
-					} else if (asset.size > 1_000) {
-						unit = "kB"
-						amount = asset.size / 1_000
-					}
-
-					const size = `${amount.toLocaleString("en-US", {
-						maximumFractionDigits: 2,
-					})} ${unit}`
-
-					let symbol = " "
-
-					if (asset.size > 500_000) {
-						symbol = chalk.yellow("!")
-					}
-
-					if (asset.size > 1_000_000) {
-						symbol = chalk.redBright("!")
-					}
-
-					table.push([asset.name, size, symbol])
-				})
-
-				console.info(table.toString())
-			}
 		}
 	}
-}
-
-const tableStyles = {
-	chars: {
-		top: "",
-		"top-mid": "",
-		"top-left": "",
-		"top-right": "",
-		bottom: "",
-		"bottom-mid": "",
-		"bottom-left": "",
-		"bottom-right": "",
-		left: "",
-		"left-mid": "",
-		mid: "",
-		"mid-mid": "",
-		right: "",
-		"right-mid": "",
-		middle: "   ",
-	},
-	style: { "padding-left": 0, "padding-right": 0 },
 }
