@@ -186,9 +186,7 @@ export async function createWebpackConfig({
 				  }
 				: undefined,
 		},
-		moduleFederation: {
-			options: moduleFederationConfig,
-		},
+		moduleFederation: moduleFederationConfig,
 		output: {
 			sourceMap: {
 				js: mode === "development" ? "cheap-module-source-map" : "hidden-source-map",
