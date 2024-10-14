@@ -1,14 +1,20 @@
 import { exec } from "child_process"
 import * as path from "path"
 import { createRsbuild } from "@rsbuild/core"
-import fs from "fs"
+import fs, { watchFile } from "fs"
+import { unwatchFile } from "node:fs"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
 import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
 import { pkgCommands } from "../util/pkgCommands"
-import { StepParams } from "../util/runSteps"
-import { loadCss } from "../util/loadChaynsCss"
+import { runSteps, StepParams } from "../util/runSteps"
+import { project } from "../util/project"
+import { loadEnvironment } from "../features/environment/loadEnvironment"
+import { checkForTypeScript } from "../features/typescript/checkForTypeScript"
+import { checkSSLConfig } from "../features/ssl-check/checkSSLConfig"
+
+let closingDevServer = false
 
 interface DevCommandArgs {
 	devtools: boolean
@@ -88,6 +94,24 @@ export function devCommand({
 
 		const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
 
-		rsbuild.startDevServer()
+		const { server, urls } = await rsbuild.startDevServer()
+
+		urls.forEach((url) => {
+			console.log("Project is running at: ", url)
+		})
+
+		const watchFileFunc = async () => {
+			if (closingDevServer) return
+			closingDevServer = true
+			console.log("Start restarting dev server")
+			await server.close()
+			loadEnvironment(true)
+			closingDevServer = false
+			await runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
+			console.log("Dev Server restarted")
+			unwatchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+		}
+
+		watchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
 	}
 }
