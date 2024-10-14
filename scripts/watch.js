@@ -3,7 +3,6 @@ const esbuildConfig = require("./esbuildConfig")
 
 copyAssets()
 
-require("esbuild").build({
-	...esbuildConfig,
-	watch: true,
-})
+require("esbuild")
+	.context(esbuildConfig)
+	.then((ctx) => ctx.watch())
