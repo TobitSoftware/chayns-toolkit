@@ -175,15 +175,19 @@ export async function createWebpackConfig({
 				plugins,
 			},
 			htmlPlugin: false,
-			tools: prefixCss
-				? {
-						postcss: (opts) => {
-							opts.postcssOptions.plugins.push(
-								require("postcss-prefix-selector")({
-									prefix: `.${packageName}`,
-								})
-							)
-						},
+			postcss: prefixCss
+				? (opts) => {
+						if (!opts.postcssOptions) {
+							return
+						}
+						if (!opts.postcssOptions.plugins) {
+							opts.postcssOptions.plugins = []
+						}
+						opts.postcssOptions.plugins.push(
+							require("postcss-prefix-selector")({
+								prefix: `.${packageName}`,
+							})
+						)
 				  }
 				: undefined,
 		},
