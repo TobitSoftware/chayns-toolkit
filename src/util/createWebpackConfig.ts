@@ -83,17 +83,19 @@ export async function createWebpackConfig({
 
 	Object.entries(entryPoints).forEach(([k, { pathHtml, pathIndex, templateParameters = {} }]) => {
 		entries[k] = pathIndex
-		plugins.push(
-			new HtmlWebpackPlugin({
-				template: pathHtml,
-				filename: `${k}.html`,
-				chunks: [k],
-				templateParameters: {
-					CHAYNS_TOOLKIT_CSS_TAG: `<script>(${loadCss.toString()})()</script>`,
-					...templateParameters,
-				},
-			})
-		)
+		if (pathHtml) {
+			plugins.push(
+				new HtmlWebpackPlugin({
+					template: pathHtml,
+					filename: `${k}.html`,
+					chunks: [k],
+					templateParameters: {
+						CHAYNS_TOOLKIT_CSS_TAG: `<script>(${loadCss.toString()})()</script>`,
+						...templateParameters,
+					},
+				})
+			)
+		}
 	})
 
 	if (!packageName) throw Error("The name field in package.json has to be provided.")
@@ -124,7 +126,6 @@ export async function createWebpackConfig({
 			},
 		}
 	}
-
 	return {
 		performance:
 			parsed.BUNDLE_ANALYZE === "true" || analyze
