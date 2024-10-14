@@ -4,7 +4,7 @@ import { pluginSass } from "@rsbuild/plugin-sass"
 import { pluginCssMinimizer } from "@rsbuild/plugin-css-minimizer"
 import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry"
 import { pluginSvgr } from "@rsbuild/plugin-svgr"
-import { loadEnv } from "@rsbuild/core"
+import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import type { PackageJson } from "type-fest"
 import { project } from "./project"
@@ -77,9 +77,9 @@ export async function createWebpackConfig({
 		mode: buildEnv,
 	})
 
-	const plugins = []
+	const plugins: Rspack.Configuration["plugins"] = []
 
-	const entries = {}
+	const entries: RsbuildEntry = {}
 
 	Object.entries(entryPoints).forEach(([k, { pathHtml, pathIndex, templateParameters = {} }]) => {
 		entries[k] = pathIndex
