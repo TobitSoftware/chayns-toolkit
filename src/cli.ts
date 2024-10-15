@@ -35,6 +35,7 @@ program
 			await runSteps([buildCommand({ analyze: options.analyze })])
 		} catch (e) {
 			output.error(e)
+			output.exit(1)
 		}
 
 		console.info("")
