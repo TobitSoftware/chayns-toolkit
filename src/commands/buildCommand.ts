@@ -21,6 +21,7 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 				analyze,
 				outputFilename: config.output.filename,
 				singleBundle: config.output.singleBundle,
+				serverSideRendering: config.output.serverSideRendering,
 				path: target ? `${config.output.path}/${target}` : config.output.path,
 				packageJson,
 				prefixCss: config.output.prefixCss,

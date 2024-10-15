@@ -31,11 +31,13 @@ export function devCommand({
 			mode: "development" as const,
 			outputFilename: config.output.filename,
 			singleBundle: config.output.singleBundle,
+			serverSideRendering: config.output.serverSideRendering,
 			packageJson,
 			injectDevtoolsScript: devtools,
 			prefixCss: config.output.prefixCss,
 			exposeModules: config.output.exposeModules,
 			entryPoints: config.output.entryPoints,
+			target: "client",
 		})
 
 		if (devtools) {

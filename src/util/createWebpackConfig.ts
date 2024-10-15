@@ -45,6 +45,7 @@ interface CreateConfigOptions {
 	mode: Mode
 	analyze: boolean
 	singleBundle: boolean
+	serverSideRendering: boolean
 	outputFilename: {
 		html: string
 		js: string
@@ -73,6 +74,7 @@ export async function createWebpackConfig({
 	exposeModules,
 	entryPoints,
 	target,
+	serverSideRendering,
 }: CreateConfigOptions): Promise<RsbuildConfig> {
 	const packageName = packageJson.name
 	const buildEnv = mode === "production" ? process.env.BUILD_ENV || "production" : "development"
@@ -94,7 +96,7 @@ export async function createWebpackConfig({
 		}),
 	]
 
-	if (target === "server") {
+	if (serverSideRendering && target === "client") {
 		rsBuildPlugins.push(pluginNodePolyfill())
 	}
 
@@ -125,16 +127,15 @@ export async function createWebpackConfig({
 		moduleFederationConfig = {
 			options: {
 				name: packageName?.split("-").join("_"),
-				filename: exposeModules ? "remoteEntry.js" : undefined,
-				async: false, // TODO:
+				filename: "remoteEntry.js",
 				runtimePlugins:
 					target === "server"
 						? [require.resolve("@module-federation/node/runtimePlugin")]
 						: undefined,
-				exposes: exposeModules || undefined,
+				exposes: exposeModules,
 				library: target === "server" ? { type: "commonjs-module" } : undefined,
 				shared:
-					mode !== "development" || !exposeModules
+					mode !== "development"
 						? {
 								react: {
 									requiredVersion:
