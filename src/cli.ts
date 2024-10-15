@@ -8,6 +8,7 @@ import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
 import { output } from "./util/output"
 import { runSteps } from "./util/runSteps"
+import { serveCommand } from "./commands/serveCommand"
 
 const program = new Command()
 program.version(__PKG_VERSION__, "-v, --version", "output the version number")
@@ -45,6 +46,17 @@ program
 	.action(async () => {
 		await lintCommand()
 		console.info("")
+	})
+
+program
+	.command("serve")
+	.description("serves the files from a local build folder")
+	.action(async () => {
+		try {
+			await runSteps([serveCommand()])
+		} catch (e) {
+			output.error(e)
+		}
 	})
 
 program

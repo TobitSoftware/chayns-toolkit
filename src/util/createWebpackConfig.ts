@@ -11,6 +11,9 @@ import { project } from "./project"
 import { loadCss } from "./loadChaynsCss"
 import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 
+import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
+import { pluginNodePolyfill } from "@rsbuild/plugin-node-polyfill"
+
 const prodDefaultFilename =
 	process.env.NODE_ENV === "production"
 		? {
@@ -56,8 +59,8 @@ interface CreateConfigOptions {
 	injectDevtoolsScript?: boolean
 	prefixCss?: boolean
 	exposeModules?: {}
-	apiVersion?: number
 	entryPoints: EntryPoints
+	target: "client" | "server" | null
 }
 
 export async function createWebpackConfig({
@@ -69,6 +72,7 @@ export async function createWebpackConfig({
 	prefixCss = false,
 	exposeModules,
 	entryPoints,
+	target,
 }: CreateConfigOptions): Promise<RsbuildConfig> {
 	const packageName = packageJson.name
 	const buildEnv = mode === "production" ? process.env.BUILD_ENV || "production" : "development"
@@ -78,6 +82,21 @@ export async function createWebpackConfig({
 	})
 
 	const plugins: Rspack.Configuration["plugins"] = []
+	const rsBuildPlugins = [
+		pluginReact(),
+		pluginSass(),
+		pluginAssetsRetry(),
+		pluginCssMinimizer(),
+		pluginSvgr({
+			svgrOptions: {
+				exportType: "default",
+			},
+		}),
+	]
+
+	if (target === "server") {
+		rsBuildPlugins.push(pluginNodePolyfill())
+	}
 
 	const entries: RsbuildEntry = {}
 
@@ -107,7 +126,13 @@ export async function createWebpackConfig({
 			options: {
 				name: packageName?.split("-").join("_"),
 				filename: exposeModules ? "remoteEntry.js" : undefined,
+				async: false, // TODO:
+				runtimePlugins:
+					target === "server"
+						? [require.resolve("@module-federation/node/runtimePlugin")]
+						: undefined,
 				exposes: exposeModules || undefined,
+				library: target === "server" ? { type: "commonjs-module" } : undefined,
 				shared:
 					mode !== "development" || !exposeModules
 						? {
@@ -125,6 +150,7 @@ export async function createWebpackConfig({
 						: undefined,
 			},
 		}
+		plugins.push(new ModuleFederationPlugin(moduleFederationConfig.options))
 	}
 	return {
 		performance:
@@ -156,17 +182,7 @@ export async function createWebpackConfig({
 			},
 			entry: entries,
 		},
-		plugins: [
-			pluginReact(),
-			pluginSass(),
-			pluginAssetsRetry(),
-			pluginCssMinimizer(),
-			pluginSvgr({
-				svgrOptions: {
-					exportType: "default",
-				},
-			}),
-		],
+		plugins: rsBuildPlugins,
 		tools: {
 			rspack: {
 				output: {
@@ -191,13 +207,13 @@ export async function createWebpackConfig({
 				  }
 				: undefined,
 		},
-		moduleFederation: moduleFederationConfig,
 		output: {
+			target: target === "server" ? "node" : "web",
 			sourceMap: {
 				js: mode === "development" ? "cheap-module-source-map" : "hidden-source-map",
 			},
 			cleanDistPath: mode === "production",
-			assetPrefix: "auto",
+			assetPrefix: target === "server" ? undefined : "auto",
 			overrideBrowserslist:
 				mode === "production"
 					? ["cover 90%", "not dead", "not op_mini all", "Firefox ESR", "not android < 5"]

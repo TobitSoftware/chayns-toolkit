@@ -23,10 +23,9 @@ const outputSchema = yup
 			image: yup.string().notRequired(),
 			media: yup.string().notRequired(),
 		}),
-		path: yup.string().notRequired(),
+		path: yup.string().notRequired().default("build"),
 		prefixCss: yup.boolean().notRequired(),
 		exposeModules: yup.object().notRequired(),
-		apiVersion: yup.number().notRequired(),
 		entryPoints: yup
 			.object()
 			.required()

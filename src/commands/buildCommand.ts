@@ -11,42 +11,49 @@ interface BuildOptions {
 
 export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson }) => {
-		let webpackConfig = await createWebpackConfig({
-			mode: "production",
-			analyze,
-			outputFilename: config.output.filename,
-			singleBundle: config.output.singleBundle,
-			path: config.output.path,
-			packageJson,
-			prefixCss: config.output.prefixCss,
-			exposeModules: config.output.exposeModules,
-			apiVersion: config.output.apiVersion,
-			entryPoints: config.output.entryPoints,
-		})
+		const targets = config.output.serverSideRendering
+			? (["server", "client"] as const)
+			: ([null] as const)
 
-		if (typeof config.webpack === "function") {
-			const modifier = config.webpack as WebpackModifierFunction
-
-			webpackConfig = modifyWebpackConfig({
-				config: webpackConfig,
-				dev: false,
-				modifier,
+		for (const target of targets) {
+			let webpackConfig = await createWebpackConfig({
+				mode: "production",
+				analyze,
+				outputFilename: config.output.filename,
+				singleBundle: config.output.singleBundle,
+				path: target ? `${config.output.path}/${target}` : config.output.path,
+				packageJson,
+				prefixCss: config.output.prefixCss,
+				exposeModules: config.output.exposeModules,
+				entryPoints: config.output.entryPoints,
+				target,
 			})
-		}
 
-		const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
+			if (typeof config.webpack === "function") {
+				const modifier = config.webpack as WebpackModifierFunction
 
-		output.info(`Bundling your code...`)
+				webpackConfig = modifyWebpackConfig({
+					config: webpackConfig,
+					dev: false,
+					modifier,
+					target: target ?? "client",
+				})
+			}
 
-		const stats = await runCompiler(rsbuild)
+			const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
 
-		if (stats?.hasErrors()) {
-			output.error("Compilation failed.\n")
+			output.info(`Bundling your code...`)
 
-			stats.compilation.errors.forEach((error: Error) => {
-				console.error(error)
-			})
-			output.exit(1)
+			const stats = await runCompiler(rsbuild)
+
+			if (stats?.hasErrors()) {
+				output.error("Compilation failed.\n")
+
+				stats.compilation.errors.forEach((error: Error) => {
+					console.error(error)
+				})
+				output.exit(1)
+			}
 		}
 	}
 }
