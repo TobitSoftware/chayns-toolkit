@@ -9,14 +9,12 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import { paramCase } from "param-case"
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
-import { Configuration, ResolveOptions, container, DefinePlugin } from "webpack"
+import { Configuration, ResolveOptions, DefinePlugin } from "webpack"
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
-import { NodeFederationPlugin, StreamingTargetPlugin } from "@module-federation/node"
+import { ModuleFederationPlugin } from "@module-federation/enhanced"
 import { setBrowserslistEnvironment } from "../features/environment/browserslist"
 import createBabelPresetOptions from "./createBabelPresetOptions"
 import { project } from "./project"
-
-const { ModuleFederationPlugin } = container
 
 type Mode = "development" | "production" | "none"
 
@@ -67,50 +65,36 @@ export async function createWebpackConfig({
 		}),
 	]
 	if (apiVersion) {
-		const baseConfig = {
-			name: packageName?.split("-").join("_"),
-			filename: exposeModules ? "remoteEntry.js" : undefined,
-			exposes: exposeModules || undefined,
-			shared:
-				mode !== "development" || target === "server" || !exposeModules
-					? {
-							react: {
-								requiredVersion:
-									packageJson.peerDependencies?.react ||
-									packageJson?.dependencies?.react,
-								singleton: target === "server",
-							},
-							"react-dom": {
-								requiredVersion:
-									packageJson.peerDependencies?.["react-dom"] ||
-									packageJson?.dependencies?.["react-dom"],
-								singleton: target === "server",
-							},
-					  }
-					: {},
-		}
-		baseConfig.shared["@module-federation/runtime"] = {
-			singleton: true,
-		}
-
-		if (target === "server") {
-			plugins.push(
-				new NodeFederationPlugin({
-					...baseConfig,
-					remoteType: "script",
-					library: { type: "commonjs-module" },
-				})
-			)
-			plugins.push(
-				new StreamingTargetPlugin({
-					name: baseConfig.name,
-					remoteType: "script",
-					library: { type: "commonjs-module" },
-				})
-			)
-		} else {
-			plugins.push(new ModuleFederationPlugin(baseConfig))
-		}
+		plugins.push(
+			new ModuleFederationPlugin({
+				name: packageName?.split("-").join("_"),
+				filename: exposeModules ? "remoteEntry.js" : undefined,
+				exposes: exposeModules || undefined,
+				library: target === "server" ? { type: "commonjs-module" } : undefined,
+				remoteType: "script",
+				runtimePlugins:
+					target === "server"
+						? [require.resolve("@module-federation/node/runtimePlugin")]
+						: undefined,
+				shared:
+					mode !== "development" || target === "server"
+						? {
+								react: {
+									requiredVersion:
+										packageJson.peerDependencies?.react ||
+										packageJson?.dependencies?.react,
+									singleton: target === "server",
+								},
+								"react-dom": {
+									requiredVersion:
+										packageJson.peerDependencies?.["react-dom"] ||
+										packageJson?.dependencies?.["react-dom"],
+									singleton: target === "server",
+								},
+						  }
+						: undefined,
+			})
+		)
 	}
 
 	let templateContent: string | null = null
@@ -256,12 +240,14 @@ export async function createWebpackConfig({
 		mode,
 		// `webpack-dev-server` does not yet pick up `browserslist` as a web
 		// target, so HMR does not work.
-		target: target === "server" ? false : mode === "development" ? "web" : "browserslist",
+		target:
+			target === "server" ? "async-node" : mode === "development" ? "web" : "browserslist",
 		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
 		context: project.resolvePath("."),
 		output: {
 			path: outputPath ?? project.resolvePath("build/" + pathSuffix),
 			hashDigestLength: 12,
+			publicPath: "auto",
 			filename:
 				target === "server"
 					? "[name]-[contenthash].js"
@@ -273,12 +259,11 @@ export async function createWebpackConfig({
 					  }),
 			libraryTarget: target === "server" ? "commonjs-module" : undefined,
 			assetModuleFilename: "static/media/[hash][ext][query]",
-			chunkLoadingGlobal:
-				apiVersion && exposeModules
-					? `webpackChunk${packageName?.split("-").join("_")}__${
-							process.env.BUILD_ENV || process.env.NODE_ENV
-					  }__${process.env.VERSION}`
-					: undefined,
+			chunkLoadingGlobal: exposeModules
+				? `webpackChunk${packageName?.split("-").join("_")}__${
+						process.env.BUILD_ENV || process.env.NODE_ENV
+				  }__${process.env.VERSION}`
+				: undefined,
 		},
 		resolve: {
 			extensions: [".js", ".jsx", ".ts", ".tsx"],
