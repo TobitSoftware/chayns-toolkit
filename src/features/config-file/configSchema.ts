@@ -14,15 +14,17 @@ const developmentSchema = yup
 const outputSchema = yup
 	.object({
 		singleBundle: yup.boolean().default(false).required(),
-		filename: yup.object({
-			html: yup.string().notRequired(),
-			js: yup.string().notRequired(),
-			css: yup.string().notRequired(),
-			svg: yup.string().notRequired(),
-			font: yup.string().notRequired(),
-			image: yup.string().notRequired(),
-			media: yup.string().notRequired(),
-		}),
+		filename: yup
+			.object({
+				html: yup.string().notRequired(),
+				js: yup.string().notRequired(),
+				css: yup.string().notRequired(),
+				svg: yup.string().notRequired(),
+				font: yup.string().notRequired(),
+				image: yup.string().notRequired(),
+				media: yup.string().notRequired(),
+			})
+			.notRequired(),
 		path: yup.string().notRequired().default("build"),
 		serverSideRendering: yup.boolean().default(false).required(),
 		prefixCss: yup.boolean().notRequired(),

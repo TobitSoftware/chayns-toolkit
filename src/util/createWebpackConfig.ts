@@ -46,14 +46,14 @@ interface CreateConfigOptions {
 	analyze: boolean
 	singleBundle: boolean
 	serverSideRendering: boolean
-	outputFilename: {
-		html: string
-		js: string
-		css: string
-		svg: string
-		font: string
-		image: string
-		media: string
+	outputFilename?: {
+		html?: string
+		js?: string
+		css?: string
+		svg?: string
+		font?: string
+		image?: string
+		media?: string
 	}
 	path?: string
 	packageJson: PackageJson
@@ -163,6 +163,7 @@ export async function createWebpackConfig({
 						},
 				  }
 				: undefined,
+		// @ts-expect-error missing in types
 		context: {
 			rootPath: project.resolvePath("."),
 		},
