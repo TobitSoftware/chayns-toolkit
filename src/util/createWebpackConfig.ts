@@ -247,7 +247,7 @@ export async function createWebpackConfig({
 		output: {
 			path: outputPath ?? project.resolvePath("build/" + pathSuffix),
 			hashDigestLength: 12,
-			publicPath: "auto",
+			publicPath: target === "server" ? undefined : "auto",
 			filename:
 				target === "server"
 					? "[name]-[contenthash].js"
