@@ -3,10 +3,14 @@ import { project } from "../../util/project"
 import { configSchema, ToolkitConfig } from "./configSchema"
 
 export async function loadConfig(): Promise<ToolkitConfig> {
-	let config: unknown = {}
+	let config: Partial<ToolkitConfig> = {}
 
 	if (project.hasFile(JS_CONFIG_FILENAME)) {
-		config = (await import("file://" + project.resolvePath(JS_CONFIG_FILENAME))).default
+		config = (
+			(await import(`file://${project.resolvePath(JS_CONFIG_FILENAME)}`)) as {
+				default: Partial<ToolkitConfig>
+			}
+		).default
 	}
 
 	try {

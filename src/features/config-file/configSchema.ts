@@ -24,7 +24,7 @@ const outputSchema = yup
 			media: yup.string().notRequired(),
 		}),
 		path: yup.string().notRequired().default("build"),
-		serverSideRendering: yup.boolean().default(false).notRequired(),
+		serverSideRendering: yup.boolean().default(false).required(),
 		prefixCss: yup.boolean().notRequired(),
 		exposeModules: yup.object().notRequired(),
 		entryPoints: yup

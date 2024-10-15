@@ -1,4 +1,5 @@
 import { createRsbuild } from "@rsbuild/core"
+import { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
@@ -16,7 +17,8 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 			: ([null] as const)
 
 		for (const target of targets) {
-			let webpackConfig = await createWebpackConfig({
+			// eslint-disable-next-line no-await-in-loop
+			let webpackConfig = (await createWebpackConfig({
 				mode: "production",
 				analyze,
 				outputFilename: config.output.filename,
@@ -28,7 +30,7 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 				exposeModules: config.output.exposeModules,
 				entryPoints: config.output.entryPoints,
 				target,
-			})
+			})) as RsbuildConfig
 
 			if (typeof config.webpack === "function") {
 				const modifier = config.webpack as WebpackModifierFunction
@@ -41,10 +43,12 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 				})
 			}
 
+			// eslint-disable-next-line no-await-in-loop
 			const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
 
 			output.info(`Bundling your code...`)
 
+			// eslint-disable-next-line no-await-in-loop
 			const stats = await runCompiler(rsbuild)
 
 			if (stats?.hasErrors()) {
