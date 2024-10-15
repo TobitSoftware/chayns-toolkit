@@ -1,3 +1,4 @@
+import { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 import { exec } from "child_process"
 import * as path from "path"
 import { createRsbuild } from "@rsbuild/core"
@@ -26,7 +27,7 @@ export function devCommand({
 	return async ({ config, packageJson, packageManager }) => {
 		const { port, host, cert, key } = config.development
 
-		let webpackConfig = await createWebpackConfig({
+		let webpackConfig = (await createWebpackConfig({
 			analyze: false,
 			mode: "development" as const,
 			outputFilename: config.output.filename,
@@ -38,7 +39,7 @@ export function devCommand({
 			exposeModules: config.output.exposeModules,
 			entryPoints: config.output.entryPoints,
 			target: "client",
-		})
+		})) as RsbuildConfig
 
 		if (devtools) {
 			if ("react-devtools" in (packageJson.dependencies || {})) {
@@ -91,6 +92,7 @@ export function devCommand({
 				config: webpackConfig,
 				dev: true,
 				modifier,
+				target: "client",
 			})
 		}
 
@@ -109,7 +111,7 @@ export function devCommand({
 			await server.close()
 			loadEnvironment(true)
 			closingDevServer = false
-			await runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
+			await runSteps([checkForTypeScript, checkSSLConfig], [devCommand({ devtools })])
 			console.log("Dev Server restarted")
 			unwatchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
 		}
