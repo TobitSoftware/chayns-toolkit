@@ -127,7 +127,7 @@ export async function createWebpackConfig({
 		moduleFederationConfig = {
 			options: {
 				name: packageName?.split("-").join("_"),
-				filename: "remoteEntry.js",
+				filename: "v2.remoteEntry.js",
 				runtimePlugins:
 					target === "server"
 						? [require.resolve("@module-federation/node/runtimePlugin")]
