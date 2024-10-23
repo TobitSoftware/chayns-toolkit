@@ -68,7 +68,7 @@ export async function createWebpackConfig({
 		plugins.push(
 			new ModuleFederationPlugin({
 				name: packageName?.split("-").join("_"),
-				filename: exposeModules ? "remoteEntry.js" : undefined,
+				filename: exposeModules ? "v2.remoteEntry.js" : undefined,
 				exposes: exposeModules || undefined,
 				library: target === "server" ? { type: "commonjs-module" } : undefined,
 				remoteType: "script",
