@@ -86,7 +86,9 @@ export async function createWebpackConfig({
 	const plugins: Rspack.Configuration["plugins"] = []
 	const rsBuildPlugins = [
 		pluginReact(),
-		pluginSass(),
+		pluginSass({
+			exclude: /\?rawCss$/,
+		}),
 		pluginAssetsRetry(),
 		pluginCssMinimizer(),
 		pluginSvgr({
