@@ -86,9 +86,7 @@ export async function createWebpackConfig({
 	const plugins: Rspack.Configuration["plugins"] = []
 	const rsBuildPlugins = [
 		pluginReact(),
-		pluginSass({
-			exclude: /\?rawCss$/,
-		}),
+		pluginSass(),
 		pluginAssetsRetry(),
 		pluginCssMinimizer(),
 		pluginSvgr({
@@ -123,37 +121,34 @@ export async function createWebpackConfig({
 
 	if (!packageName) throw Error("The name field in package.json has to be provided.")
 
-	let moduleFederationConfig = undefined
-
 	if (exposeModules) {
-		moduleFederationConfig = {
-			options: {
-				name: packageName?.split("-").join("_"),
-				filename: "v2.remoteEntry.js",
-				runtimePlugins:
-					target === "server"
-						? [require.resolve("@module-federation/node/runtimePlugin")]
-						: undefined,
-				exposes: exposeModules,
-				library: target === "server" ? { type: "commonjs-module" } : undefined,
-				shared:
-					mode !== "development"
-						? {
-								react: {
-									requiredVersion:
-										packageJson.peerDependencies?.react ||
-										packageJson?.dependencies?.react,
-								},
-								"react-dom": {
-									requiredVersion:
-										packageJson.peerDependencies?.["react-dom"] ||
-										packageJson?.dependencies?.["react-dom"],
-								},
-						  }
-						: undefined,
-			},
+		const moduleFederationConfig = {
+			dts: false,
+			name: packageName?.split("-").join("_"),
+			filename: "v2.remoteEntry.js",
+			runtimePlugins:
+				target === "server"
+					? [require.resolve("@module-federation/node/runtimePlugin")]
+					: undefined,
+			exposes: exposeModules,
+			library: target === "server" ? { type: "commonjs-module" } : undefined,
+			shared:
+				mode !== "development"
+					? {
+							react: {
+								requiredVersion:
+									packageJson.peerDependencies?.react ||
+									packageJson?.dependencies?.react,
+							},
+							"react-dom": {
+								requiredVersion:
+									packageJson.peerDependencies?.["react-dom"] ||
+									packageJson?.dependencies?.["react-dom"],
+							},
+					  }
+					: undefined,
 		}
-		plugins.push(new ModuleFederationPlugin(moduleFederationConfig.options))
+		plugins.push(new ModuleFederationPlugin(moduleFederationConfig))
 	}
 	return {
 		performance:
