@@ -124,6 +124,7 @@ export async function createWebpackConfig({
 	if (exposeModules) {
 		const moduleFederationConfig = {
 			dts: false,
+			manifest: false,
 			name: packageName?.split("-").join("_"),
 			filename: "v2.remoteEntry.js",
 			runtimePlugins:
@@ -148,7 +149,7 @@ export async function createWebpackConfig({
 					  }
 					: undefined,
 		}
-		plugins.push(new ModuleFederationPlugin(moduleFederationConfig))
+		plugins.push(moduleFederationConfig)
 	}
 	return {
 		performance:
