@@ -149,7 +149,7 @@ export async function createWebpackConfig({
 					  }
 					: undefined,
 		}
-		plugins.push(moduleFederationConfig)
+		plugins.push(new ModuleFederationPlugin(moduleFederationConfig))
 	}
 	return {
 		performance:
