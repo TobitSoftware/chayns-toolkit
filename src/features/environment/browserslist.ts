@@ -11,11 +11,3 @@ export const prodBrowsers = [
 	"Firefox ESR",
 	"not android < 5",
 ].join()
-
-export function setBrowserslistEnvironment(mode: "development" | "production" | "none"): void {
-	if (mode === "development") {
-		process.env.BROWSERSLIST = devBrowsers
-	} else if (mode === "production") {
-		process.env.BROWSERSLIST = prodBrowsers
-	}
-}

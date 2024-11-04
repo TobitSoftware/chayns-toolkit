@@ -1,22 +1,19 @@
-import webpack, { Configuration } from "webpack"
+import { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 import { JS_CONFIG_FILENAME } from "../features/config-file/loadConfig"
 import { fm } from "./format"
 
 interface ModifyWebpackConfigOptions {
-	config: Configuration
+	config: RsbuildConfig
 	modifier: WebpackModifierFunction
 	dev: boolean
+	target: "server" | "client"
 }
 
-export function modifyWebpackConfig({
-	config,
-	dev,
-	modifier,
-}: ModifyWebpackConfigOptions): Configuration {
+export function modifyWebpackConfig({ config, dev, modifier, target }: ModifyWebpackConfigOptions) {
 	if (!modifier) return config
 	const modifiedWebpackConfig = modifier(config, {
-		webpack,
 		dev,
+		target,
 	})
 
 	if (modifiedWebpackConfig === undefined) {
@@ -38,6 +35,6 @@ export function modifyWebpackConfig({
 }
 
 export type WebpackModifierFunction = (
-	config: webpack.Configuration,
-	options: { webpack: typeof webpack; dev: boolean }
-) => webpack.Configuration
+	config: RsbuildConfig,
+	options: { dev: boolean; target: "server" | "client" }
+) => RsbuildConfig

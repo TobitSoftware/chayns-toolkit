@@ -1,381 +1,230 @@
 /* eslint-disable */
-import { version as babelVersion } from "@babel/core"
-import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin"
-import { CleanWebpackPlugin } from "clean-webpack-plugin"
-import * as crypto from "crypto"
-import DotenvWebpackPlugin from "dotenv-webpack"
+import { pluginReact } from "@rsbuild/plugin-react"
+import { pluginSass } from "@rsbuild/plugin-sass"
+import { pluginCssMinimizer } from "@rsbuild/plugin-css-minimizer"
+import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry"
+import { pluginSvgr } from "@rsbuild/plugin-svgr"
+import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
 import HtmlWebpackPlugin from "html-webpack-plugin"
-import MiniCssExtractPlugin from "mini-css-extract-plugin"
-import { paramCase } from "param-case"
-import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin"
 import type { PackageJson } from "type-fest"
-import { Configuration, ResolveOptions, container, DefinePlugin } from "webpack"
-import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
-import { setBrowserslistEnvironment } from "../features/environment/browserslist"
-import createBabelPresetOptions from "./createBabelPresetOptions"
 import { project } from "./project"
+import { loadCss } from "./loadChaynsCss"
+import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 
-const { ModuleFederationPlugin } = container
+import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
+import { pluginNodePolyfill } from "@rsbuild/plugin-node-polyfill"
+
+const prodDefaultFilename =
+	process.env.NODE_ENV === "production"
+		? {
+				html: "[name].html",
+				js: "[name].[contenthash:8].im.js",
+				css: "[name].[contenthash:8].im.css",
+				svg: "[name].[contenthash:8].im.svg",
+				font: "[name].[contenthash:8].im[ext]",
+				image: "[name].[contenthash:8].im[ext]",
+				media: "[name].[contenthash:8].im[ext]",
+		  }
+		: {}
 
 type Mode = "development" | "production" | "none"
+
+export type EntryPoint = {
+	pathHtml: string
+	pathIndex: string
+	templateParameters: {
+		title: string
+	}
+}
+
+type EntryPoints = {
+	[key: string]: EntryPoint
+} & { [key in keyof any]: EntryPoint }
 
 interface CreateConfigOptions {
 	mode: Mode
 	analyze: boolean
 	singleBundle: boolean
-	outputFilename: string
+	serverSideRendering: boolean
+	outputFilename?: {
+		html?: string
+		js?: string
+		css?: string
+		svg?: string
+		font?: string
+		image?: string
+		media?: string
+	}
 	path?: string
 	packageJson: PackageJson
 	injectDevtoolsScript?: boolean
 	prefixCss?: boolean
-	injectCssInPage?: boolean
 	exposeModules?: {}
-	injectChaynsCss?: boolean
-	apiVersion?: number
+	entryPoints: EntryPoints
+	target: "client" | "server" | null
 }
 
 export async function createWebpackConfig({
 	mode,
 	analyze,
 	outputFilename,
-	singleBundle,
 	path: outputPath,
 	packageJson,
-	injectDevtoolsScript = false,
 	prefixCss = false,
-	injectCssInPage = false,
 	exposeModules,
-	injectChaynsCss = true,
-	apiVersion = null!,
-}: CreateConfigOptions): Promise<Configuration> {
+	entryPoints,
+	target,
+	serverSideRendering,
+}: CreateConfigOptions): Promise<RsbuildConfig> {
 	const packageName = packageJson.name
 	const buildEnv = mode === "production" ? process.env.BUILD_ENV || "production" : "development"
-	const plugins = [
-		new DotenvWebpackPlugin({
-			path: `./.env.${buildEnv}.local`,
-			systemvars: true,
-			silent: true,
-		}),
-		new DotenvWebpackPlugin({
-			path: "./.env.local",
-			systemvars: true,
-			silent: true,
-		}),
-		new DotenvWebpackPlugin({
-			path: `./.env.${buildEnv}`,
-			systemvars: true,
-			silent: true,
-		}),
-		new DotenvWebpackPlugin({
-			path: "./.env",
-			systemvars: true,
-			silent: true,
-		}),
-		new DefinePlugin({
-			__REQUIRED_REACT_VERSION__: JSON.stringify(
-				packageJson.peerDependencies?.react || packageJson?.dependencies?.react
-			),
+
+	const { parsed, publicVars } = loadEnv({
+		mode: buildEnv,
+	})
+
+	const plugins: Rspack.Configuration["plugins"] = []
+	const rsBuildPlugins = [
+		pluginReact(),
+		pluginSass(),
+		pluginAssetsRetry(),
+		pluginCssMinimizer(),
+		pluginSvgr({
+			svgrOptions: {
+				exportType: "default",
+			},
 		}),
 	]
-	if (apiVersion) {
-		plugins.push(
-			new ModuleFederationPlugin({
-				name: packageName?.split("-").join("_"),
-				filename: exposeModules ? "remoteEntry.js" : undefined,
-				exposes: exposeModules || undefined,
-				shared:
-					mode !== "development" || !exposeModules
-						? {
-								react: {
-									requiredVersion:
-										packageJson.peerDependencies?.react ||
-										packageJson?.dependencies?.react,
-								},
-								"react-dom": {
-									requiredVersion:
-										packageJson.peerDependencies?.["react-dom"] ||
-										packageJson?.dependencies?.["react-dom"],
-								},
-						  }
-						: undefined,
-			})
-		)
+
+	if (serverSideRendering && target === "client") {
+		rsBuildPlugins.push(pluginNodePolyfill())
 	}
 
-	let templateContent: string | null = null
+	const entries: RsbuildEntry = {}
 
-	if (mode === "development" && project.hasFile("src/index.dev.html")) {
-		templateContent = await project.readFile("src/index.dev.html")
-	}
-
-	if (!templateContent && project.hasFile("src/index.html")) {
-		templateContent = await project.readFile("src/index.html")
-	}
-
-	// Add the React devtools script tag
-	if (injectDevtoolsScript && templateContent && mode === "development") {
-		const firstScriptIndex = templateContent.indexOf("<script")
-
-		templateContent = `${templateContent.substring(
-			0,
-			firstScriptIndex
-		)}\n<!-- The React Devtools connection script -->
-    <script src="http://localhost:8097"></script>\n${templateContent.substring(firstScriptIndex)}`
-	}
-
-	if (templateContent) {
-		const minify =
-			mode === "production"
-				? {
-						removeComments: true,
-						collapseWhitespace: true,
-						removeRedundantAttributes: true,
-						useShortDoctype: true,
-						removeEmptyAttributes: true,
-						removeStyleLinkTypeAttributes: true,
-						keepClosingSlash: true,
-						minifyJS: true,
-						minifyCSS: true,
-						minifyURLs: true,
-				  }
-				: undefined
-
-		plugins.push(
-			new HtmlWebpackPlugin({
-				templateContent,
-				minify,
-			})
-		)
-	}
-
-	if (analyze) {
-		plugins.push(new BundleAnalyzerPlugin())
-	}
-
-	if (mode === "production") {
-		plugins.push(new CleanWebpackPlugin())
-	}
-
-	setBrowserslistEnvironment(mode)
-
-	if (mode === "development") {
-		plugins.push(new ReactRefreshWebpackPlugin({ overlay: false }))
-	}
+	Object.entries(entryPoints).forEach(([k, { pathHtml, pathIndex, templateParameters = {} }]) => {
+		entries[k] = pathIndex
+		if (pathHtml) {
+			plugins.push(
+				new HtmlWebpackPlugin({
+					template: pathHtml,
+					filename: `${k}.html`,
+					chunks: [k],
+					templateParameters: {
+						CHAYNS_TOOLKIT_CSS_TAG: `<script>(${loadCss.toString()})()</script>`,
+						...templateParameters,
+					},
+				})
+			)
+		}
+	})
 
 	if (!packageName) throw Error("The name field in package.json has to be provided.")
 
-	// could be a problem with multiple chunks
-	if (!singleBundle && mode !== "development") {
-		plugins.push(
-			new MiniCssExtractPlugin({
-				filename: `static/css/${packageName}.[contenthash].im.css`,
-				chunkFilename: `static/css/${packageName}.[chunkhash].chunk.im.css`,
-			})
-		)
-	}
-
-	const shouldUseSourceMaps = mode !== "production"
-
-	const babelPresetOptions = createBabelPresetOptions({
-		packageJson,
-	})
-
-	const babelCacheIdentifier = crypto
-		.createHash("md5")
-		.update(
-			[
-				JSON.stringify(babelPresetOptions),
-				process.env.BABEL_ENV,
-				process.env.NODE_ENV,
-				babelVersion,
-			].join("--")
-		)
-		.digest("hex")
-
-	const resolvePlugins: Exclude<ResolveOptions["plugins"], undefined> = []
-
-	if (project.hasFile("jsconfig.json")) {
-		resolvePlugins.push(
-			new TsconfigPathsPlugin({
-				configFile: "jsconfig.json",
-				extensions: [".js", ".jsx"],
-			})
-		)
-	} else if (project.hasFile("tsconfig.json")) {
-		resolvePlugins.push(
-			new TsconfigPathsPlugin({
-				extensions: [".js", ".jsx", ".ts", ".tsx"],
-			})
-		)
-	}
-
-	function injectCssStyleLoader(element: any) {
-		// @ts-expect-error
-		const $moduleCss =
-			this.domAPI.moduleCss || document.querySelector(".module-css:not(.injected)")
-		// @ts-expect-error
-		this.domAPI.moduleCss = $moduleCss
-
-		if ($moduleCss) {
-			$moduleCss.appendChild(element)
-			$moduleCss.classList.add("injected")
-		} else {
-			// @ts-expect-error
-			document.head.appendChild(element)
-		}
-	}
-
-	return {
-		entry:
-			!apiVersion ||
-			!exposeModules ||
-			project.hasFile("src/index.js") ||
-			project.hasFile("src/index.jsx") ||
-			project.hasFile("src/index.ts") ||
-			project.hasFile("src/index.tsx")
-				? { index: project.resolvePath("src/index") }
-				: {},
-		mode,
-		// `webpack-dev-server` does not yet pick up `browserslist` as a web
-		// target, so HMR does not work.
-		target: mode === "development" ? "web" : "browserslist",
-		devtool: shouldUseSourceMaps ? "eval-cheap-source-map" : false,
-		context: project.resolvePath("."),
-		output: {
-			path: outputPath ?? project.resolvePath("build/"),
-			hashDigestLength: 12,
-			filename: getOutputPath({
-				mode,
-				filename: outputFilename,
-				singleBundle,
-				packageName,
-			}),
-			assetModuleFilename: "static/media/[hash].im[ext][query]",
-			chunkLoadingGlobal:
-				apiVersion && exposeModules
-					? `webpackChunk${packageName?.split("-").join("_")}__${
-							process.env.BUILD_ENV || process.env.NODE_ENV
-					  }__${process.env.VERSION}`
+	if (exposeModules) {
+		const moduleFederationConfig = {
+			dts: false,
+			manifest: false,
+			name: packageName?.split("-").join("_"),
+			filename: "v2.remoteEntry.js",
+			runtimePlugins:
+				target === "server"
+					? [require.resolve("@module-federation/node/runtimePlugin")]
 					: undefined,
-		},
-		resolve: {
-			extensions: [".js", ".jsx", ".ts", ".tsx"],
-			plugins: resolvePlugins,
-		},
-		module: {
-			rules: [
-				{
-					test: /\.(js|jsx)$/,
-					use: require.resolve("source-map-loader"),
-					include: /node_modules\/chayns-components/,
-				},
-				{
-					test: /\.(js|jsx|ts|tsx)$/,
-					use: {
-						loader: require.resolve("babel-loader"),
-						options: {
-							presets: [["chayns-toolkit/babel", babelPresetOptions]],
-							babelrc: false,
-							configFile: false,
-							compact: mode === "production",
-							cacheDirectory: true,
-							// eslint-disable-next-line
-							cacheIdentifier: babelCacheIdentifier,
-						},
-					},
-					exclude: /node_modules/,
-				},
-				{
-					test: /\.(css|scss)/,
-					use: [
-						mode === "development" || singleBundle
-							? {
-									loader: require.resolve("style-loader"),
-									options: injectCssInPage
-										? { insert: injectCssStyleLoader }
-										: undefined,
-							  }
-							: MiniCssExtractPlugin.loader,
-						{
-							loader: require.resolve("css-loader"),
-							options: {
-								modules: {
-									auto: true,
-									localIdentName:
-										mode === "development"
-											? "[path][name]__[local]"
-											: "[hash:base64]",
-									exportLocalsConvention: "camelCase",
-								},
+			exposes: exposeModules,
+			library: target === "server" ? { type: "commonjs-module" } : undefined,
+			shared:
+				mode !== "development"
+					? {
+							react: {
+								requiredVersion:
+									packageJson.peerDependencies?.react ||
+									packageJson?.dependencies?.react,
 							},
-						},
-						{
-							loader: require.resolve("postcss-loader"),
-							options: {
-								postcssOptions: {
-									plugins: [
-										[
-											"postcss-preset-env",
-											{
-												autoprefixer: {
-													flexbox: "no-2009",
-												},
-												stage: 2,
-											},
-										],
-										"postcss-flexbugs-fixes",
-										mode === "production" && "cssnano",
-										prefixCss && [
-											"postcss-prefix-selector",
-											{
-												prefix: `.${packageName}`,
-											},
-										],
-									].filter(Boolean),
-								},
+							"react-dom": {
+								requiredVersion:
+									packageJson.peerDependencies?.["react-dom"] ||
+									packageJson?.dependencies?.["react-dom"],
 							},
+					  }
+					: undefined,
+		}
+		plugins.push(new ModuleFederationPlugin(moduleFederationConfig))
+	}
+	return {
+		performance:
+			parsed.BUNDLE_ANALYZE === "true" || analyze
+				? {
+						bundleAnalyze: {
+							analyzerMode: "server",
+							openAnalyzer: true,
 						},
-						require.resolve("sass-loader"),
-					],
-				},
-				{
-					test: /\.(png|jpe?g|gif|webp)$/i,
-					type: "asset",
-					parser: {
-						dataUrlCondition: { maxSize: 10 * 1024 },
-					},
-				},
-				{
-					test: /\.svg$/,
-					use: require.resolve("@svgr/webpack"),
-				},
-			],
+				  }
+				: undefined,
+		// @ts-expect-error missing in types
+		context: {
+			rootPath: project.resolvePath("."),
 		},
-		plugins,
-		optimization: {
-			splitChunks: exposeModules || singleBundle ? false : { chunks: "all" },
+		source: {
+			tsconfigPath: project.hasFile("tsconfig.json")
+				? project.resolvePath("tsconfig.json")
+				: undefined,
+			define: {
+				"process.env.VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
+				"process.env.BUILD_ENV": JSON.stringify(buildEnv),
+				__REQUIRED_REACT_VERSION__: JSON.stringify(
+					packageJson.peerDependencies?.react || packageJson?.dependencies?.react
+				),
+				"process.env.__PACKAGE_NAME__": JSON.stringify(
+					packageJson.name?.replace(/-/g, "_")
+				),
+				...publicVars,
+			},
+			entry: entries,
 		},
-		performance: false,
+		plugins: rsBuildPlugins,
+		tools: {
+			rspack: {
+				output: {
+					uniqueName: packageName,
+				},
+				plugins,
+			},
+			htmlPlugin: false,
+			postcss: prefixCss
+				? (opts) => {
+						if (!opts.postcssOptions) {
+							return
+						}
+						if (!opts.postcssOptions.plugins) {
+							opts.postcssOptions.plugins = []
+						}
+						opts.postcssOptions.plugins.push(
+							require("postcss-prefix-selector")({
+								prefix: `.${packageName}`,
+							})
+						)
+				  }
+				: undefined,
+		},
+		output: {
+			target: target === "server" ? "node" : "web",
+			sourceMap: {
+				js: mode === "development" ? "cheap-module-source-map" : "hidden-source-map",
+			},
+			cleanDistPath: mode === "production",
+			assetPrefix: target === "server" ? undefined : "auto",
+			overrideBrowserslist:
+				mode === "production"
+					? ["cover 90%", "not dead", "not op_mini all", "Firefox ESR", "not android < 5"]
+					: undefined,
+			filename: outputFilename || prodDefaultFilename,
+			distPath: {
+				root: outputPath || "build",
+			},
+		},
+		dev: {
+			assetPrefix: "auto",
+		},
 	}
-}
-
-function getOutputPath({
-	mode,
-	filename,
-	singleBundle,
-	packageName,
-}: {
-	mode: Mode
-	filename: string
-	singleBundle: boolean
-	packageName: string
-}) {
-	const outputPath = singleBundle ? "" : "static/js/"
-
-	const preparedFilename = filename.replace("[package]", paramCase(packageName))
-
-	if (mode === "development") {
-		return `${outputPath}[name].bundle.js`
-	}
-	return outputPath + preparedFilename
 }

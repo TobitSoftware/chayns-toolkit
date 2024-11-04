@@ -3,13 +3,12 @@ import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
 import { testCommand } from "./commands/testCommand"
-import { convertConfigFile } from "./features/config-file/convertConfigFile"
 import { loadEnvironment } from "./features/environment/loadEnvironment"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
-import { waitForPort } from "./features/wait-for-port/waitForPort"
 import { output } from "./util/output"
 import { runSteps } from "./util/runSteps"
+import { serveCommand } from "./commands/serveCommand"
 
 const program = new Command()
 program.version(__PKG_VERSION__, "-v, --version", "output the version number")
@@ -21,7 +20,7 @@ program
 	.action(async (options: { devtools: boolean }) => {
 		loadEnvironment(true)
 		await runSteps(
-			[convertConfigFile, checkForTypeScript, checkSSLConfig, waitForPort],
+			[checkForTypeScript, checkSSLConfig],
 			[devCommand({ devtools: options.devtools })]
 		)
 	})
@@ -36,6 +35,7 @@ program
 			await runSteps([buildCommand({ analyze: options.analyze })])
 		} catch (e) {
 			output.error(e)
+			output.exit(1)
 		}
 
 		console.info("")
@@ -47,6 +47,17 @@ program
 	.action(async () => {
 		await lintCommand()
 		console.info("")
+	})
+
+program
+	.command("serve")
+	.description("serves the files from a local build folder")
+	.action(async () => {
+		try {
+			await runSteps([serveCommand()])
+		} catch (e) {
+			output.error(e)
+		}
 	})
 
 program

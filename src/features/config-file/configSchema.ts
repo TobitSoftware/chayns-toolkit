@@ -1,4 +1,5 @@
 import * as yup from "yup"
+import { EntryPoint } from "../../util/createWebpackConfig"
 
 const developmentSchema = yup
 	.object({
@@ -13,13 +14,25 @@ const developmentSchema = yup
 const outputSchema = yup
 	.object({
 		singleBundle: yup.boolean().default(false).required(),
-		filename: yup.string().default("[package].[contenthash].im.js").required(),
-		path: yup.string().notRequired(),
-		injectCssInPage: yup.boolean().notRequired(),
+		filename: yup
+			.object({
+				html: yup.string().notRequired(),
+				js: yup.string().notRequired(),
+				css: yup.string().notRequired(),
+				svg: yup.string().notRequired(),
+				font: yup.string().notRequired(),
+				image: yup.string().notRequired(),
+				media: yup.string().notRequired(),
+			})
+			.notRequired(),
+		path: yup.string().notRequired().default("build"),
+		serverSideRendering: yup.boolean().default(false).required(),
 		prefixCss: yup.boolean().notRequired(),
 		exposeModules: yup.object().notRequired(),
-		injectChaynsCss: yup.boolean().notRequired(),
-		apiVersion: yup.number().notRequired(),
+		entryPoints: yup
+			.object()
+			.required()
+			.default({} as EntryPoint),
 	})
 	.required()
 	.noUnknown()

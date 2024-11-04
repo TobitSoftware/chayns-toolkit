@@ -22,9 +22,7 @@ export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 		config = await loadConfig()
 	} catch (e) {
 		const error = e as Error
-		output.error(
-			`An error occured while loading the ${fm.path`chayns-toolkit.json`} file:\n`
-		)
+		output.error(`An error occured while loading the ${fm.path`toolkit.config.js`} file:\n`)
 		output.blank(error.message)
 		return
 	}

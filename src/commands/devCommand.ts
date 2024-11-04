@@ -1,14 +1,21 @@
+import { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 import { exec } from "child_process"
 import * as path from "path"
-import webpack, { Configuration } from "webpack"
-import WebpackDevServer from "webpack-dev-server"
+import { createRsbuild } from "@rsbuild/core"
+import fs, { watchFile } from "fs"
+import { unwatchFile } from "node:fs"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { fm } from "../util/format"
 import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
 import { pkgCommands } from "../util/pkgCommands"
-import { StepParams } from "../util/runSteps"
-import { loadCss } from "../util/loadChaynsCss"
+import { runSteps, StepParams } from "../util/runSteps"
+import { project } from "../util/project"
+import { loadEnvironment } from "../features/environment/loadEnvironment"
+import { checkForTypeScript } from "../features/typescript/checkForTypeScript"
+import { checkSSLConfig } from "../features/ssl-check/checkSSLConfig"
+
+let closingDevServer = false
 
 interface DevCommandArgs {
 	devtools: boolean
@@ -20,60 +27,19 @@ export function devCommand({
 	return async ({ config, packageJson, packageManager }) => {
 		const { port, host, cert, key } = config.development
 
-		let webpackConfig = await createWebpackConfig({
+		let webpackConfig = (await createWebpackConfig({
 			analyze: false,
 			mode: "development" as const,
 			outputFilename: config.output.filename,
 			singleBundle: config.output.singleBundle,
+			serverSideRendering: config.output.serverSideRendering,
 			packageJson,
 			injectDevtoolsScript: devtools,
 			prefixCss: config.output.prefixCss,
-			injectCssInPage: config.output.injectCssInPage,
-			injectChaynsCss: config.output.injectChaynsCss,
 			exposeModules: config.output.exposeModules,
-			apiVersion: config.output.apiVersion,
-		})
-
-		if (typeof config.webpack === "function") {
-			const modifier = config.webpack as WebpackModifierFunction
-
-			webpackConfig = modifyWebpackConfig({
-				config: webpackConfig,
-				dev: true,
-				modifier,
-			})
-		}
-
-		webpackConfig.plugins = webpackConfig.plugins?.map((webpackPlugin) => {
-			if (
-				!(
-					typeof webpackPlugin === "object" &&
-					typeof webpackPlugin.userOptions === "object"
-				)
-			)
-				return webpackPlugin
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-			if (webpackPlugin.userOptions?.template) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,no-param-reassign
-				if (typeof webpackPlugin.userOptions.templateParameters !== "object") {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
-					webpackPlugin.userOptions.templateParameters = {}
-				}
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
-				webpackPlugin.userOptions.templateParameters.CHAYNS_TOOLKIT_CSS_TAG = `<script>(${loadCss.toString()})()</script>`
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-			} else if (webpackPlugin.userOptions?.templateContent) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign,@typescript-eslint/no-unsafe-assignment
-				webpackPlugin.userOptions.templateContent =
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-					webpackPlugin.userOptions.templateContent.replace(
-						"<%= CHAYNS_TOOLKIT_CSS_TAG %>",
-						`<script>(${loadCss.toString()})()</script>`
-					)
-			}
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-			return webpackPlugin
-		})
+			entryPoints: config.output.entryPoints,
+			target: "client",
+		})) as RsbuildConfig
 
 		if (devtools) {
 			if ("react-devtools" in (packageJson.dependencies || {})) {
@@ -103,51 +69,53 @@ export function devCommand({
 			exec(`node ${path.join(require.resolve("react-devtools"), "../bin.js")}`)
 		}
 
-		const compiler = webpack(webpackConfig)
-
-		const baseWebpackDevServerConfig = {
-			historyApiFallback: true,
-			compress: true,
-			allowedHosts: "all",
-			host,
-			port,
-			client: {
-				logging: "none",
-				overlay: false,
-			},
-			server: {
-				type: cert && key ? "https" : "http",
-				options: {
-					key,
-					cert,
-				},
-			},
-			devMiddleware: {
-				stats: {
-					all: false,
-					colors: true,
-					errors: true,
-					warnings: true,
-				},
-			},
-			hot: true,
-			headers: {
-				"Access-Control-Allow-Origin": "*",
-				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-				"Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization",
-			},
+		webpackConfig.server ||= {}
+		webpackConfig.server.host = host
+		webpackConfig.server.port = port
+		webpackConfig.server.headers = {
+			"Access-Control-Allow-Origin": "*",
+			"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+			"Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization",
 		}
 
-		const webPackDevServerConfig = modifyWebpackConfig({
-			config: baseWebpackDevServerConfig as Configuration,
-			dev: true,
-			modifier: config.webpackDev as WebpackModifierFunction,
-		})
-		const devServer = new WebpackDevServer(
-			webPackDevServerConfig as WebpackDevServer.Configuration,
-			compiler
-		)
+		if (cert && key) {
+			webpackConfig.server.https = {
+				cert: fs.readFileSync(cert),
+				key: fs.readFileSync(key),
+			}
+		}
 
-		devServer.startCallback(() => {})
+		if (typeof config.webpack === "function") {
+			const modifier = config.webpack as WebpackModifierFunction
+
+			webpackConfig = modifyWebpackConfig({
+				config: webpackConfig,
+				dev: true,
+				modifier,
+				target: "client",
+			})
+		}
+
+		const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
+
+		const { server, urls } = await rsbuild.startDevServer()
+
+		urls.forEach((url) => {
+			console.log("Project is running at: ", url)
+		})
+
+		const watchFileFunc = async () => {
+			if (closingDevServer) return
+			closingDevServer = true
+			console.log("Start restarting dev server")
+			await server.close()
+			loadEnvironment(true)
+			closingDevServer = false
+			await runSteps([checkForTypeScript, checkSSLConfig], [devCommand({ devtools })])
+			console.log("Dev Server restarted")
+			unwatchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+		}
+
+		watchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
 	}
 }
