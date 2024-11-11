@@ -35,6 +35,13 @@ module.exports = {
          * @type {string}
          */
         path: "//my-qa-server/example-project",
+        entryPoints: {
+            // key defines the name of the resulting html-file (here index.html)
+            index: {
+                pathIndex: "./src/index", // path to your entry point index.js/index.ts
+                pathHtml: "./src/index.html", // path to the html template
+            },
+        },
     },
     // ... other options ...
 }
@@ -42,6 +49,6 @@ module.exports = {
 
 ## Single File Builds
 
-In single-file build mode, the compiler will inline all assets (CSS, images,
-etc.) together with all JavaScript into a single bundle. This can be useful when
-building smaller fragments of a UI, e.g. some kind of plugin.
+In single-file build mode, the compiler will inline all assets (CSS, images, etc.) together with all
+JavaScript into a single bundle. This can be useful when building smaller fragments of a UI, e.g.
+some kind of plugin.

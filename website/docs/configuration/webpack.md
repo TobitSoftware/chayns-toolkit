@@ -4,15 +4,15 @@ slug: webpack-customization
 sidebar_label: Webpack Customization
 ---
 
-Even though the included webpack configuration will handle most cases, we also
-provide the ability to modify it.
+Even though the included webpack configuration will handle most cases, we also provide the ability
+to modify it.
 
-> Please note that the webpack configuration does not follow semantic versioning
-> and can change with any release.
+> Please note that the webpack configuration does not follow semantic versioning and can change with
+> any release.
 
-Use the `webpack` property of the configuration object to specify a function
-that receives the default webpack configuration along with some other
-information. This modifier function has to return the modified configuration.
+Use the `webpack` property of the configuration object to specify a function that receives the
+default webpack configuration along with some other information. This modifier function has to
+return the modified configuration.
 
 ```js {5} title="/toolkit.config.js"
 module.exports = {
@@ -25,9 +25,8 @@ module.exports = {
 }
 ```
 
-The modifier function receives two arguments. First is our default webpack
-configuration, second is an object with additional information and utilities,
-following this interface:
+The modifier function receives two arguments. First is our default webpack configuration, second is
+an object with additional information and utilities, following this interface:
 
 ```ts
 interface Options {
@@ -42,15 +41,21 @@ interface Options {
      * production.
      */
     dev: boolean
+
+    /**
+     * Specifies if the current build is for client or server
+     */
+    target: "client" | "server"
 }
 ```
 
-> If you find yourself modifying the webpack configuration often for a feature
-> that you think belongs in our default config, please
-> [open an issue](https://github.com/TobitSoftware/create-chayns-app/issues) to
-> discuss it.
+> If you find yourself modifying the webpack configuration often for a feature that you think
+> belongs in our default config, please
+> [open an issue](https://github.com/TobitSoftware/create-chayns-app/issues) to discuss it.
 
 ## Examples
+
+⚠️ Below examples are not updated for v3 yet.
 
 ### Adding a Babel Plugin
 
@@ -62,18 +67,14 @@ to `babel-loader`:
 module.exports = {
     webpack(config) {
         const babelRule = config.module.rules.find(
-            (rule) =>
-                rule.use.loader && rule.use.loader.includes("babel-loader")
+            (rule) => rule.use.loader && rule.use.loader.includes("babel-loader")
         )
 
         if (!babelRule) return config
 
         const babelOptions = babelRule.use.options
 
-        const pipelinePlugin = [
-            "@babel/plugin-proposal-pipeline-operator",
-            { proposal: "smart" },
-        ]
+        const pipelinePlugin = ["@babel/plugin-proposal-pipeline-operator", { proposal: "smart" }]
 
         if (Array.isArray(babelOptions.plugins)) {
             babelOptions.plugins.push(pipelinePlugin)
