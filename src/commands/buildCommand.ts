@@ -27,6 +27,7 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 				path: target ? `${config.output.path}/${target}` : config.output.path,
 				packageJson,
 				prefixCss: config.output.prefixCss,
+				cssVersion: config.output.cssVersion,
 				exposeModules: config.output.exposeModules,
 				entryPoints: config.output.entryPoints,
 				target,

@@ -8,7 +8,7 @@ import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import type { PackageJson } from "type-fest"
 import { project } from "./project"
-import { loadCss } from "./loadChaynsCss"
+import { getCssTag } from "./loadChaynsCss"
 import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 
 import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
@@ -59,6 +59,7 @@ interface CreateConfigOptions {
 	packageJson: PackageJson
 	injectDevtoolsScript?: boolean
 	prefixCss?: boolean
+	cssVersion?: string
 	exposeModules?: {}
 	entryPoints: EntryPoints
 	target: "client" | "server" | null
@@ -71,6 +72,7 @@ export async function createWebpackConfig({
 	path: outputPath,
 	packageJson,
 	prefixCss = false,
+	cssVersion = "4.2",
 	exposeModules,
 	entryPoints,
 	target,
@@ -111,7 +113,7 @@ export async function createWebpackConfig({
 					filename: `${k}.html`,
 					chunks: [k],
 					templateParameters: {
-						CHAYNS_TOOLKIT_CSS_TAG: `<script>(${loadCss.toString()})()</script>`,
+						CHAYNS_TOOLKIT_CSS_TAG: getCssTag(cssVersion),
 						...templateParameters,
 					},
 				})

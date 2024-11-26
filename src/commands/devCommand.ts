@@ -36,6 +36,7 @@ export function devCommand({
 			packageJson,
 			injectDevtoolsScript: devtools,
 			prefixCss: config.output.prefixCss,
+			cssVersion: config.output.cssVersion,
 			exposeModules: config.output.exposeModules,
 			entryPoints: config.output.entryPoints,
 			target: "client",

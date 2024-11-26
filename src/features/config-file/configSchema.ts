@@ -28,6 +28,10 @@ const outputSchema = yup
 		path: yup.string().notRequired().default("build"),
 		serverSideRendering: yup.boolean().default(false).required(),
 		prefixCss: yup.boolean().notRequired(),
+		cssVersion: yup
+			.string()
+			.matches(/^\d+.\d+$/)
+			.notRequired(),
 		exposeModules: yup.object().notRequired(),
 		entryPoints: yup
 			.object()

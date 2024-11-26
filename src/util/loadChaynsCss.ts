@@ -1,11 +1,23 @@
 /* eslint-disable */
 // @ts-nocheck
 
+export const getCssTag = (version = "4.2") => {
+	const url = new URL(`https://style.tobit.cloud/css/v${version}`)
+	if (
+		["development", "qa", "staging"].includes(process.env.BUILD_ENV) ||
+		process.env.NODE_ENV === "development"
+	) {
+		url.host = "style-staging.tobit.cloud"
+	}
+	const script = loadCss.toString().replace("##url##", url.toString())
+	return `<script>(${script})()</script>`
+}
+
 // Replaced compatibility script
 // Should be removed when styles are in chayns-components and/or in static style css
-export const loadCss = () => {
+const loadCss = () => {
 	// url encoded to prevent append url parameters from cloud worker
-	const apiUrl = new URL("https://domain.chayns.net/css/".replace("domain", "api"))
+	const apiUrl = new URL("##url##")
 	const parameters = new URLSearchParams(window.location.search.toLowerCase())
 
 	apiUrl.searchParams.set(
