@@ -42,6 +42,16 @@ module.exports = {
                 pathHtml: "./src/index.html", // path to the html template
             },
         },
+        /**
+         * Prefixes all css selectors with the name from the package.json.
+         * This requires that you wrap your application with a div which has that name as className.
+         *
+         */
+        prefixCss: true,
+        /**
+         * The css version which should be used for the CHAYNS_TOOLKIT_CSS_TAG variable
+         */
+        cssVersion: "4.2",
     },
     // ... other options ...
 }
