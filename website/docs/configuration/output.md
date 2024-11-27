@@ -45,7 +45,7 @@ module.exports = {
         /**
          * Prefixes all css selectors with the name from the package.json.
          * This requires that you wrap your application with a div which has that name as className.
-         *
+         * Known issue: Using this option does not work with css modules.
          */
         prefixCss: true,
         /**
