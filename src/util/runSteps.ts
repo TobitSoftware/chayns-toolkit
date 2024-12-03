@@ -24,6 +24,7 @@ export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 		const error = e as Error
 		output.error(`An error occured while loading the ${fm.path`toolkit.config.js`} file:\n`)
 		output.blank(error.message)
+		output.exit(1)
 		return
 	}
 
