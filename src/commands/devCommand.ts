@@ -1,4 +1,4 @@
-import { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
+/* eslint-disable no-await-in-loop */
 import { exec } from "child_process"
 import * as path from "path"
 import { createRsbuild } from "@rsbuild/core"
@@ -27,96 +27,105 @@ export function devCommand({
 	return async ({ config, packageJson, packageManager }) => {
 		const { port, host, cert, key } = config.development
 
-		let webpackConfig = (await createWebpackConfig({
-			analyze: false,
-			mode: "development" as const,
-			outputFilename: config.output.filename,
-			singleBundle: config.output.singleBundle,
-			serverSideRendering: config.output.serverSideRendering,
-			packageJson,
-			injectDevtoolsScript: devtools,
-			prefixCss: config.output.prefixCss,
-			cssVersion: config.output.cssVersion,
-			exposeModules: config.output.exposeModules,
-			entryPoints: config.output.entryPoints,
-			target: "client",
-		})) as RsbuildConfig
+		const targets =
+			config.output.serverSideRendering === "all"
+				? (["server", "client"] as const)
+				: ([null] as const)
 
-		if (devtools) {
-			if ("react-devtools" in (packageJson.dependencies || {})) {
-				output.error(`You added ${fm.code`react-devtools`} as a regular dependency.`)
-				output.blank(
-					`Install it under ${fm.code`devDependencies`} by running ${pkgCommands.move(
-						packageManager,
-						"react-devtools",
-						"dev"
-					)}.\n`
-				)
-				process.exit(1)
-			} else if (!("react-devtools" in (packageJson.devDependencies || {}))) {
-				output.error(
-					`You need to install the ${fm.code`react-devtools`} package to use the ${fm.command`--devtools`} option.`
-				)
-				output.blank(
-					`Run ${pkgCommands.move(
-						packageManager,
-						"react-devtools",
-						"dev"
-					)} to add it as a ${fm.code`devDependency`}.\n`
-				)
-				process.exit(1)
-			}
-
-			exec(`node ${path.join(require.resolve("react-devtools"), "../bin.js")}`)
-		}
-
-		webpackConfig.server ||= {}
-		webpackConfig.server.host = host
-		webpackConfig.server.port = port
-		webpackConfig.server.headers = {
-			"Access-Control-Allow-Origin": "*",
-			"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-			"Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization",
-		}
-
-		if (cert && key) {
-			webpackConfig.server.https = {
-				cert: fs.readFileSync(cert),
-				key: fs.readFileSync(key),
-			}
-		}
-
-		if (typeof config.webpack === "function") {
-			const modifier = config.webpack as WebpackModifierFunction
-
-			webpackConfig = modifyWebpackConfig({
-				config: webpackConfig,
-				dev: true,
-				modifier,
-				target: "client",
+		for (const target of targets) {
+			let webpackConfig = await createWebpackConfig({
+				analyze: false,
+				mode: "development" as const,
+				outputFilename: config.output.filename,
+				singleBundle: config.output.singleBundle,
+				serverSideRendering:
+					config.output.serverSideRendering !== false &&
+					config.output.serverSideRendering !== "build-only",
+				packageJson,
+				injectDevtoolsScript: devtools,
+				prefixCss: config.output.prefixCss,
+				cssVersion: config.output.cssVersion,
+				exposeModules: config.output.exposeModules,
+				entryPoints: config.output.entryPoints,
+				target,
 			})
+
+			if (devtools) {
+				if ("react-devtools" in (packageJson.dependencies || {})) {
+					output.error(`You added ${fm.code`react-devtools`} as a regular dependency.`)
+					output.blank(
+						`Install it under ${fm.code`devDependencies`} by running ${pkgCommands.move(
+							packageManager,
+							"react-devtools",
+							"dev"
+						)}.\n`
+					)
+					process.exit(1)
+				} else if (!("react-devtools" in (packageJson.devDependencies || {}))) {
+					output.error(
+						`You need to install the ${fm.code`react-devtools`} package to use the ${fm.command`--devtools`} option.`
+					)
+					output.blank(
+						`Run ${pkgCommands.move(
+							packageManager,
+							"react-devtools",
+							"dev"
+						)} to add it as a ${fm.code`devDependency`}.\n`
+					)
+					process.exit(1)
+				}
+
+				exec(`node ${path.join(require.resolve("react-devtools"), "../bin.js")}`)
+			}
+
+			webpackConfig.server ||= {}
+			webpackConfig.server.host = host
+			webpackConfig.server.port = port
+			webpackConfig.server.headers = {
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+				"Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization",
+			}
+
+			if (cert && key) {
+				webpackConfig.server.https = {
+					cert: fs.readFileSync(cert),
+					key: fs.readFileSync(key),
+				}
+			}
+
+			if (typeof config.webpack === "function") {
+				const modifier = config.webpack as WebpackModifierFunction
+
+				webpackConfig = modifyWebpackConfig({
+					config: webpackConfig,
+					dev: true,
+					modifier,
+					target: "client",
+				})
+			}
+
+			const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
+
+			const { server, urls } = await rsbuild.startDevServer()
+
+			urls.forEach((url) => {
+				console.log("Project is running at: ", url)
+			})
+
+			const watchFileFunc = async () => {
+				if (closingDevServer) return
+				closingDevServer = true
+				console.log("Start restarting dev server")
+				await server.close()
+				loadEnvironment(true)
+				closingDevServer = false
+				await runSteps([checkForTypeScript, checkSSLConfig], [devCommand({ devtools })])
+				console.log("Dev Server restarted")
+				unwatchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+			}
+
+			watchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
 		}
-
-		const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
-
-		const { server, urls } = await rsbuild.startDevServer()
-
-		urls.forEach((url) => {
-			console.log("Project is running at: ", url)
-		})
-
-		const watchFileFunc = async () => {
-			if (closingDevServer) return
-			closingDevServer = true
-			console.log("Start restarting dev server")
-			await server.close()
-			loadEnvironment(true)
-			closingDevServer = false
-			await runSteps([checkForTypeScript, checkSSLConfig], [devCommand({ devtools })])
-			console.log("Dev Server restarted")
-			unwatchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
-		}
-
-		watchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
 	}
 }

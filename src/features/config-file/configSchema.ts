@@ -26,7 +26,11 @@ const outputSchema = yup
 			})
 			.notRequired(),
 		path: yup.string().notRequired().default("build"),
-		serverSideRendering: yup.boolean().default(false).required(),
+		serverSideRendering: yup
+			.mixed()
+			.oneOf([true, false, "all", "build-only"])
+			.default(false)
+			.required(),
 		prefixCss: yup.boolean().notRequired(),
 		cssVersion: yup
 			.string()
