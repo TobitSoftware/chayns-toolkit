@@ -6,7 +6,7 @@ interface ModifyWebpackConfigOptions {
 	config: RsbuildConfig
 	modifier: WebpackModifierFunction
 	dev: boolean
-	target: "server" | "client"
+	target: "server" | "client" | null
 }
 
 export function modifyWebpackConfig({ config, dev, modifier, target }: ModifyWebpackConfigOptions) {
@@ -36,5 +36,5 @@ export function modifyWebpackConfig({ config, dev, modifier, target }: ModifyWeb
 
 export type WebpackModifierFunction = (
 	config: RsbuildConfig,
-	options: { dev: boolean; target: "server" | "client" }
+	options: { dev: boolean; target: "server" | "client" | null }
 ) => RsbuildConfig

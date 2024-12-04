@@ -108,7 +108,7 @@ export function devCommand({
 					config: webpackConfig,
 					dev: true,
 					modifier,
-					target: "client",
+					target,
 				})
 			}
 
