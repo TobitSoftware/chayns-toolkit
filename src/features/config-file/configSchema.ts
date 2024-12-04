@@ -5,6 +5,12 @@ const developmentSchema = yup
 	.object({
 		host: yup.string().max(255).default("adaptive").required(),
 		port: yup.number().positive().max(65535).default(1234).required(),
+		ports: yup
+			.object({
+				client: yup.number(),
+				server: yup.number(),
+			})
+			.notRequired(),
 		cert: yup.string().notRequired(),
 		key: yup.string().notRequired(),
 	})

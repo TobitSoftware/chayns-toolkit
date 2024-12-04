@@ -25,7 +25,7 @@ export function devCommand({
 	devtools,
 }: DevCommandArgs): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson, packageManager }) => {
-		const { port, host, cert, key } = config.development
+		const { port, ports, host, cert, key } = config.development
 
 		const targets =
 			config.output.serverSideRendering === "all"
@@ -81,6 +81,13 @@ export function devCommand({
 			webpackConfig.server ||= {}
 			webpackConfig.server.host = host
 			webpackConfig.server.port = port
+			if (ports) {
+				if (target === "server") {
+					webpackConfig.server.port = ports.server
+				} else {
+					webpackConfig.server.port = ports.client
+				}
+			}
 			webpackConfig.server.headers = {
 				"Access-Control-Allow-Origin": "*",
 				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
