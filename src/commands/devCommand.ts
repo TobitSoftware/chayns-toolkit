@@ -81,7 +81,7 @@ export function devCommand({
 			webpackConfig.server ||= {}
 			webpackConfig.server.host = host
 			webpackConfig.server.port = port
-			if (ports) {
+			if (config.output.serverSideRendering === "all" && ports) {
 				if (target === "server") {
 					webpackConfig.server.port = ports.server
 				} else {
