@@ -31,11 +31,17 @@ const loadCss = () => {
 		apiUrl.searchParams.set("color", parameters.get("color") || "")
 	}
 
-	const hidden = "hidden"
+	const $style = document.createElement("style")
+	document.head.appendChild($style)
+	$style.sheet.insertRule("html.chayns-toolkit-css-loading { overflow: hidden; opacity: 0; }")
 
 	const setVisibility = (v) => {
-		document.documentElement.style.visibility = v ? "" : hidden
-		document.documentElement.style.overflow = v ? "" : hidden
+		if (v) {
+			document.documentElement.classList.remove("chayns-toolkit-css-loading")
+			$style.remove()
+		} else {
+			document.documentElement.classList.add("chayns-toolkit-css-loading")
+		}
 	}
 	setVisibility(false)
 
