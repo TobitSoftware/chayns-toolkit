@@ -6,6 +6,7 @@ import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry"
 import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
 import HtmlWebpackPlugin from "html-webpack-plugin"
+import semver from "semver"
 import type { PackageJson } from "type-fest"
 import { project } from "./project"
 import { getCssTag } from "./loadChaynsCss"
@@ -124,6 +125,30 @@ export async function createWebpackConfig({
 	if (!packageName) throw Error("The name field in package.json has to be provided.")
 
 	if (exposeModules) {
+		const shared: ConstructorParameters<typeof ModuleFederationPlugin>[0]["shared"] = {
+			react: {
+				requiredVersion:
+					packageJson.peerDependencies?.react || packageJson?.dependencies?.react,
+			},
+			"react-dom": {
+				requiredVersion:
+					packageJson.peerDependencies?.["react-dom"] ||
+					packageJson?.dependencies?.["react-dom"],
+			},
+		}
+
+		if (
+			semver.gte(
+				semver.minVersion(
+					packageJson.dependencies?.["react-dom"] ??
+						packageJson.devDependencies?.["react-dom"]!
+				)!,
+				"18.0.0"
+			)
+		) {
+			shared["react-dom/client"] = shared["react-dom"]
+		}
+
 		const moduleFederationConfig = {
 			dts: false,
 			manifest: false,
@@ -135,21 +160,7 @@ export async function createWebpackConfig({
 					: undefined,
 			exposes: exposeModules,
 			library: target === "server" ? { type: "commonjs-module" } : undefined,
-			shared:
-				mode !== "development"
-					? {
-							react: {
-								requiredVersion:
-									packageJson.peerDependencies?.react ||
-									packageJson?.dependencies?.react,
-							},
-							"react-dom": {
-								requiredVersion:
-									packageJson.peerDependencies?.["react-dom"] ||
-									packageJson?.dependencies?.["react-dom"],
-							},
-					  }
-					: undefined,
+			shared: mode !== "development" ? shared : undefined,
 		}
 		plugins.push(new ModuleFederationPlugin(moduleFederationConfig))
 	}
