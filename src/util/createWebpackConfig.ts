@@ -80,7 +80,7 @@ export async function createWebpackConfig({
 	serverSideRendering,
 }: CreateConfigOptions): Promise<RsbuildConfig> {
 	const packageName = packageJson.name
-	const buildEnv = mode === "production" ? process.env.BUILD_ENV || "production" : "development"
+	const buildEnv = process.env.BUILD_ENV || (mode === "production" ? "production" : "development")
 
 	const { parsed, publicVars } = loadEnv({
 		mode: buildEnv,

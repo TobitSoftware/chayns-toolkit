@@ -1,4 +1,6 @@
+import chalk from "chalk"
 import dotenv from "dotenv"
+import { output } from "../../util/output"
 
 export function loadEnvironment(development = false) {
 	if (development) {
@@ -8,7 +10,9 @@ export function loadEnvironment(development = false) {
 		process.env.BABEL_ENV = "production"
 		process.env.NODE_ENV = "production"
 	}
-	const buildEnv = development ? "development" : process.env.BUILD_ENV || "production"
+	const buildEnv = process.env.BUILD_ENV || (!development ? "production" : "development")
+	output.info(`Loading environment ${chalk.yellow(buildEnv)}`)
+
 	dotenv.config({ path: `.env.${buildEnv}.local` })
 	dotenv.config({ path: `.env.local` })
 	dotenv.config({ path: `.env.${buildEnv}` })
