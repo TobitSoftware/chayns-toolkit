@@ -5,12 +5,12 @@ slug: env-vars
 
 With chayns-toolkit@3 `.env`-files are automatically loaded depending on the current environment
 which is defined as `process.env.BUILD_ENV || (!development ? 'production' : 'development')`. This
-will load up to 4 files:
+will load up to 4 files, with the files listed at the bottom having higher priority:
 
 ```
 .env
-.env.{environment}
 .env.local
+.env.{environment}
 .env.{environment}.local
 ```
 
@@ -24,6 +24,23 @@ const API_KEY = process.env.GOOGLE_MAPS_API_KEY
 // or
 const API_KEY = import.meta.env.GOOGLE_MAPS_API_KEY
 ```
+
+## Default Variables
+
+The chayns-toolkit will define following variables by default:
+
+-   process.env.VERSION
+-   import.meta.env.VERSION
+-   process.env.BUILD_VERSION
+-   import.env.BUILD_VERSION
+-   process.env.BUILD_ENV
+-   import.meta.env.BUILD_ENV
+-   process.env.\_\_PACKAGE_NAME\_\_
+-   import.meta.env.\_\_PACKAGE_NAME\_\_
+-   \_\_REQUIRED_REACT_VERSION\_\_
+
+Rsbuild also injects some variables by default, for further information check their
+[documentation](https://rsbuild.dev/guide/advanced/env-vars#default-variables).
 
 ## How to Use It Correctly
 
@@ -57,12 +74,12 @@ All system environment variables as well as any variables specified in a `.env.l
 root of your project directory will be available to your code under `process.env.VAR_NAME`.
 
 Starting with version 2.0.12 `.env`-files are also loaded according to the current environment. This
-way up to 4 files can be loaded.
+way up to 4 files can be loaded, with the files listed at the bottom having higher priority.
 
 ```
 .env
-.env.{environment}
 .env.local
+.env.{environment}
 .env.{environment}.local
 ```
 
