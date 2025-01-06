@@ -184,12 +184,19 @@ export async function createWebpackConfig({
 				: undefined,
 			define: {
 				"process.env.VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
+				"import.meta.env.VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
+				"process.env.BUILD_VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
+				"import.meta.env.BUILD_VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
 				"process.env.BUILD_ENV": JSON.stringify(buildEnv),
-				__REQUIRED_REACT_VERSION__: JSON.stringify(
-					packageJson.peerDependencies?.react || packageJson?.dependencies?.react
-				),
+				"import.meta.env.BUILD_ENV": JSON.stringify(buildEnv),
 				"process.env.__PACKAGE_NAME__": JSON.stringify(
 					packageJson.name?.replace(/-/g, "_")
+				),
+				"import.meta.env.__PACKAGE_NAME__": JSON.stringify(
+					packageJson.name?.replace(/-/g, "_")
+				),
+				__REQUIRED_REACT_VERSION__: JSON.stringify(
+					packageJson.peerDependencies?.react || packageJson?.dependencies?.react
 				),
 				...publicVars,
 			},
