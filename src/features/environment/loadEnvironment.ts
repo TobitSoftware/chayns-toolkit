@@ -6,11 +6,13 @@ export function loadEnvironment(development = false) {
 	if (development) {
 		process.env.BABEL_ENV = "development"
 		process.env.NODE_ENV = "development"
+		process.env.BUILD_ENV ||= "development"
 	} else {
 		process.env.BABEL_ENV = "production"
 		process.env.NODE_ENV = "production"
+		process.env.BUILD_ENV ||= "production"
 	}
-	const buildEnv = process.env.BUILD_ENV || (!development ? "production" : "development")
+	const buildEnv = process.env.BUILD_ENV
 	output.info(`Loading environment ${chalk.yellow(buildEnv)}`)
 
 	dotenv.config({ path: `.env.${buildEnv}.local` })
