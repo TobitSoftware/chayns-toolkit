@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { type PostCSSOptions } from "@rsbuild/core/dist-types/types"
 import { pluginReact } from "@rsbuild/plugin-react"
 import { pluginSass } from "@rsbuild/plugin-sass"
 import { pluginCssMinimizer } from "@rsbuild/plugin-css-minimizer"
@@ -216,14 +217,26 @@ export async function createWebpackConfig({
 						if (!opts.postcssOptions) {
 							return
 						}
-						if (!opts.postcssOptions.plugins) {
-							opts.postcssOptions.plugins = []
+						const modifyOptions = (options: PostCSSOptions) => {
+							if (!options.plugins) {
+								options.plugins = []
+							}
+							options.plugins.push(
+								require("postcss-prefix-selector")({
+									prefix: `.${packageName}`,
+								})
+							)
 						}
-						opts.postcssOptions.plugins.push(
-							require("postcss-prefix-selector")({
-								prefix: `.${packageName}`,
-							})
-						)
+						if (typeof opts.postcssOptions === "function") {
+							const originalOptions = opts.postcssOptions
+							opts.postcssOptions = (context) => {
+								const options = originalOptions(context)
+								modifyOptions(options)
+								return options
+							}
+							return
+						}
+						modifyOptions(opts.postcssOptions)
 				  }
 				: undefined,
 		},
