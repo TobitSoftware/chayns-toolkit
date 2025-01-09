@@ -33,6 +33,7 @@ interface Options {
     /**
      * The webpack module. To avoid version conflicts, you should not import
      * webpack on your own if you want to use one of the built-in plugins.
+     * No longer available with version 3
      */
     webpack: webpack
 
@@ -55,7 +56,57 @@ interface Options {
 
 ## Examples
 
-⚠️ Below examples are not updated for v3 yet.
+### DefinePlugin
+
+Instead of webpack.DefinePlugin you can simply define variables via assignment to
+config.source.define.
+
+```js
+module.exports = {
+    webpack(config, { dev }) {
+        config.source.define.__DEVELOPMENT__ = dev
+        config.source.define.__QA__ = process.env.BUILD_ENV === "qa"
+        config.source.define.__STAGING__ = process.env.BUILD_ENV === "staging"
+        config.source.define.__PRODUCTION__ = process.env.BUILD_ENV === "production"
+
+        return config
+    },
+}
+```
+
+### Adding react-compiler
+
+Add the required devDependencies:
+`npm i react-compiler @rsbuild/plugin-babel babel-plugin-react-compiler -D`
+
+When using react version prior to 19 also add: `npm i react-compiler-runtime -D`
+
+```js
+const { pluginBabel } = require("@rsbuild/plugin-babel")
+
+module.exports = {
+    webpack(config) {
+        config.plugins.push(
+            pluginBabel({
+                include: /\.(?:jsx|tsx)$/,
+                babelLoaderOptions(opts) {
+                    opts.plugins?.unshift([
+                        "babel-plugin-react-compiler",
+                        {
+                            // specify target react version
+                            target: "18", // '17' || '18' || '19'
+                        },
+                    ])
+                },
+            })
+        )
+
+        return config
+    },
+}
+```
+
+⚠️ Below examples only work for versions prior to 3
 
 ### Adding a Babel Plugin
 
