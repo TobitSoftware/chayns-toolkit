@@ -30,7 +30,8 @@ const outputSchema = yup
 				image: yup.string().notRequired(),
 				media: yup.string().notRequired(),
 			})
-			.notRequired(),
+			.notRequired()
+			.default(undefined),
 		path: yup.string().notRequired().default("build"),
 		serverSideRendering: yup
 			.mixed()

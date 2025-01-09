@@ -16,7 +16,7 @@ import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
 import { pluginNodePolyfill } from "@rsbuild/plugin-node-polyfill"
 
-const prodDefaultFilename =
+const getDefaultFilename = () =>
 	process.env.NODE_ENV === "production"
 		? {
 				html: "[name].html",
@@ -251,7 +251,7 @@ export async function createWebpackConfig({
 				mode === "production"
 					? ["cover 90%", "not dead", "not op_mini all", "Firefox ESR", "not android < 5"]
 					: undefined,
-			filename: outputFilename || prodDefaultFilename,
+			filename: outputFilename || getDefaultFilename(),
 			distPath: {
 				root: outputPath || "build",
 			},
