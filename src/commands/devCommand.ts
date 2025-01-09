@@ -122,19 +122,19 @@ export function devCommand({
 
 			let closingDevServer = false
 
-			const watchFileFunc = async () => {
+			const watchFileFunc = () => {
 				if (closingDevServer) return
 				closingDevServer = true
-				console.log("Start restarting dev server")
-				await server.close()
-				loadEnvironment(true)
-				closingDevServer = false
-				await runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
-				console.log("Dev Server restarted")
-				unwatchFile(project.resolvePath("./toolkit.config.js"), () => void watchFileFunc())
+				console.log("Restarting dev server")
+				void server.close().then(() => {
+					loadEnvironment(true)
+					closingDevServer = false
+					void runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
+					unwatchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+				})
 			}
 
-			watchFile(project.resolvePath("./toolkit.config.js"), () => void watchFileFunc())
+			watchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
 		}
 	}
 }
