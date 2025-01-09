@@ -74,6 +74,7 @@
 		"eslint-plugin-react": "^7.27.1",
 		"eslint-plugin-react-hooks": "^4.3.0",
 		"html-webpack-plugin": "^5.5.0 <5.5.4",
+		"html-webpack-tags-plugin": "^3.0.2",
 		"jest": "^29.7.0",
 		"mini-css-extract-plugin": "^2.4.5",
 		"pnpapi": "^0.0.0",

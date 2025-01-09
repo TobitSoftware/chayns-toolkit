@@ -7,6 +7,7 @@ import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry"
 import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
 import HtmlWebpackPlugin from "html-webpack-plugin"
+import HtmlWebpackTagsPlugin from "html-webpack-tags-plugin"
 import semver from "semver"
 import type { PackageJson } from "type-fest"
 import { project } from "./project"
@@ -71,6 +72,7 @@ export async function createWebpackConfig({
 	mode,
 	analyze,
 	outputFilename,
+	injectDevtoolsScript,
 	path: outputPath,
 	packageJson,
 	prefixCss = false,
@@ -122,6 +124,15 @@ export async function createWebpackConfig({
 			)
 		}
 	})
+
+	if (injectDevtoolsScript && target !== "server") {
+		plugins.push(
+			new HtmlWebpackTagsPlugin({
+				scripts: ["http://localhost:8097"],
+				append: false,
+			})
+		)
+	}
 
 	if (!packageName) throw Error("The name field in package.json has to be provided.")
 

@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
 import { exec } from "child_process"
-import * as path from "path"
 import { createRsbuild } from "@rsbuild/core"
 import fs, { watchFile } from "fs"
 import { unwatchFile } from "node:fs"
@@ -15,10 +14,8 @@ import { loadEnvironment } from "../features/environment/loadEnvironment"
 import { checkForTypeScript } from "../features/typescript/checkForTypeScript"
 import { checkSSLConfig } from "../features/ssl-check/checkSSLConfig"
 
-let closingDevServer = false
-
 interface DevCommandArgs {
-	devtools: boolean
+	devtools?: boolean
 }
 
 export function devCommand({
@@ -75,7 +72,10 @@ export function devCommand({
 					process.exit(1)
 				}
 
-				exec(`node ${path.join(require.resolve("react-devtools"), "../bin.js")}`)
+				const originalEnvPort = process.env.PORT
+				process.env.PORT = undefined
+				exec(`npx react-devtools`)
+				process.env.PORT = originalEnvPort
 			}
 
 			webpackConfig.server ||= {}
@@ -120,6 +120,8 @@ export function devCommand({
 				console.log("Project is running at: ", url)
 			})
 
+			let closingDevServer = false
+
 			const watchFileFunc = async () => {
 				if (closingDevServer) return
 				closingDevServer = true
@@ -127,12 +129,12 @@ export function devCommand({
 				await server.close()
 				loadEnvironment(true)
 				closingDevServer = false
-				await runSteps([checkForTypeScript, checkSSLConfig], [devCommand({ devtools })])
+				await runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
 				console.log("Dev Server restarted")
-				unwatchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+				unwatchFile(project.resolvePath("./toolkit.config.js"), () => void watchFileFunc())
 			}
 
-			watchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+			watchFile(project.resolvePath("./toolkit.config.js"), () => void watchFileFunc())
 		}
 	}
 }
