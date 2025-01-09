@@ -7,7 +7,9 @@ export async function loadConfig(): Promise<ToolkitConfig> {
 
 	if (project.hasFile(JS_CONFIG_FILENAME)) {
 		config = (
-			(await import(`file://${project.resolvePath(JS_CONFIG_FILENAME)}`)) as {
+			(await import(
+				`file://${project.resolvePath(JS_CONFIG_FILENAME)}?update=${Date.now()}`
+			)) as {
 				default: Partial<ToolkitConfig>
 			}
 		).default
