@@ -3,12 +3,17 @@
 		"esModuleInterop": true,
 		"lib": ["ES2018"],
 		"module": "ESNext",
-		"noEmit": true,
+		"noEmit": false,
+		"outDir": "lib/types",
+		"declaration": true,
+		"emitDeclarationOnly": true,
 		"moduleResolution": "node",
 		"rootDir": "src",
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
 		"target": "ES2018"
-	}
+	},
+	"include": ["./src/index.ts"],
+	"exclude": ["node_modules", "**/*.spec.ts", "**/*.spec.tsx", "dist"]
 }

@@ -9,7 +9,12 @@ interface ModifyWebpackConfigOptions {
 	target: "server" | "client" | null
 }
 
-export function modifyWebpackConfig({ config, dev, modifier, target }: ModifyWebpackConfigOptions) {
+export function modifyWebpackConfig({
+	config,
+	dev,
+	modifier,
+	target,
+}: ModifyWebpackConfigOptions): RsbuildConfig {
 	if (!modifier || !usedConfigFilename) return config
 	const modifiedWebpackConfig = modifier(config, {
 		dev,

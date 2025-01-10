@@ -1,5 +1,5 @@
 import * as yup from "yup"
-import { EntryPoint } from "../../util/createWebpackConfig"
+import { EntryPoint, EntryPoints } from "../../util/createWebpackConfig"
 
 const developmentSchema = yup
 	.object({
@@ -47,7 +47,19 @@ const outputSchema = yup
 		entryPoints: yup
 			.object()
 			.required()
-			.default({} as EntryPoint),
+			.default({} as EntryPoints)
+			.test("entryPoints", "config is invalid", (val) =>
+				Object.keys(val).every((k) =>
+					yup.object({
+						pathHtml: yup.string().required(),
+						pathIndex: yup.string().required(),
+						templateParameters: yup
+							.object()
+							.notRequired()
+							.default({} as EntryPoint),
+					})
+				)
+			),
 	})
 	.required()
 	.noUnknown()

@@ -36,13 +36,13 @@ export type EntryPoint = {
 	pathHtml: string
 	pathIndex: string
 	templateParameters: {
-		title: string
+		[key: string]: string
 	}
 }
 
-type EntryPoints = {
+export type EntryPoints = {
 	[key: string]: EntryPoint
-} & { [key in keyof any]: EntryPoint }
+}
 
 interface CreateConfigOptions {
 	mode: Mode

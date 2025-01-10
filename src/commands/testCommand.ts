@@ -18,10 +18,10 @@ type BabelPresetOptions = {
 }
 
 type BabelTransformOptions = {
-	presets: Array<[string, BabelPresetOptions]>
+	presets: Array<string | BabelPresetOptions>
 }
 
-type JestConfig = Partial<{
+export type JestConfig = Partial<{
 	transform: {
 		[glob: string]: [string, BabelTransformOptions] | string
 	}
