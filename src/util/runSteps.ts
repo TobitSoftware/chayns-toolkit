@@ -1,7 +1,6 @@
 import type { PackageJson } from "type-fest"
 import { ToolkitConfig } from "../features/config-file/configSchema"
 import { loadConfig } from "../features/config-file/loadConfig"
-import { fm } from "./format"
 import { getPackageManager, PackageManager } from "./getPackageManager"
 import { loadPackageJson } from "./loadPackageJson"
 import { output } from "./output"
@@ -22,7 +21,7 @@ export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 		config = await loadConfig()
 	} catch (e) {
 		const error = e as Error
-		output.error(`An error occured while loading the ${fm.path`toolkit.config.js`} file:\n`)
+		output.error(`An error occured while loading the toolkit config:\n`)
 		output.blank(error.message)
 		output.exit(1)
 		return

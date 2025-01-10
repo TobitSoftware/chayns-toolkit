@@ -1,5 +1,5 @@
 import { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
-import { JS_CONFIG_FILENAME } from "../features/config-file/loadConfig"
+import { usedConfigFilename } from "../features/config-file/loadConfig"
 import { fm } from "./format"
 
 interface ModifyWebpackConfigOptions {
@@ -10,7 +10,7 @@ interface ModifyWebpackConfigOptions {
 }
 
 export function modifyWebpackConfig({ config, dev, modifier, target }: ModifyWebpackConfigOptions) {
-	if (!modifier) return config
+	if (!modifier || !usedConfigFilename) return config
 	const modifiedWebpackConfig = modifier(config, {
 		dev,
 		target,
@@ -19,14 +19,14 @@ export function modifyWebpackConfig({ config, dev, modifier, target }: ModifyWeb
 	if (modifiedWebpackConfig === undefined) {
 		throw Error(
 			`The webpack customization function in your ${fm.path(
-				JS_CONFIG_FILENAME
+				usedConfigFilename
 			)} returned nothing.`
 		)
 	}
 	if (typeof modifiedWebpackConfig !== "object") {
 		throw Error(
 			`The webpack customization function in your ${fm.path(
-				JS_CONFIG_FILENAME
+				usedConfigFilename
 			)} returned an invalid configuration.`
 		)
 	}

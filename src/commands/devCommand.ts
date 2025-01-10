@@ -13,6 +13,7 @@ import { project } from "../util/project"
 import { loadEnvironment } from "../features/environment/loadEnvironment"
 import { checkForTypeScript } from "../features/typescript/checkForTypeScript"
 import { checkSSLConfig } from "../features/ssl-check/checkSSLConfig"
+import { usedConfigFilename } from "../features/config-file/loadConfig"
 
 interface DevCommandArgs {
 	devtools?: boolean
@@ -122,6 +123,10 @@ export function devCommand({
 
 			let closingDevServer = false
 
+			const configFilename = usedConfigFilename
+
+			if (!configFilename) return
+
 			const watchFileFunc = () => {
 				if (closingDevServer) return
 				closingDevServer = true
@@ -130,11 +135,11 @@ export function devCommand({
 					loadEnvironment(true)
 					closingDevServer = false
 					void runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
-					unwatchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+					unwatchFile(project.resolvePath(configFilename), watchFileFunc)
 				})
 			}
 
-			watchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+			watchFile(project.resolvePath(configFilename), watchFileFunc)
 		}
 	}
 }

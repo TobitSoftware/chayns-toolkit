@@ -49,10 +49,7 @@ export async function checkForTypeScript({
 }
 
 async function createTsConfig(): Promise<void> {
-	await project.writeFile(
-		"tsconfig.json",
-		JSON.stringify(defaultTsconfig, undefined, 4)
-	)
+	await project.writeFile("tsconfig.json", JSON.stringify(defaultTsconfig, undefined, 4))
 
 	output.info(
 		`Seems like you want to use TypeScript. A ${fm.path`tsconfig.json`} file has been set up for you.`
@@ -72,5 +69,6 @@ const defaultTsconfig: TsConfigJson = {
 		noEmit: true,
 		skipLibCheck: true,
 		strict: true,
+		baseUrl: "src",
 	},
 }
