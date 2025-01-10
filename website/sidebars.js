@@ -18,12 +18,7 @@ module.exports = {
 			type: "category",
 			label: "Commands",
 			collapsed: false,
-			items: [
-				"commands/dev",
-				"commands/build",
-				"commands/lint",
-				"commands/test",
-			],
+			items: ["commands/dev", "commands/build", "commands/lint", "commands/test"],
 		},
 		{
 			type: "category",
@@ -33,6 +28,7 @@ module.exports = {
 				"configuration/development",
 				"configuration/output",
 				"configuration/webpack",
+				"configuration/typescript",
 			],
 		},
 		"contributing",
