@@ -4,23 +4,23 @@ module.exports = buildToolkitConfig({
     development: {
         cert: '//fs1/SSL/tobitag.crt',
         key: '//fs1/SSL/tobitag.key',
-        port: 8080,
+        port: process.env.PORT || 8080,
     },
     output: {
         // prefixCss: true,
         // exposeModules: {
         // 	"./AppWrapper": "./src/AppWrapper",
         // },
-        // apiVersion: 5,
         entryPoints: {
             index: {
-                pathHtml: './src/index2.html',
+                pathHtml: './src/index.html',
                 pathIndex: './src/index',
                 templateParameters: {
                     title: 'Test',
                 },
             },
         },
+        cssVersion: '5.0',
     },
     webpack(config) {
         return config;

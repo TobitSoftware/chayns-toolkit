@@ -1,14 +1,18 @@
-import React from "react"
-import { InferProps } from "prop-types"
-import App from "./App"
+import React, { ComponentProps } from 'react';
+import App from './App';
+import { ChaynsProvider, withCompatMode } from 'chayns-api';
+import { PageProvider } from '@chayns-components/core';
 
-const propTypes = {}
+type Props = ComponentProps<typeof ChaynsProvider> | {};
 
-const AppWrapper: React.FunctionComponent<InferProps<typeof propTypes>> = (
-	props
-) => {
-	return <App />
-}
+export const AppWrapper: React.FC<Props> = (props) => {
+    return (
+        <ChaynsProvider {...props}>
+            <PageProvider>
+                <App />
+            </PageProvider>
+        </ChaynsProvider>
+    );
+};
 
-// export default withCompatMode(AppWrapper);
-export default AppWrapper
+export default withCompatMode(AppWrapper);
