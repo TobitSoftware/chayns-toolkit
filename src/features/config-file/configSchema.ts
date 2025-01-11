@@ -4,11 +4,11 @@ import type { JestConfig } from "../../commands/testCommand"
 
 const developmentSchema = z.object({
 	host: z.string().max(255).default("adaptive"),
-	port: z.number().positive().max(65535).default(1234),
+	port: z.coerce.number().positive().max(65535).default(1234),
 	ports: z
 		.object({
-			client: z.number().positive().max(65535).default(1234),
-			server: z.number().positive().max(65535).default(1235),
+			client: z.coerce.number().positive().max(65535).default(1234),
+			server: z.coerce.number().positive().max(65535).default(1235),
 		})
 		.default({}),
 	cert: z.string().optional(),
