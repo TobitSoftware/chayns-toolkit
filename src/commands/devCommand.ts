@@ -13,6 +13,7 @@ import { project } from "../util/project"
 import { loadEnvironment, resetEnvironment } from "../features/environment/loadEnvironment"
 import { checkForTypeScript } from "../features/typescript/checkForTypeScript"
 import { checkSSLConfig } from "../features/ssl-check/checkSSLConfig"
+import { JS_CONFIG_FILENAME } from "../features/config-file/loadConfig"
 
 interface DevCommandArgs {
 	devtools?: boolean
@@ -115,10 +116,28 @@ export function devCommand({
 			const { server, urls } = await rsbuild.startDevServer()
 
 			urls.forEach((url) => {
-				console.log("Project is running at: ", url)
+				output.info(`Project is running at: ${url}`)
 			})
 
 			let closingDevServer = false
+
+			const buildEnv = process.env.BUILD_ENV || "development"
+			let watchFileList = [
+				JS_CONFIG_FILENAME,
+				".env",
+				".env.local",
+				`.env.${buildEnv}`,
+				`.env.${buildEnv}.local`,
+			]
+			Object.values(config.output.entryPoints ?? {}).forEach(({ pathHtml }) => {
+				if (!watchFileList.includes(pathHtml)) {
+					watchFileList.push(pathHtml)
+				}
+			})
+
+			watchFileList = watchFileList
+				.map((file) => project.resolvePath(file))
+				.filter((file) => project.hasFile(file))
 
 			const watchFileFunc = () => {
 				if (closingDevServer) return
@@ -129,11 +148,14 @@ export function devCommand({
 					loadEnvironment(true)
 					closingDevServer = false
 					void runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
-					unwatchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+					watchFileList.forEach((file) => unwatchFile(file, watchFileFunc))
 				})
 			}
 
-			watchFile(project.resolvePath("./toolkit.config.js"), watchFileFunc)
+			watchFileList.forEach((file) => {
+				output.info(`Watching for file changes of ${fm.path(file)}`)
+				watchFile(file, watchFileFunc)
+			})
 		}
 	}
 }
