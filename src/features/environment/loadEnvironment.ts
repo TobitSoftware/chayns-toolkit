@@ -2,6 +2,8 @@ import chalk from "chalk"
 import dotenv from "dotenv"
 import { output } from "../../util/output"
 
+const initialEnv = { ...process.env }
+
 export function loadEnvironment(development = false) {
 	if (development) {
 		process.env.BABEL_ENV = "development"
@@ -19,4 +21,14 @@ export function loadEnvironment(development = false) {
 	dotenv.config({ path: `.env.local` })
 	dotenv.config({ path: `.env.${buildEnv}` })
 	dotenv.config({ path: ".env" })
+}
+
+export function resetEnvironment() {
+	Object.keys(process.env).forEach((k) => {
+		if (!(k in initialEnv)) {
+			delete process.env[k]
+		} else if (initialEnv[k] !== process.env[k]) {
+			process.env[k] = initialEnv[k]
+		}
+	})
 }

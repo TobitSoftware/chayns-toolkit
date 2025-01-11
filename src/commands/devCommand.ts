@@ -10,7 +10,7 @@ import { output } from "../util/output"
 import { pkgCommands } from "../util/pkgCommands"
 import { runSteps, StepParams } from "../util/runSteps"
 import { project } from "../util/project"
-import { loadEnvironment } from "../features/environment/loadEnvironment"
+import { loadEnvironment, resetEnvironment } from "../features/environment/loadEnvironment"
 import { checkForTypeScript } from "../features/typescript/checkForTypeScript"
 import { checkSSLConfig } from "../features/ssl-check/checkSSLConfig"
 
@@ -125,6 +125,7 @@ export function devCommand({
 				closingDevServer = true
 				console.log("Restarting dev server")
 				void server.close().then(() => {
+					resetEnvironment()
 					loadEnvironment(true)
 					closingDevServer = false
 					void runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
