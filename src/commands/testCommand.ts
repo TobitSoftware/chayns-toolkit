@@ -18,10 +18,10 @@ type BabelPresetOptions = {
 }
 
 type BabelTransformOptions = {
-	presets: Array<[string, BabelPresetOptions]>
+	presets: Array<string | BabelPresetOptions>
 }
 
-type JestConfig = Partial<{
+export type JestConfig = Partial<{
 	transform: {
 		[glob: string]: [string, BabelTransformOptions] | string
 	}
@@ -38,7 +38,7 @@ export function testCommand({
 	watch,
 	setupFile,
 }: TestOptions): (stepParams: StepParams) => Promise<void> {
-	return async ({ config, packageJson }) => {
+	return async ({ config }) => {
 		let jestConfig: JestConfig = {
 			transform: {
 				"\\.[jt]sx?$": [

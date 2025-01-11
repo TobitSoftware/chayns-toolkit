@@ -1,84 +1,77 @@
-import * as yup from "yup"
-import { EntryPoint } from "../../util/createWebpackConfig"
+import { z } from "zod"
+import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
+import type { JestConfig } from "../../commands/testCommand"
 
-const developmentSchema = yup
-	.object({
-		host: yup.string().max(255).default("adaptive").required(),
-		port: yup.number().positive().max(65535).default(1234).required(),
-		ports: yup
-			.object({
-				client: yup.number(),
-				server: yup.number(),
-			})
-			.notRequired(),
-		cert: yup.string().notRequired(),
-		key: yup.string().notRequired(),
-	})
-	.required()
-	.noUnknown()
+const developmentSchema = z.object({
+	host: z.string().max(255).default("adaptive"),
+	port: z.number().positive().max(65535).default(1234),
+	ports: z
+		.object({
+			client: z.number().positive().max(65535).default(1234),
+			server: z.number().positive().max(65535).default(1235),
+		})
+		.default({}),
+	cert: z.string().optional(),
+	key: z.string().optional(),
+})
 
-const outputSchema = yup
+const outputSchema = z
 	.object({
-		singleBundle: yup.boolean().default(false).required(),
-		filename: yup
+		singleBundle: z.boolean().default(false),
+		filename: z
 			.object({
-				html: yup.string().notRequired(),
-				js: yup.string().notRequired(),
-				css: yup.string().notRequired(),
-				svg: yup.string().notRequired(),
-				font: yup.string().notRequired(),
-				image: yup.string().notRequired(),
-				media: yup.string().notRequired(),
+				html: z.string().optional(),
+				js: z.string().optional(),
+				css: z.string().optional(),
+				svg: z.string().optional(),
+				font: z.string().optional(),
+				image: z.string().optional(),
+				media: z.string().optional(),
 			})
-			.notRequired()
-			.default(undefined),
-		path: yup.string().notRequired().default("build"),
-		serverSideRendering: yup
-			.mixed()
-			.oneOf([true, false, "all", "build-only"])
-			.default(false)
-			.required(),
-		prefixCss: yup.boolean().notRequired(),
-		cssVersion: yup
+			.optional(),
+		path: z.string().default("build"),
+		serverSideRendering: z
+			.union([z.literal("all"), z.literal("build-only"), z.boolean()])
+			.default(false),
+		prefixCss: z.boolean().default(false),
+		cssVersion: z
 			.string()
-			.matches(/^\d+.\d+$/)
-			.notRequired(),
-		exposeModules: yup.object().notRequired(),
-		entryPoints: yup
-			.object()
-			.required()
-			.default({} as EntryPoint),
+			.regex(/^\d+\.\d+$/)
+			.default("4.2"),
+		exposeModules: z.record(z.string(), z.string()).optional(),
+		entryPoints: z
+			.record(
+				z.string(),
+				z.object({
+					pathIndex: z.string(),
+					pathHtml: z.string(),
+					templateParameters: z.record(z.string(), z.string()).optional(),
+				})
+			)
+			.default({}),
 	})
-	.required()
-	.noUnknown()
+	.refine(
+		(data) =>
+			Object.keys(data.entryPoints).length || Object.keys(data.exposeModules ?? {}).length,
+		"Need to define at least one key for either entryPoints or exposeModules"
+	)
 
-export const configSchema = yup
-	.object({
-		development: developmentSchema,
-		output: outputSchema,
-		webpack: yup
-			.mixed()
-			.notRequired()
-			.default(null)
-			.test(
-				"is-function-or-null",
-				// eslint-disable-next-line no-template-curly-in-string
-				"${path} is not a function or null",
-				(value) => typeof value === "function" || value === null
-			),
-		jest: yup
-			.mixed()
-			.notRequired()
-			.default(null)
-			.test(
-				"is-function-or-null",
-				// eslint-disable-next-line no-template-curly-in-string
-				"${path} is not a function or null",
-				(value) => typeof value === "function" || value === null
-			),
-		webpackDev: yup.mixed().notRequired().default(null),
-	})
-	.required()
-	.noUnknown()
+export const configSchema = z.object({
+	development: developmentSchema.default({}),
+	output: outputSchema.default({}),
+	webpack: z
+		.function()
+		.args(
+			z.custom<RsbuildConfig>(),
+			z.object({
+				dev: z.boolean(),
+				target: z.union([z.literal("server"), z.literal("client"), z.null()]),
+			})
+		)
+		.returns(z.custom<RsbuildConfig>())
+		.optional(),
+	jest: z.function().args(z.custom<JestConfig>()).returns(z.custom<JestConfig>()).optional(),
+})
 
-export type ToolkitConfig = yup.InferType<typeof configSchema>
+export type ToolkitConfig = z.input<typeof configSchema>
+export type ParsedToolkitConfig = z.output<typeof configSchema>

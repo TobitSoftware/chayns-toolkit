@@ -1,22 +1,23 @@
-import * as yup from "yup"
+import { ZodError } from "zod"
 import { project } from "../../util/project"
-import { configSchema, ToolkitConfig } from "./configSchema"
+import { configSchema, ParsedToolkitConfig, ToolkitConfig } from "./configSchema"
 
-export async function loadConfig(): Promise<ToolkitConfig> {
-	let config: Partial<ToolkitConfig> = {}
+export async function loadConfig(): Promise<ParsedToolkitConfig> {
+	let config: ToolkitConfig = {}
 
 	if (project.hasFile(JS_CONFIG_FILENAME)) {
+		delete require.cache[project.resolvePath(JS_CONFIG_FILENAME)]
 		config = (
 			(await import(
 				`file://${project.resolvePath(JS_CONFIG_FILENAME)}?update=${Date.now()}`
 			)) as {
-				default: Partial<ToolkitConfig>
+				default: ToolkitConfig
 			}
 		).default
 	}
 
 	try {
-		const validatedValue = await configSchema.validate(config)
+		const validatedValue = configSchema.parse(config)
 
 		const { host, cert, key } = validatedValue.development
 
@@ -28,18 +29,15 @@ export async function loadConfig(): Promise<ToolkitConfig> {
 
 		return validatedValue
 	} catch (error: unknown) {
-		console.error(error)
-		const validationError = error as yup.ValidationError
-
-		let errorMessage = ""
-
-		if (validationError.errors.length) {
-			validationError.errors.forEach((message) => {
-				errorMessage += `- ${message}\n`
-			})
+		if (error instanceof ZodError) {
+			const errorMessage = error.errors
+				.map(({ path, message }) => `- ${path.join(".")}: ${message}\n`)
+				.join("")
+			throw new Error(errorMessage)
 		}
 
-		throw Error(errorMessage)
+		console.error(error)
+		throw error
 	}
 }
 

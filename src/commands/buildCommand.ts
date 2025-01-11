@@ -1,5 +1,4 @@
 import { createRsbuild } from "@rsbuild/core"
-import { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
@@ -18,12 +17,12 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 
 		for (const target of targets) {
 			// eslint-disable-next-line no-await-in-loop
-			let webpackConfig = (await createWebpackConfig({
+			let webpackConfig = await createWebpackConfig({
 				mode: "production",
 				analyze,
 				outputFilename: config.output.filename,
 				singleBundle: config.output.singleBundle,
-				serverSideRendering: config.output.serverSideRendering,
+				serverSideRendering: config.output.serverSideRendering !== false,
 				path: target ? `${config.output.path}/${target}` : config.output.path,
 				packageJson,
 				prefixCss: config.output.prefixCss,
@@ -31,7 +30,7 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 				exposeModules: config.output.exposeModules,
 				entryPoints: config.output.entryPoints,
 				target,
-			})) as RsbuildConfig
+			})
 
 			if (typeof config.webpack === "function") {
 				const modifier = config.webpack as WebpackModifierFunction

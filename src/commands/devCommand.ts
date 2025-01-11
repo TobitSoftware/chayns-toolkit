@@ -35,9 +35,7 @@ export function devCommand({
 				mode: "development" as const,
 				outputFilename: config.output.filename,
 				singleBundle: config.output.singleBundle,
-				serverSideRendering:
-					config.output.serverSideRendering !== false &&
-					config.output.serverSideRendering !== "build-only",
+				serverSideRendering: config.output.serverSideRendering === "all",
 				packageJson,
 				injectDevtoolsScript: devtools,
 				prefixCss: config.output.prefixCss,

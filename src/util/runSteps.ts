@@ -1,5 +1,5 @@
 import type { PackageJson } from "type-fest"
-import { ToolkitConfig } from "../features/config-file/configSchema"
+import { ParsedToolkitConfig } from "../features/config-file/configSchema"
 import { loadConfig } from "../features/config-file/loadConfig"
 import { fm } from "./format"
 import { getPackageManager, PackageManager } from "./getPackageManager"
@@ -7,7 +7,7 @@ import { loadPackageJson } from "./loadPackageJson"
 import { output } from "./output"
 
 export interface StepParams {
-	config: ToolkitConfig
+	config: ParsedToolkitConfig
 	packageJson: PackageJson
 	packageManager: PackageManager | undefined
 }
@@ -16,7 +16,7 @@ type PromiseOrNot<T> = T | Promise<T>
 type Step = (params: StepParams) => PromiseOrNot<boolean> | PromiseOrNot<void>
 
 export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
-	let config: ToolkitConfig
+	let config: ParsedToolkitConfig
 
 	try {
 		config = await loadConfig()

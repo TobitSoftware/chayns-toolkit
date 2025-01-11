@@ -1,4 +1,6 @@
-module.exports = {
+const { buildToolkitConfig } = require('chayns-toolkit');
+
+module.exports = buildToolkitConfig({
     development: {
         cert: '//fs1/SSL/tobitag.crt',
         key: '//fs1/SSL/tobitag.key',
@@ -23,4 +25,4 @@ module.exports = {
     webpack(config) {
         return config;
     },
-};
+});

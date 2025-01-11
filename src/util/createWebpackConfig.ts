@@ -35,14 +35,14 @@ type Mode = "development" | "production" | "none"
 export type EntryPoint = {
 	pathHtml: string
 	pathIndex: string
-	templateParameters: {
-		title: string
+	templateParameters?: {
+		[key: string]: string
 	}
 }
 
 type EntryPoints = {
 	[key: string]: EntryPoint
-} & { [key in keyof any]: EntryPoint }
+}
 
 interface CreateConfigOptions {
 	mode: Mode
@@ -108,7 +108,7 @@ export async function createWebpackConfig({
 
 	const entries: RsbuildEntry = {}
 
-	Object.entries(entryPoints).forEach(([k, { pathHtml, pathIndex, templateParameters = {} }]) => {
+	Object.entries(entryPoints).forEach(([k, { pathHtml, pathIndex, templateParameters }]) => {
 		entries[k] = pathIndex
 		if (pathHtml) {
 			plugins.push(
@@ -262,7 +262,7 @@ export async function createWebpackConfig({
 				mode === "production"
 					? ["cover 90%", "not dead", "not op_mini all", "Firefox ESR", "not android < 5"]
 					: undefined,
-			filename: outputFilename || getDefaultFilename(),
+			filename: { ...getDefaultFilename(), ...outputFilename },
 			distPath: {
 				root: outputPath || "build",
 			},

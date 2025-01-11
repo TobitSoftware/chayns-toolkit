@@ -23,6 +23,8 @@
 		"name": "Leonhard Driesch",
 		"email": "leonhard.driesch@tobit.com"
 	},
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
 	"bin": {
 		"chayns-toolkit": "./cli.js"
 	},
@@ -40,7 +42,7 @@
 		"format": "prettier . --write",
 		"lint": "eslint src/ --ext js,jsx,ts,tsx",
 		"prepare": "husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks",
-		"prepublishOnly": "npm run build",
+		"prepublishOnly": "npm run build && tsc --project tsconfig.build.json",
 		"test": "jest"
 	},
 	"dependencies": {
@@ -94,8 +96,10 @@
 	},
 	"devDependencies": {
 		"@types/eslint": "^8.2.0",
+		"@types/mock-fs": "^4.13.4",
 		"@types/node": "^16.11.10",
 		"@types/semver": "^7.3.9",
+		"@types/serve-handler": "^6.1.4",
 		"chalk": "^4.1.2",
 		"commander": "^8.3.0",
 		"esbuild": "^0.24.0",
@@ -110,7 +114,7 @@
 		"shx": "^0.3.3",
 		"type-fest": "^2.6.0",
 		"typescript": "^4.5.2",
-		"yup": "0.32.11"
+		"zod": "^3.24.1"
 	},
 	"engines": {
 		"node": ">=20.10.0"
