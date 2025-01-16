@@ -4,8 +4,7 @@ slug: development
 sidebar_label: Development
 ---
 
-These options configure your development server started with
-`chayns-toolkit dev`.
+These options configure your development server started with `chayns-toolkit dev`.
 
 All options aswell as the `toolkit.config.js` file itself are optional.
 
@@ -45,4 +44,18 @@ module.exports = {
     },
     // ... other options ...
 }
+```
+
+Optionally you can also use wrap the config with `buildToolkitConfig`. This can provide better
+auto-completion when editing the config. The format of the config is the same.
+
+```js
+const { buildToolkitConfig } = require("chayns-toolkit")
+
+module.exports = buildToolkitConfig({
+    development: {
+        // ...
+    },
+    // ...
+})
 ```
