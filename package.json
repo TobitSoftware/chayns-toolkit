@@ -80,7 +80,6 @@
 		"html-webpack-tags-plugin": "^3.0.2",
 		"jest": "^29.7.0",
 		"mini-css-extract-plugin": "^2.4.5",
-		"pnpapi": "^0.0.0",
 		"postcss": "^8.4.4",
 		"postcss-flexbugs-fixes": "^5.0.2",
 		"postcss-loader": "^6.2.1",
@@ -115,7 +114,7 @@
 		"semver": "^7.3.5",
 		"shx": "^0.3.3",
 		"type-fest": "^2.6.0",
-		"typescript": "^4.5.2"
+		"typescript": "^5.7.3"
 	},
 	"engines": {
 		"node": ">=20.10.0"
