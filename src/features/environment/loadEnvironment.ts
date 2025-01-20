@@ -1,5 +1,5 @@
+import { loadEnv } from "@rsbuild/core"
 import chalk from "chalk"
-import dotenv from "dotenv"
 import { output } from "../../util/output"
 
 const initialEnv = { ...process.env }
@@ -17,10 +17,9 @@ export function loadEnvironment(development = false) {
 	const buildEnv = process.env.BUILD_ENV
 	output.info(`Loading environment ${chalk.yellow(buildEnv)}`)
 
-	dotenv.config({ path: `.env.${buildEnv}.local` })
-	dotenv.config({ path: `.env.local` })
-	dotenv.config({ path: `.env.${buildEnv}` })
-	dotenv.config({ path: ".env" })
+	loadEnv({
+		mode: buildEnv,
+	})
 }
 
 export function resetEnvironment() {
