@@ -77,7 +77,7 @@ module.exports = {
 ### Adding react-compiler
 
 Add the required devDependencies:
-`npm i react-compiler @rsbuild/plugin-babel babel-plugin-react-compiler -D`
+`npm i @rsbuild/plugin-babel babel-plugin-react-compiler eslint-plugin-react-compiler -D`
 
 When using react version prior to 19 also add: `npm i react-compiler-runtime -D`
 
@@ -93,7 +93,7 @@ module.exports = {
                     opts.plugins?.unshift([
                         "babel-plugin-react-compiler",
                         {
-                            // specify target react version
+                            // specify target react version, can be omitted for versions prior to 19
                             target: "18", // '17' || '18' || '19'
                         },
                     ])
