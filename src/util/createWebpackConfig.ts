@@ -137,6 +137,11 @@ export async function createWebpackConfig({
 	if (!packageName) throw Error("The name field in package.json has to be provided.")
 
 	if (exposeModules) {
+		if (Object.keys(entries).length === 0) {
+			// override default index-entry when using exposeModules without
+			// entrypoints, to avoid the need of a useless/empty index.js
+			entries.index = undefined!
+		}
 		const shared: ConstructorParameters<typeof ModuleFederationPlugin>[0]["shared"] = {
 			react: {
 				requiredVersion:
