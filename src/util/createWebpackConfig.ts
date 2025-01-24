@@ -33,7 +33,7 @@ const getDefaultFilename = () =>
 type Mode = "development" | "production" | "none"
 
 export type EntryPoint = {
-	pathHtml: string
+	pathHtml?: string
 	pathIndex: string
 	templateParameters?: {
 		[key: string]: string

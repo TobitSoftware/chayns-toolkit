@@ -44,7 +44,7 @@ const outputSchema = z
 				z.string(),
 				z.object({
 					pathIndex: z.string(),
-					pathHtml: z.string(),
+					pathHtml: z.string().optional(),
 					templateParameters: z.record(z.string(), z.string()).optional(),
 				})
 			)

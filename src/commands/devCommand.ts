@@ -130,7 +130,7 @@ export function devCommand({
 				`.env.${buildEnv}.local`,
 			]
 			Object.values(config.output.entryPoints ?? {}).forEach(({ pathHtml }) => {
-				if (!watchFileList.includes(pathHtml)) {
+				if (pathHtml && !watchFileList.includes(pathHtml)) {
 					watchFileList.push(pathHtml)
 				}
 			})
