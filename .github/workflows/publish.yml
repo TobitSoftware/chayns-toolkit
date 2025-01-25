@@ -7,7 +7,7 @@ on:
             - "v*"
 
 env:
-    TAG: >
+    TAG: >-
         ${{ contains(github.ref_name, 'alpha') && 'alpha' || (contains(github.ref_name, '-') &&
         'beta' || 'latest') }}
 
