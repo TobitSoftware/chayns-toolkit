@@ -7,7 +7,7 @@ module.exports = buildToolkitConfig({
         port: process.env.PORT || 8080,
     },
     output: {
-        // prefixCss: true,
+        prefixCss: true,
         // exposeModules: {
         // 	"./AppWrapper": "./src/AppWrapper",
         // },

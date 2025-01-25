@@ -240,6 +240,7 @@ export async function createWebpackConfig({
 							options.plugins.push(
 								require("postcss-prefix-selector")({
 									prefix: `.${packageName}`,
+									ignoreFiles: [/\.module\.s?css$/i],
 								})
 							)
 						}
