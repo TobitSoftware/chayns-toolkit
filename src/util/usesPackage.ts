@@ -28,7 +28,7 @@ export async function usesPackage(
 	if (Array.isArray(query)) {
 		return packageList.filter((packageName) =>
 			query.some((matcher) => {
-				if (isRegExp(matcher)) {
+				if (matcher instanceof RegExp) {
 					return matcher.test(packageName)
 				}
 				return matcher === packageName
@@ -36,12 +36,8 @@ export async function usesPackage(
 		)
 	}
 
-	if (isRegExp(query)) {
+	if (query instanceof RegExp) {
 		return packageList.some((e) => query.test(e))
 	}
 	return packageList.includes(query)
-}
-
-function isRegExp(value: unknown): value is RegExp {
-	return Object.prototype.toString.call(value) === "[object RegExp]"
 }
