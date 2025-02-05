@@ -226,6 +226,13 @@ export async function createWebpackConfig({
 					uniqueName: packageName,
 				},
 				plugins,
+				module: {
+					parser: {
+						javascript: {
+							exportsPresence: "warn",
+						},
+					},
+				},
 			},
 			htmlPlugin: false,
 			postcss: prefixCss
