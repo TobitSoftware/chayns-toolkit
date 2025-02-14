@@ -23,6 +23,7 @@ export function serveCommand(): (stepParams: StepParams) => Promise<void> {
 			const start = Date.now()
 			await handler(request, response, {
 				public: config.output.path ?? "build",
+				cleanUrls: ["/", "!/*"],
 			})
 			console.log(request.method, request.url)
 			console.log(
@@ -30,7 +31,7 @@ export function serveCommand(): (stepParams: StepParams) => Promise<void> {
 				(response.statusCode === 200 ? chalk.green : chalk.red)(response.statusCode),
 				"in",
 				Date.now() - start,
-				"ms"
+				"ms",
 			)
 		}
 
@@ -40,8 +41,8 @@ export function serveCommand(): (stepParams: StepParams) => Promise<void> {
 						key,
 						cert,
 					},
-					requestHandler
-			  )
+					requestHandler,
+				)
 			: http.createServer(requestHandler)
 
 		server.listen(port, () => {
