@@ -1,11 +1,11 @@
-const { dependencies, version } = require("../package.json")
+const { dependencies, peerDependencies, version } = require("../package.json")
 
 const esbuildConfig = {
 	entryPoints: ["src/cli.ts"],
 	bundle: true,
 	platform: "node",
 	target: ["node20"],
-	external: [...Object.keys(dependencies), "react-devtools", "typescript"],
+	external: [...Object.keys(dependencies), ...Object.keys(peerDependencies), "react-devtools"],
 	outfile: "lib/cli.js",
 	define: {
 		__PKG_VERSION__: JSON.stringify(version),
