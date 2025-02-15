@@ -13,7 +13,7 @@ import { project } from "../util/project"
 import { loadEnvironment, resetEnvironment } from "../features/environment/loadEnvironment"
 import { checkForTypeScript } from "../features/typescript/checkForTypeScript"
 import { checkSSLConfig } from "../features/ssl-check/checkSSLConfig"
-import { JS_CONFIG_FILENAME } from "../features/config-file/loadConfig"
+import { usedConfigFilename } from "../features/config-file/loadConfig"
 
 interface DevCommandArgs {
 	devtools?: boolean
@@ -53,20 +53,20 @@ export function devCommand({
 						`Install it under ${fm.code`devDependencies`} by running ${pkgCommands.move(
 							packageManager,
 							"react-devtools",
-							"dev"
-						)}.\n`
+							"dev",
+						)}.\n`,
 					)
 					process.exit(1)
 				} else if (!("react-devtools" in (packageJson.devDependencies || {}))) {
 					output.error(
-						`You need to install the ${fm.code`react-devtools`} package to use the ${fm.command`--devtools`} option.`
+						`You need to install the ${fm.code`react-devtools`} package to use the ${fm.command`--devtools`} option.`,
 					)
 					output.blank(
 						`Run ${pkgCommands.move(
 							packageManager,
 							"react-devtools",
-							"dev"
-						)} to add it as a ${fm.code`devDependency`}.\n`
+							"dev",
+						)} to add it as a ${fm.code`devDependency`}.\n`,
 					)
 					process.exit(1)
 				}
@@ -122,13 +122,10 @@ export function devCommand({
 			let closingDevServer = false
 
 			const buildEnv = process.env.BUILD_ENV || "development"
-			let watchFileList = [
-				JS_CONFIG_FILENAME,
-				".env",
-				".env.local",
-				`.env.${buildEnv}`,
-				`.env.${buildEnv}.local`,
-			]
+			let watchFileList = [".env", ".env.local", `.env.${buildEnv}`, `.env.${buildEnv}.local`]
+			if (usedConfigFilename) {
+				watchFileList.unshift(usedConfigFilename)
+			}
 			Object.values(config.output.entryPoints ?? {}).forEach(({ pathHtml }) => {
 				if (pathHtml && !watchFileList.includes(pathHtml)) {
 					watchFileList.push(pathHtml)
