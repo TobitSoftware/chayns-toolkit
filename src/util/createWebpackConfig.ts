@@ -8,7 +8,6 @@ import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import HtmlWebpackTagsPlugin from "html-webpack-tags-plugin"
-import semver from "semver"
 import type { PackageJson } from "type-fest"
 import { project } from "./project"
 import { getCssTag } from "./loadChaynsCss"
@@ -27,7 +26,7 @@ const getDefaultFilename = () =>
 				font: "[name].[contenthash:8].im[ext]",
 				image: "[name].[contenthash:8].im[ext]",
 				media: "[name].[contenthash:8].im[ext]",
-		  }
+			}
 		: {}
 
 type Mode = "development" | "production" | "none"
@@ -120,7 +119,7 @@ export async function createWebpackConfig({
 						CHAYNS_TOOLKIT_CSS_TAG: getCssTag(cssVersion),
 						...templateParameters,
 					},
-				})
+				}),
 			)
 		}
 	})
@@ -130,7 +129,7 @@ export async function createWebpackConfig({
 			new HtmlWebpackTagsPlugin({
 				scripts: ["http://localhost:8097"],
 				append: false,
-			})
+			}),
 		)
 	}
 
@@ -154,16 +153,11 @@ export async function createWebpackConfig({
 			},
 		}
 
-		if (
-			semver.gte(
-				semver.minVersion(
-					packageJson.dependencies?.["react-dom"] ??
-						packageJson.devDependencies?.["react-dom"]!
-				)!,
-				"18.0.0"
-			)
-		) {
+		try {
+			require.resolve("react-dom/client", { paths: [project.resolvePath("node_modules")] })
 			shared["react-dom/client"] = shared["react-dom"]
+		} catch (ex) {
+			//
 		}
 
 		const moduleFederationConfig = {
@@ -189,7 +183,7 @@ export async function createWebpackConfig({
 							analyzerMode: "server",
 							openAnalyzer: true,
 						},
-				  }
+					}
 				: undefined,
 		// @ts-expect-error missing in types
 		context: {
@@ -207,13 +201,13 @@ export async function createWebpackConfig({
 				"process.env.BUILD_ENV": JSON.stringify(buildEnv),
 				"import.meta.env.BUILD_ENV": JSON.stringify(buildEnv),
 				"process.env.__PACKAGE_NAME__": JSON.stringify(
-					packageJson.name?.replace(/-/g, "_")
+					packageJson.name?.replace(/-/g, "_"),
 				),
 				"import.meta.env.__PACKAGE_NAME__": JSON.stringify(
-					packageJson.name?.replace(/-/g, "_")
+					packageJson.name?.replace(/-/g, "_"),
 				),
 				__REQUIRED_REACT_VERSION__: JSON.stringify(
-					packageJson.peerDependencies?.react || packageJson?.dependencies?.react
+					packageJson.peerDependencies?.react || packageJson?.dependencies?.react,
 				),
 				...publicVars,
 			},
@@ -248,7 +242,7 @@ export async function createWebpackConfig({
 								require("postcss-prefix-selector")({
 									prefix: `.${packageName}`,
 									ignoreFiles: [/\.module\.s?css$/i],
-								})
+								}),
 							)
 						}
 						if (typeof opts.postcssOptions === "function") {
@@ -261,7 +255,7 @@ export async function createWebpackConfig({
 							return
 						}
 						modifyOptions(opts.postcssOptions)
-				  }
+					}
 				: undefined,
 		},
 		output: {
