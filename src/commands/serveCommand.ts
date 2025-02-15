@@ -23,7 +23,10 @@ export function serveCommand(): (stepParams: StepParams) => Promise<void> {
 			const start = Date.now()
 			await handler(request, response, {
 				public: config.output.path ?? "build",
-				cleanUrls: ["/", "!/*"],
+				// prevents redirect for all html-files to avoid the removal of query-parameters,
+				// but keeps default-handling to serve index.html content when path is empty
+				// or matches a directory
+				cleanUrls: ["!**/*.html"],
 			})
 			console.log(request.method, request.url)
 			console.log(
