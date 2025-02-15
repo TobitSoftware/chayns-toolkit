@@ -2,7 +2,7 @@
 module.exports = {
 	title: "chayns-toolkit",
 	tagline: "A zero-config toolchain for developing chayns® apps.",
-	url: "https://tobitsoftware.github.io/chayns-toolkit",
+	url: "https://tobitsoftware.github.io",
 	baseUrl: "/chayns-toolkit/",
 	onBrokenLinks: "warn",
 	onBrokenMarkdownLinks: "warn",
@@ -12,10 +12,6 @@ module.exports = {
 	themeConfig: {
 		colorMode: {
 			respectPrefersColorScheme: true,
-			switchConfig: {
-				darkIcon: "🌑",
-				lightIcon: "💡",
-			},
 		},
 		navbar: {
 			logo: {
@@ -40,11 +36,12 @@ module.exports = {
 			copyright: `Copyright © ${new Date().getFullYear()} Tobit Software Laboratories AG. Built with Docusaurus.`,
 		},
 		prism: {
-			theme: require("prism-react-renderer/themes/github"),
-			darkTheme: require("prism-react-renderer/themes/oceanicNext"),
+			theme: require("prism-react-renderer").themes.github,
+			darkTheme: require("prism-react-renderer").themes.oceanicNext,
 		},
 		algolia: {
 			apiKey: "d32ad728937f5e05637e7bcb70ae6171",
+			appId: "BH4D9OD16A",
 			indexName: "tobitsoftware",
 		},
 	},
@@ -55,8 +52,7 @@ module.exports = {
 				docs: {
 					sidebarPath: require.resolve("./sidebars.js"),
 					// Please change this to your repo.
-					editUrl:
-						"https://github.com/TobitSoftware/chayns-toolkit/edit/main/docs/",
+					editUrl: "https://github.com/TobitSoftware/chayns-toolkit/edit/main/docs/",
 				},
 				theme: {
 					customCss: require.resolve("./src/css/custom.css"),
