@@ -22,21 +22,22 @@
         "extends": "chayns-toolkit/eslint"
     },
     "dependencies": {
-        "@chayns-components/core": "^5.0.0-beta.955",
+        "@chayns-components/core": "^5.0.0-beta.1027",
         "@types/lodash-es": "^4.17.12",
-        "chayns-api": "^2.1.8",
+        "chayns-api": "^2.1.14",
         "lodash-es": "^4.17.21",
         "react": "^18.3.1",
         "react-dom": "^18.3.1"
     },
     "devDependencies": {
-        "@babel/plugin-proposal-pipeline-operator": "^7.25.9",
-        "@testing-library/react": "^16.1.0",
-        "@testing-library/user-event": "^14.5.2",
+        "@babel/plugin-proposal-pipeline-operator": "^7.26.7",
+        "@rsbuild/plugin-babel": "^1.0.3",
+        "@testing-library/react": "^16.2.0",
+        "@testing-library/user-event": "^14.6.1",
         "@types/react": "^18.3.18",
         "@types/react-dom": "^18.3.5",
         "chayns-toolkit": "file:..",
-        "react-devtools": "^6.0.1",
+        "react-devtools": "^6.1.1",
         "typescript": "^5.7.3"
     }
 }

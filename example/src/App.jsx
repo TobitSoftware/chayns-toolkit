@@ -7,11 +7,12 @@ import HmrTest from 'components/hmr-test/HmrTest';
 import SvgTest from 'components/svg-test/SvgTest';
 import TsTest from 'components/ts-test/TsTest';
 import UrlLoaderTest from 'components/url-loader-test/UrlLoaderTest';
+import PipelineOperatorTest from 'components/pipeline-operator-test/PipelineOperatorTest';
 import React, { Suspense } from 'react';
 import './App.css';
 
-const LazyComponent = React.lazy(() =>
-    import('./components/code-splitting-test/CodeSplittingTest')
+const LazyComponent = React.lazy(
+    () => import('./components/code-splitting-test/CodeSplittingTest'),
 );
 
 export default function App() {
@@ -30,7 +31,7 @@ export default function App() {
             <Suspense fallback={<div />}>
                 <LazyComponent />
             </Suspense>
-            {/*<PipelineOperatorTest />*/}
+            <PipelineOperatorTest />
         </>
     );
 }
