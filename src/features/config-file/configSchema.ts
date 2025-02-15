@@ -46,19 +46,26 @@ const outputSchema = z
 					pathIndex: z.string(),
 					pathHtml: z.string().optional(),
 					templateParameters: z.record(z.string(), z.string()).optional(),
-				})
+				}),
 			)
 			.default({}),
 	})
 	.refine(
 		(data) =>
 			Object.keys(data.entryPoints).length || Object.keys(data.exposeModules ?? {}).length,
-		"Need to define at least one key for either entryPoints or exposeModules"
+		"Need to define at least one key for either output.entryPoints or output.exposeModules",
 	)
 
 export const configSchema = z.object({
 	development: developmentSchema.default({}),
-	output: outputSchema.default({}),
+	output: outputSchema.default({
+		entryPoints: {
+			index: {
+				pathIndex: "./src/index",
+				pathHtml: "./src/index.html",
+			},
+		},
+	}),
 	webpack: z
 		.function()
 		.args(
@@ -66,7 +73,7 @@ export const configSchema = z.object({
 			z.object({
 				dev: z.boolean(),
 				target: z.union([z.literal("server"), z.literal("client"), z.null()]),
-			})
+			}),
 		)
 		.returns(z.custom<RsbuildConfig>())
 		.optional(),
