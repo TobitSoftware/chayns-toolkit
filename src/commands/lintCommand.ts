@@ -14,28 +14,20 @@ export async function lintCommand(): Promise<void> {
 
 		await ESLint.outputFixes(results)
 
-		const warningCount = results.reduce(
-			(count, file) => count + file.warningCount,
-			0
-		)
-		const errorCount = results.reduce(
-			(count, file) => count + file.errorCount,
-			0
-		)
+		const warningCount = results.reduce((count, file) => count + file.warningCount, 0)
+		const errorCount = results.reduce((count, file) => count + file.errorCount, 0)
 
 		let formattedResults = ""
 
 		if (warningCount || errorCount) {
 			const formatter = await eslint.loadFormatter("pretty")
-			formattedResults = formatter.format(results)
+			formattedResults = await formatter.format(results)
 		}
 
 		if (errorCount + warningCount === 0) {
 			output.info(`No linting errors were found.\n`)
 		} else {
-			output.warn(
-				`${errorCount} errors and ${warningCount} were found:\n`
-			)
+			output.warn(`${errorCount} errors and ${warningCount} were found:\n`)
 			console.log(formattedResults)
 		}
 	} catch (e: unknown) {
