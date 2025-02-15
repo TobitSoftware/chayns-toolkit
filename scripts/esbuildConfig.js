@@ -5,7 +5,7 @@ const esbuildConfig = {
 	bundle: true,
 	platform: "node",
 	target: ["node20"],
-	external: [...Object.keys(dependencies), "react-devtools"],
+	external: [...Object.keys(dependencies), "react-devtools", "typescript"],
 	outfile: "lib/cli.js",
 	define: {
 		__PKG_VERSION__: JSON.stringify(version),

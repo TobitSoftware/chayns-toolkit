@@ -1,5 +1,4 @@
 import { ZodError } from "zod"
-import ts from "typescript"
 import { readFileSync } from "node:fs"
 import Module from "node:module"
 import { project } from "../../util/project"
@@ -32,6 +31,7 @@ export async function loadConfig(): Promise<ParsedToolkitConfig> {
 	if (usedConfigFilename) {
 		output.info(`loading ${fm.path(usedConfigFilename)}...`)
 		if (usedConfigFilename === TS_CONFIG_FILENAME) {
+			const { default: ts } = await import("typescript")
 			const transpiled = ts.transpile(readFileSync(TS_CONFIG_FILENAME, "utf-8"), {
 				esModuleInterop: true,
 			})
