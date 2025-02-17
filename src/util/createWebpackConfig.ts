@@ -217,7 +217,9 @@ export async function createWebpackConfig({
 		tools: {
 			rspack: {
 				output: {
-					uniqueName: packageName,
+					uniqueName: exposeModules
+						? `${packageName}__${buildEnv}__${process.env.BUILD_VERSION || 1}`
+						: packageName,
 				},
 				plugins,
 				module: {
