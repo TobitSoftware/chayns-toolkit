@@ -88,9 +88,12 @@ export function devCommand({
 				}
 			}
 			webpackConfig.server.headers = {
-				"Access-Control-Allow-Origin": "*",
-				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-				"Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization",
+				"Access-Control-Allow-Headers": "Authorization, Content-Type, X-Requested-With",
+				"Access-Control-Allow-Private-Network": "true",
+			}
+			webpackConfig.server.cors = {
+				credentials: true,
+				origin: true,
 			}
 
 			if (cert && key) {
