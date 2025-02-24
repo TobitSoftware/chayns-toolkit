@@ -5,7 +5,9 @@ import handler from "serve-handler"
 import fs from "fs"
 import { StepParams } from "../util/runSteps"
 
-export function serveCommand(): (stepParams: StepParams) => Promise<void> {
+export function serveCommand(options: {
+	port?: number
+}): (stepParams: StepParams) => Promise<void> {
 	return async ({ config }) => {
 		const { host, port, cert: certPath, key: keyPath } = config.development
 
@@ -66,8 +68,8 @@ export function serveCommand(): (stepParams: StepParams) => Promise<void> {
 				)
 			: http.createServer(requestHandler)
 
-		server.listen(port, () => {
-			const url = `http${shouldUseHttps ? "s" : ""}://${host}:${port}`
+		server.listen(options.port ?? port, () => {
+			const url = `http${shouldUseHttps ? "s" : ""}://${host}:${options.port ?? port}`
 			console.log(`Running at ${url}`)
 		})
 

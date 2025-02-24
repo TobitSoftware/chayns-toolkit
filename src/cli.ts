@@ -21,7 +21,7 @@ program
 		loadEnvironment(true)
 		await runSteps(
 			[checkForTypeScript, checkSSLConfig],
-			[devCommand({ devtools: options.devtools })]
+			[devCommand({ devtools: options.devtools })],
 		)
 	})
 
@@ -52,9 +52,10 @@ program
 program
 	.command("serve")
 	.description("serves the files from a local build folder")
-	.action(async () => {
+	.option("-p, --port <number>", "port number")
+	.action(async ({ port }: { port?: number }) => {
 		try {
-			await runSteps([serveCommand()])
+			await runSteps([serveCommand({ port })])
 		} catch (e) {
 			output.error(e)
 		}
@@ -67,7 +68,7 @@ program
 	.option(
 		"--setupFile <path>",
 		"file that should be executed before the tests are initialized",
-		""
+		"",
 	)
 	.action(async (options: { watch: boolean; setupFile: string }) => {
 		try {
