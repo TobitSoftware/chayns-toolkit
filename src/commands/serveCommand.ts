@@ -19,7 +19,25 @@ export function serveCommand(): (stepParams: StepParams) => Promise<void> {
 		}
 		const shouldUseHttps = Boolean(cert && key)
 
+		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		const requestHandler: http.RequestListener = async (request, response) => {
+			if (request.headers.origin) {
+				response.setHeader("Access-Control-Allow-Origin", request.headers.origin)
+				response.setHeader(
+					"Access-Control-Allow-Methods",
+					"GET, POST, PUT, DELETE, PATCH, OPTIONS",
+				)
+				response.setHeader(
+					"Access-Control-Allow-Headers",
+					"Authorization, Content-Type, X-Requested-With",
+				)
+				if (request.headers["Access-Control-Request-Private-Network"]) {
+					response.setHeader("Access-Control-Allow-Private-Network", "true")
+					response.setHeader("Access-Control-Allow-Credentials", "true")
+				}
+			}
+			response.setHeader("Vary", "Origin")
+
 			const start = Date.now()
 			await handler(request, response, {
 				public: config.output.path ?? "build",
