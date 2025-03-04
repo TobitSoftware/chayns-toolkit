@@ -216,6 +216,11 @@ export async function createWebpackConfig({
 		plugins: rsBuildPlugins,
 		tools: {
 			rspack: {
+				resolve: {
+					fallback: {
+						"react-dom/client": false,
+					},
+				},
 				output: {
 					uniqueName: exposeModules
 						? `${packageName}__${buildEnv}__${process.env.BUILD_VERSION || 1}`
