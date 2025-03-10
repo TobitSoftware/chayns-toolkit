@@ -54,7 +54,12 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 			if (stats?.hasErrors()) {
 				output.error("Compilation failed.\n")
 
-				stats.compilation.errors.forEach((error: Error) => {
+				const errors =
+					"stats" in stats
+						? stats.stats.flatMap((s) => s.compilation.errors)
+						: stats.compilation.errors
+
+				errors.forEach((error: Error) => {
 					console.error(error)
 				})
 				output.exit(1)
