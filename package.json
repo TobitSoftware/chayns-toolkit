@@ -59,7 +59,6 @@
 		"@rsbuild/plugin-react": "^1.1.0",
 		"@rsbuild/plugin-sass": "^1.2.1",
 		"@rsbuild/plugin-svgr": "^1.0.6",
-		"@rspack/core": "^1.2.3",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
 		"@typescript-eslint/parser": "^5.62.0",
@@ -85,6 +84,7 @@
 		"zod": "^3.24.2"
 	},
 	"devDependencies": {
+		"@rspack/core": "^1.2.7",
 		"@types/eslint": "^8.56.12",
 		"@types/jest": "^29.5.14",
 		"@types/mock-fs": "^4.13.4",
