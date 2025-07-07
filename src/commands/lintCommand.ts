@@ -1,13 +1,27 @@
 import { ESLint } from "eslint"
 import { output } from "../util/output"
+import { existsSync, writeFileSync } from "node:fs"
 
 export async function lintCommand(): Promise<void> {
 	output.info(`Linting your code...`)
 
 	try {
+		if (
+			!existsSync("./eslint.config.js") &&
+			!existsSync("./eslint.config.cjs") &&
+			!existsSync("./eslint.config.mjs") &&
+			!existsSync("./eslint.config.ts") &&
+			!existsSync("./eslint.config.cts") &&
+			!existsSync("./eslint.config.mts")
+		) {
+			writeFileSync(
+				"./eslint.config.mjs",
+				`import config from '@chayns-toolkit/eslint-config';\n\nexport default config;\n`,
+			)
+		}
+
 		const eslint = new ESLint({
 			fix: true,
-			extensions: ["js", "jsx", "ts", "tsx"],
 		})
 
 		const results = await eslint.lintFiles(["./src"])
