@@ -1,6 +1,6 @@
 {
 	"name": "chayns-toolkit",
-	"version": "3.3.0-alpha.2",
+	"version": "3.3.0-alpha.3",
 	"description": "A zero-config toolchain for developing chayns® apps.",
 	"keywords": [
 		"chayns",
