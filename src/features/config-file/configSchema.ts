@@ -73,6 +73,7 @@ export const configSchema = z.object({
 			z.object({
 				dev: z.boolean(),
 				target: z.union([z.literal("server"), z.literal("client"), z.null()]),
+				watch: z.boolean().default(false),
 			}),
 		)
 		.returns(z.custom<RsbuildConfig>())

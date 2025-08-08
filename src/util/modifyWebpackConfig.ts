@@ -7,13 +7,21 @@ interface ModifyWebpackConfigOptions {
 	modifier: WebpackModifierFunction
 	dev: boolean
 	target: "server" | "client" | null
+	watch: boolean
 }
 
-export function modifyWebpackConfig({ config, dev, modifier, target }: ModifyWebpackConfigOptions) {
+export function modifyWebpackConfig({
+	config,
+	dev,
+	modifier,
+	target,
+	watch,
+}: ModifyWebpackConfigOptions) {
 	if (!modifier || !usedConfigFilename) return config
 	const modifiedWebpackConfig = modifier(config, {
 		dev,
 		target,
+		watch,
 	})
 
 	if (modifiedWebpackConfig === undefined) {
@@ -36,5 +44,5 @@ export function modifyWebpackConfig({ config, dev, modifier, target }: ModifyWeb
 
 export type WebpackModifierFunction = (
 	config: RsbuildConfig,
-	options: { dev: boolean; target: "server" | "client" | null },
+	options: { dev: boolean; target: "server" | "client" | null; watch: boolean },
 ) => RsbuildConfig
