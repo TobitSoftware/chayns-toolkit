@@ -111,6 +111,7 @@ export function devCommand({
 					dev: true,
 					modifier,
 					target,
+					watch: true,
 				})
 			}
 

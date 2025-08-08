@@ -44,6 +44,7 @@ export function buildCommand({
 					dev: false,
 					modifier,
 					target: target ?? "client",
+					watch,
 				})
 			}
 
