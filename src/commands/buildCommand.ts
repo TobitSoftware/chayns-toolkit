@@ -53,7 +53,9 @@ export function buildCommand({
 			output.info(`Bundling your code...`)
 
 			// eslint-disable-next-line no-await-in-loop
-			const stats = await runCompiler(rsbuild)
+			const stats = await runCompiler(rsbuild, {
+				watch,
+			})
 
 			if (stats?.hasErrors()) {
 				output.error("Compilation failed.\n")
