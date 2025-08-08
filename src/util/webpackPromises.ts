@@ -1,6 +1,6 @@
-import { RsbuildInstance } from "@rsbuild/core"
+import { BuildOptions, RsbuildInstance } from "@rsbuild/core"
 
-export async function runCompiler(rsbuild: RsbuildInstance) {
-	const result = await rsbuild.build()
+export async function runCompiler(rsbuild: RsbuildInstance, options?: BuildOptions) {
+	const result = await rsbuild.build(options)
 	return result.stats
 }

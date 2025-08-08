@@ -7,9 +7,13 @@ import { runCompiler } from "../util/webpackPromises"
 
 interface BuildOptions {
 	analyze: boolean
+	watch: boolean
 }
 
-export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams) => Promise<void> {
+export function buildCommand({
+	analyze,
+	watch,
+}: BuildOptions): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson }) => {
 		const targets = config.output.serverSideRendering
 			? (["server", "client"] as const)
@@ -49,7 +53,9 @@ export function buildCommand({ analyze }: BuildOptions): (stepParams: StepParams
 			output.info(`Bundling your code...`)
 
 			// eslint-disable-next-line no-await-in-loop
-			const stats = await runCompiler(rsbuild)
+			const stats = await runCompiler(rsbuild, {
+				watch,
+			})
 
 			if (stats?.hasErrors()) {
 				output.error("Compilation failed.\n")

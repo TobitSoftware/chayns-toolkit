@@ -29,10 +29,11 @@ program
 	.command("build")
 	.description("bundles your code for production")
 	.option("-a, --analyze", "analyze your bundle size", false)
-	.action(async (options: { analyze: boolean }) => {
+	.option("-w, --watch", "watch for file changes", false)
+	.action(async (options: { analyze: boolean; watch: boolean }) => {
 		try {
 			loadEnvironment(false)
-			await runSteps([buildCommand({ analyze: options.analyze })])
+			await runSteps([buildCommand({ analyze: options.analyze, watch: options.watch })])
 		} catch (e) {
 			output.error(e)
 			output.exit(1)
