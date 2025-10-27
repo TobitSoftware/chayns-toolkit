@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { type PostCSSOptions } from "@rsbuild/core/dist-types/types"
+import { type PostCSSOptions, ToolsConfig } from "@rsbuild/core/dist-types/types"
 import { pluginReact } from "@rsbuild/plugin-react"
 import { pluginSass } from "@rsbuild/plugin-sass"
 import { pluginCssMinimizer } from "@rsbuild/plugin-css-minimizer"
@@ -15,6 +15,7 @@ import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 
 import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
 import { pluginNodePolyfill } from "@rsbuild/plugin-node-polyfill"
+import { pluginBabel } from "@rsbuild/plugin-babel"
 
 const getDefaultFilename = () =>
 	process.env.NODE_ENV === "production"
@@ -179,6 +180,86 @@ export async function createWebpackConfig({
 		}
 		plugins.push(new ModuleFederationPlugin(moduleFederationConfig))
 	}
+
+	const tools: ToolsConfig = {
+		rspack: {
+			resolve: {
+				fallback: {
+					"react-dom/client": false,
+				},
+			},
+			output: {
+				uniqueName: exposeModules
+					? `${packageName}__${buildEnv}__${process.env.BUILD_VERSION || 1}`
+					: packageName,
+			},
+			plugins,
+			module: {
+				parser: {
+					javascript: {
+						exportsPresence: "warn",
+					},
+				},
+			},
+		},
+		htmlPlugin: false,
+		postcss: prefixCss
+			? (opts) => {
+					if (!opts.postcssOptions) {
+						return
+					}
+					const modifyOptions = (options: PostCSSOptions) => {
+						if (!options.plugins) {
+							options.plugins = []
+						}
+						options.plugins.push(
+							require("postcss-prefix-selector")({
+								prefix: `.${packageName}`,
+								ignoreFiles: [/\.module\.s?css$/i],
+								exclude: [":root", "html", "body"],
+							}),
+						)
+					}
+					if (typeof opts.postcssOptions === "function") {
+						const originalOptions = opts.postcssOptions
+						opts.postcssOptions = (context) => {
+							const options = originalOptions(context)
+							modifyOptions(options)
+							return options
+						}
+						return
+					}
+					modifyOptions(opts.postcssOptions)
+				}
+			: undefined,
+	}
+
+	let isLinariaUsed = false
+
+	try {
+		require.resolve("@linaria/core", { paths: [project.resolvePath("node_modules")] })
+		isLinariaUsed = true
+	} catch {
+		// Linaria is not used
+	}
+
+	if (isLinariaUsed) {
+		rsBuildPlugins.push(
+			pluginBabel({
+				babelLoaderOptions: (_, { addPresets }) => {
+					addPresets(["@babel/preset-react"])
+				},
+			}),
+		)
+
+		tools.bundlerChain = (chain, { CHAIN_ID }) => {
+			chain.module
+				.rule(CHAIN_ID.RULE.JS)
+				.use(CHAIN_ID.USE.SWC)
+				.after(CHAIN_ID.USE.BABEL)
+				.loader("@wyw-in-js/webpack-loader")
+		}
+	}
 	return {
 		performance:
 			parsed.BUNDLE_ANALYZE === "true" || analyze
@@ -218,58 +299,7 @@ export async function createWebpackConfig({
 			entry: entries,
 		},
 		plugins: rsBuildPlugins,
-		tools: {
-			rspack: {
-				resolve: {
-					fallback: {
-						"react-dom/client": false,
-					},
-				},
-				output: {
-					uniqueName: exposeModules
-						? `${packageName}__${buildEnv}__${process.env.BUILD_VERSION || 1}`
-						: packageName,
-				},
-				plugins,
-				module: {
-					parser: {
-						javascript: {
-							exportsPresence: "warn",
-						},
-					},
-				},
-			},
-			htmlPlugin: false,
-			postcss: prefixCss
-				? (opts) => {
-						if (!opts.postcssOptions) {
-							return
-						}
-						const modifyOptions = (options: PostCSSOptions) => {
-							if (!options.plugins) {
-								options.plugins = []
-							}
-							options.plugins.push(
-								require("postcss-prefix-selector")({
-									prefix: `.${packageName}`,
-									ignoreFiles: [/\.module\.s?css$/i],
-									exclude: [":root", "html", "body"],
-								}),
-							)
-						}
-						if (typeof opts.postcssOptions === "function") {
-							const originalOptions = opts.postcssOptions
-							opts.postcssOptions = (context) => {
-								const options = originalOptions(context)
-								modifyOptions(options)
-								return options
-							}
-							return
-						}
-						modifyOptions(opts.postcssOptions)
-					}
-				: undefined,
-		},
+		tools,
 		output: {
 			target: target === "server" ? "node" : "web",
 			sourceMap: {
