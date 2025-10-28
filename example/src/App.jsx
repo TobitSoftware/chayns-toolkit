@@ -21,6 +21,7 @@ export default function App() {
 
     return (
         <>
+            <h1>chayns-toolkit example</h1>
             <CssModules />
             <Linaria />
             <HmrTest />
