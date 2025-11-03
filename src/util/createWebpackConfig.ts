@@ -29,8 +29,6 @@ const getDefaultFilename = () =>
 			}
 		: {}
 
-const DefaultShareScope = "chayns-api"
-
 type Mode = "development" | "production" | "none"
 
 export type EntryPoint = {
@@ -147,13 +145,11 @@ export async function createWebpackConfig({
 			react: {
 				requiredVersion:
 					packageJson.peerDependencies?.react || packageJson?.dependencies?.react,
-				shareScope: DefaultShareScope,
 			},
 			"react-dom": {
 				requiredVersion:
 					packageJson.peerDependencies?.["react-dom"] ||
 					packageJson?.dependencies?.["react-dom"],
-				shareScope: DefaultShareScope,
 			},
 		}
 
