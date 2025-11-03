@@ -167,7 +167,7 @@ export async function createWebpackConfig({
 
 		const moduleFederationConfig = {
 			dts: false,
-			manifest: false,
+			manifest: true,
 			name: packageName?.split("-").join("_"),
 			filename: "v2.remoteEntry.js",
 			runtimePlugins:
