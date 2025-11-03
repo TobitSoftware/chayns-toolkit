@@ -137,10 +137,14 @@ export async function createWebpackConfig({
 
 	if (exposeModules) {
 		if (Object.keys(entries).length === 0) {
-			// override default index-entry when using exposeModules without
-			// entrypoints, to avoid the need of a useless/empty index.js
+			// Override the default index entry when using exposeModules without
+			// explicit entry points, so that an empty or unnecessary index.js file
+			// is not required.
 			entries.index = undefined!
 		}
+		// The shareScope must not be manually set here.
+		// Setting it would prevent this module from consuming shared dependencies.
+		// Consuming modules always use the default share scope.
 		const shared: ConstructorParameters<typeof ModuleFederationPlugin>[0]["shared"] = {
 			react: {
 				requiredVersion:
