@@ -53,7 +53,7 @@
 		"@module-federation/enhanced": "^0.10.0",
 		"@module-federation/node": "^2.6.28",
 		"@rsbuild/core": "^1.2.16",
-		"@rsbuild/plugin-assets-retry": "^1.2.1",
+		"@rsbuild/plugin-assets-retry": ">=1.2.1 < 1.5.0",
 		"@rsbuild/plugin-css-minimizer": "^1.0.2",
 		"@rsbuild/plugin-node-polyfill": "^1.3.0",
 		"@rsbuild/plugin-react": "^1.1.1",
