@@ -80,6 +80,7 @@ export function devCommand({
 			webpackConfig.server ||= {}
 			webpackConfig.server.host = host
 			webpackConfig.server.port = port
+			webpackConfig.server.strictPort = config.development.strictPort
 			if (config.output.serverSideRendering === "all" && ports) {
 				if (target === "server") {
 					webpackConfig.server.port = ports.server
