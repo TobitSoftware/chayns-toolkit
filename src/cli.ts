@@ -35,7 +35,7 @@ program
 			loadEnvironment(false)
 			await runSteps([buildCommand({ analyze: options.analyze, watch: options.watch })])
 		} catch (e) {
-			output.error(e)
+			output.error(e as string)
 			output.exit(1)
 		}
 
@@ -58,7 +58,7 @@ program
 		try {
 			await runSteps([serveCommand({ port })])
 		} catch (e) {
-			output.error(e)
+			output.error(e as string)
 		}
 	})
 
@@ -75,7 +75,7 @@ program
 		try {
 			await runSteps([testCommand(options)])
 		} catch (e) {
-			output.error(e)
+			output.error(e as string)
 		}
 
 		console.info("")
