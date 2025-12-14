@@ -21,7 +21,6 @@ export function serveCommand(options: {
 		}
 		const shouldUseHttps = Boolean(cert && key)
 
-		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		const requestHandler: http.RequestListener = async (request, response) => {
 			if (request.headers.origin) {
 				response.setHeader("Access-Control-Allow-Origin", request.headers.origin)

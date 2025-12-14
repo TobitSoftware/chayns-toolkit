@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { exec } from "child_process"
 import { createRsbuild } from "@rsbuild/core"
 import fs, { watchFile } from "fs"
@@ -149,7 +148,7 @@ export function devCommand({
 			if (closingDevServer) return
 			closingDevServer = true
 			console.log("Restarting dev server")
-			Promise.all(servers.map((server) => server.close())).then(() => {
+			void Promise.all(servers.map((server) => server.close())).then(() => {
 				resetEnvironment()
 				loadEnvironment(true)
 				closingDevServer = false

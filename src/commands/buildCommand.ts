@@ -20,7 +20,6 @@ export function buildCommand({
 			: ([null] as const)
 
 		for (const target of targets) {
-			// eslint-disable-next-line no-await-in-loop
 			let webpackConfig = await createWebpackConfig({
 				mode: "production",
 				analyze,
@@ -48,12 +47,10 @@ export function buildCommand({
 				})
 			}
 
-			// eslint-disable-next-line no-await-in-loop
 			const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
 
 			output.info(`Bundling your code...`)
 
-			// eslint-disable-next-line no-await-in-loop
 			const stats = await runCompiler(rsbuild, {
 				watch,
 			})

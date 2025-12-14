@@ -18,9 +18,6 @@
         "singleQuote": true,
         "tabWidth": 4
     },
-    "eslintConfig": {
-        "extends": "chayns-toolkit/eslint"
-    },
     "dependencies": {
         "@chayns-components/core": "^5.0.0-beta.1027",
         "@types/lodash-es": "^4.17.12",

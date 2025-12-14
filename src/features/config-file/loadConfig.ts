@@ -10,7 +10,6 @@ const JS_CONFIG_FILENAME = "toolkit.config.js"
 const CJS_CONFIG_FILENAME = "toolkit.config.cjs"
 const MJS_CONFIG_FILENAME = "toolkit.config.mjs"
 const TS_CONFIG_FILENAME = "toolkit.config.ts"
-// eslint-disable-next-line import/no-mutable-exports
 export let usedConfigFilename: string | undefined
 
 export async function loadConfig(): Promise<ParsedToolkitConfig> {
@@ -38,7 +37,7 @@ export async function loadConfig(): Promise<ParsedToolkitConfig> {
 			const m = new Module(TS_CONFIG_FILENAME)
 			m.paths = [project.resolvePath("node_modules")]
 			// @ts-expect-error internal function
-			// eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-unsafe-call
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 			m._compile(transpiled, TS_CONFIG_FILENAME)
 			config = (m.exports as { default: ToolkitConfig }).default
 		} else {
