@@ -30,6 +30,8 @@ export function devCommand({
 				? (["server", "client"] as const)
 				: ([null] as const)
 
+		const servers: { close: () => Promise<void> }[] = []
+
 		for (const target of targets) {
 			let webpackConfig = await createWebpackConfig({
 				analyze: false,
@@ -119,45 +121,46 @@ export function devCommand({
 			const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
 
 			const { server, urls } = await rsbuild.startDevServer()
+			servers.push(server)
 
 			urls.forEach((url) => {
 				output.info(`Project is running at: ${url}`)
 			})
+		}
 
-			let closingDevServer = false
+		let closingDevServer = false
 
-			const buildEnv = process.env.BUILD_ENV || "development"
-			let watchFileList = [".env", ".env.local", `.env.${buildEnv}`, `.env.${buildEnv}.local`]
-			if (usedConfigFilename) {
-				watchFileList.unshift(usedConfigFilename)
+		const buildEnv = process.env.BUILD_ENV || "development"
+		let watchFileList = [".env", ".env.local", `.env.${buildEnv}`, `.env.${buildEnv}.local`]
+		if (usedConfigFilename) {
+			watchFileList.unshift(usedConfigFilename)
+		}
+		Object.values(config.output.entryPoints ?? {}).forEach(({ pathHtml }) => {
+			if (pathHtml && !watchFileList.includes(pathHtml)) {
+				watchFileList.push(pathHtml)
 			}
-			Object.values(config.output.entryPoints ?? {}).forEach(({ pathHtml }) => {
-				if (pathHtml && !watchFileList.includes(pathHtml)) {
-					watchFileList.push(pathHtml)
-				}
-			})
+		})
 
-			watchFileList = watchFileList
-				.map((file) => project.resolvePath(file))
-				.filter((file) => project.hasFile(file))
+		watchFileList = watchFileList
+			.map((file) => project.resolvePath(file))
+			.filter((file) => project.hasFile(file))
 
-			const watchFileFunc = () => {
-				if (closingDevServer) return
-				closingDevServer = true
-				console.log("Restarting dev server")
-				void server.close().then(() => {
-					resetEnvironment()
-					loadEnvironment(true)
-					closingDevServer = false
-					void runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
-					watchFileList.forEach((file) => unwatchFile(file, watchFileFunc))
-				})
-			}
-
-			watchFileList.forEach((file) => {
-				output.info(`Watching for file changes of ${fm.path(file)}`)
-				watchFile(file, watchFileFunc)
+		const watchFileFunc = () => {
+			if (closingDevServer) return
+			closingDevServer = true
+			console.log("Restarting dev server")
+			Promise.all(servers.map((server) => server.close())).then(() => {
+				resetEnvironment()
+				loadEnvironment(true)
+				closingDevServer = false
+				void runSteps([checkForTypeScript, checkSSLConfig], [devCommand({})])
+				watchFileList.forEach((file) => unwatchFile(file, watchFileFunc))
 			})
 		}
+
+		watchFileList.forEach((file) => {
+			output.info(`Watching for file changes of ${fm.path(file)}`)
+			watchFile(file, watchFileFunc)
+		})
 	}
 }
