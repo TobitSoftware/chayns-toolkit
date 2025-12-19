@@ -43,6 +43,8 @@ export function devCommand({
 				prefixCss: config.output.prefixCss,
 				cssVersion: config.output.cssVersion,
 				exposeModules: config.output.exposeModules,
+				disableReactSharing: config.output.disableReactSharing,
+				manifest: config.manifest,
 				entryPoints: config.output.entryPoints,
 				target,
 			})

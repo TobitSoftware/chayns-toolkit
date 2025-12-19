@@ -40,6 +40,7 @@ const outputSchema = z
 			.regex(/^\d+\.\d+$/)
 			.default("4.2"),
 		exposeModules: z.record(z.string(), z.string()).optional(),
+		disableReactSharing: z.boolean().default(false),
 		entryPoints: z
 			.record(
 				z.string(),
@@ -57,6 +58,13 @@ const outputSchema = z
 		"Need to define at least one key for either output.entryPoints or output.exposeModules",
 	)
 
+const manifestSchema = z.object({
+	host: z.boolean().default(false),
+	module: z.boolean().default(false),
+	externalAssets: z.array(z.string()).optional(),
+	textStringLibraries: z.array(z.string()).optional(),
+})
+
 export const configSchema = z.object({
 	development: developmentSchema.default({}),
 	output: outputSchema.default({
@@ -67,6 +75,7 @@ export const configSchema = z.object({
 			},
 		},
 	}),
+	manifest: manifestSchema.default({}),
 	webpack: z
 		.function()
 		.args(
