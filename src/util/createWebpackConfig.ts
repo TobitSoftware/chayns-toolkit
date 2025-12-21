@@ -93,6 +93,7 @@ export async function createWebpackConfig({
 }: CreateConfigOptions): Promise<RsbuildConfig> {
 	const packageName = packageJson.name
 	const buildEnv = process.env.BUILD_ENV || (mode === "production" ? "production" : "development")
+	const buildVersion = process.env.BUILD_VERSION || String(Date.now())
 
 	const { parsed, publicVars } = loadEnv({
 		mode: buildEnv,
@@ -187,6 +188,7 @@ export async function createWebpackConfig({
 								;(options.stats.metaData as any).textStringLibraries =
 									manifest.textStringLibraries
 							}
+							options.stats.metaData.buildInfo.buildVersion = buildVersion
 						},
 					}
 				: false,
@@ -333,7 +335,7 @@ export async function createWebpackConfig({
 								}
 
 								;(manifestData as Record<string, unknown>).buildVersion =
-									process.env.BUILD_VERSION || String(Date.now())
+									buildVersion
 
 								return manifestData
 							},
