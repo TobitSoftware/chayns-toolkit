@@ -79,7 +79,7 @@ export function testCommand({
 				} else {
 					output.warn(warningText)
 				}
-			} catch (ex) {
+			} catch {
 				output.warn(warningText)
 			}
 		}
