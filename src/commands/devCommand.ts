@@ -99,6 +99,8 @@ export function devCommand({
 				credentials: true,
 				origin: true,
 			}
+			webpackConfig.dev ??= {}
+			webpackConfig.dev.lazyCompilation = false
 
 			if (cert && key) {
 				webpackConfig.server.https = {
