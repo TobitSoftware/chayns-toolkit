@@ -93,7 +93,8 @@ export async function createWebpackConfig({
 }: CreateConfigOptions): Promise<RsbuildConfig> {
 	const packageName = packageJson.name
 	const buildEnv = process.env.BUILD_ENV || (mode === "production" ? "production" : "development")
-	const buildVersion = process.env.BUILD_VERSION || String(Date.now())
+	const buildVersion =
+		process.env.BUILD_VERSION || `${buildEnv}-fallback-${new Date().toISOString()}`
 
 	const { parsed, publicVars } = loadEnv({
 		mode: buildEnv,
@@ -223,10 +224,10 @@ export async function createWebpackConfig({
 				? project.resolvePath("tsconfig.json")
 				: undefined,
 			define: {
-				"process.env.VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
-				"import.meta.env.VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
-				"process.env.BUILD_VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
-				"import.meta.env.BUILD_VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
+				"process.env.VERSION": JSON.stringify(buildVersion),
+				"import.meta.env.VERSION": JSON.stringify(buildVersion),
+				"process.env.BUILD_VERSION": JSON.stringify(buildVersion),
+				"import.meta.env.BUILD_VERSION": JSON.stringify(buildVersion),
 				"process.env.BUILD_ENV": JSON.stringify(buildEnv),
 				"import.meta.env.BUILD_ENV": JSON.stringify(buildEnv),
 				"process.env.__PACKAGE_NAME__": JSON.stringify(
