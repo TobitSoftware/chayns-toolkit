@@ -60,7 +60,7 @@
 		"@rsbuild/plugin-sass": "^1.4.0",
 		"@rsbuild/plugin-svgr": "^1.2.3",
 		"@testing-library/jest-dom": "^6.9.1",
-		"@wyw-in-js/webpack-loader": "^0.7.0",
+		"@wyw-in-js/webpack-loader": "^1.0.1",
 		"ajv": "^8.17.1",
 		"eslint": "^9.39.2",
 		"eslint-formatter-pretty": "^6.0.1",
