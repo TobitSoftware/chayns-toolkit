@@ -29,6 +29,7 @@ export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 
 	const [packageJson, packageManager] = await Promise.all([
 		loadPackageJson(),
+		// eslint-disable-next-line @typescript-eslint/await-thenable
 		getPackageManager(),
 	])
 
@@ -37,7 +38,6 @@ export async function runSteps(...sequences: Array<Step[]>): Promise<void> {
 	for (const sequence of sequences) {
 		if (shouldContinue) {
 			for (const step of sequence) {
-				// eslint-disable-next-line no-await-in-loop
 				const result = await step({
 					config,
 					packageJson,

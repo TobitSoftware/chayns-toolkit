@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { moduleFederationPlugin } from "@module-federation/enhanced"
 import { type PostCSSOptions, ToolsConfig } from "@rsbuild/core/dist-types/types"
 import { pluginReact } from "@rsbuild/plugin-react"
 import { pluginSass } from "@rsbuild/plugin-sass"
@@ -66,6 +67,13 @@ interface CreateConfigOptions {
 	exposeModules?: {}
 	entryPoints: EntryPoints
 	target: "client" | "server" | null
+	disableReactSharing?: boolean
+	manifest?: {
+		host?: boolean
+		module?: boolean
+		externalAssets?: string[]
+		textStringLibraries?: string[]
+	}
 }
 
 export async function createWebpackConfig({
@@ -81,9 +89,13 @@ export async function createWebpackConfig({
 	entryPoints,
 	target,
 	serverSideRendering,
+	disableReactSharing = false,
+	manifest = {},
 }: CreateConfigOptions): Promise<RsbuildConfig> {
 	const packageName = packageJson.name
 	const buildEnv = process.env.BUILD_ENV || (mode === "production" ? "production" : "development")
+	const buildVersion =
+		process.env.BUILD_VERSION || `${buildEnv}-fallback-${new Date().toISOString()}`
 
 	const { parsed, publicVars } = loadEnv({
 		mode: buildEnv,
@@ -167,7 +179,21 @@ export async function createWebpackConfig({
 
 		const moduleFederationConfig = {
 			dts: false,
-			manifest: true,
+			manifest: manifest?.module
+				? {
+						additionalData: (options) => {
+							if (manifest?.externalAssets) {
+								;(options.stats.metaData as any).externalAssets =
+									manifest.externalAssets
+							}
+							if (manifest?.textStringLibraries) {
+								;(options.stats.metaData as any).textStringLibraries =
+									manifest.textStringLibraries
+							}
+							options.stats.metaData.buildInfo.buildVersion = buildVersion
+						},
+					}
+				: false,
 			name: packageName?.split("-").join("_"),
 			filename: "v2.remoteEntry.js",
 			runtimePlugins:
@@ -176,8 +202,8 @@ export async function createWebpackConfig({
 					: undefined,
 			exposes: exposeModules,
 			library: target === "server" ? { type: "commonjs-module" } : undefined,
-			shared: mode !== "development" ? shared : undefined,
-		}
+			shared: mode !== "development" && disableReactSharing !== true ? shared : undefined,
+		} satisfies moduleFederationPlugin.ModuleFederationPluginOptions
 		plugins.push(new ModuleFederationPlugin(moduleFederationConfig))
 	}
 
@@ -279,10 +305,10 @@ export async function createWebpackConfig({
 				? project.resolvePath("tsconfig.json")
 				: undefined,
 			define: {
-				"process.env.VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
-				"import.meta.env.VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
-				"process.env.BUILD_VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
-				"import.meta.env.BUILD_VERSION": JSON.stringify(process.env.BUILD_VERSION || 1),
+				"process.env.VERSION": JSON.stringify(buildVersion),
+				"import.meta.env.VERSION": JSON.stringify(buildVersion),
+				"process.env.BUILD_VERSION": JSON.stringify(buildVersion),
+				"import.meta.env.BUILD_VERSION": JSON.stringify(buildVersion),
 				"process.env.BUILD_ENV": JSON.stringify(buildEnv),
 				"import.meta.env.BUILD_ENV": JSON.stringify(buildEnv),
 				"process.env.__PACKAGE_NAME__": JSON.stringify(
@@ -315,6 +341,37 @@ export async function createWebpackConfig({
 			distPath: {
 				root: outputPath || "build",
 			},
+			manifest:
+				manifest?.host && target !== "server"
+					? {
+							generate: ({ manifestData }) => {
+								const filterFiles = (files: string[]) =>
+									files.filter((file) => !file.endsWith(".map"))
+
+								manifestData.allFiles = filterFiles(manifestData.allFiles)
+								Object.values(manifestData.entries).forEach((value) => {
+									if (value.assets) {
+										value.assets = filterFiles(value.assets)
+									}
+								})
+
+								if (manifest?.externalAssets) {
+									;(manifestData as Record<string, unknown>).staticFiles =
+										manifest.externalAssets
+								}
+
+								if (manifest?.textStringLibraries) {
+									;(manifestData as Record<string, unknown>).textStringLibraries =
+										manifest.textStringLibraries
+								}
+
+								;(manifestData as Record<string, unknown>).buildVersion =
+									buildVersion
+
+								return manifestData
+							},
+						}
+					: false,
 		},
 		dev: {
 			assetPrefix: "auto",

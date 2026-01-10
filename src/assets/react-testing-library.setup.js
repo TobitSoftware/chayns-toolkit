@@ -1,2 +1,2 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+// eslint-disable-next-line no-undef
 require("@testing-library/jest-dom")
