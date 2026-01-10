@@ -54,6 +54,7 @@
 		"@module-federation/node": "2.7.25",
 		"@rsbuild/core": "^1.6.14",
 		"@rsbuild/plugin-assets-retry": ">=1.2.1 < 1.5.0",
+		"@rsbuild/plugin-babel": "^1.0.6",
 		"@rsbuild/plugin-css-minimizer": "^1.1.0",
 		"@rsbuild/plugin-node-polyfill": "^1.4.2",
 		"@rsbuild/plugin-react": "^1.4.2",
