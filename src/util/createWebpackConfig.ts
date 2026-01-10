@@ -272,7 +272,8 @@ export async function createWebpackConfig({
 	if (isLinariaUsed) {
 		rsBuildPlugins.push(
 			pluginBabel({
-				babelLoaderOptions: (_, { addPresets }) => {
+				babelLoaderOptions: (options, { addPresets }) => {
+					options.sourceMaps = false
 					addPresets(["@babel/preset-react"])
 				},
 			}),
