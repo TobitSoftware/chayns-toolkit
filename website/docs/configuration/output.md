@@ -52,6 +52,11 @@ module.exports = {
          * The css version which should be used for the CHAYNS_TOOLKIT_CSS_TAG variable
          */
         cssVersion: "4.2",
+        /**
+         * The option to use for transforming React JSX. The default value is "automatic", which means that the new JSX transform will be used. If you want to use the old JSX transform, you can set this option to "classic". Note that the old JSX transform is deprecated and will be removed in a future version of React.
+         * @type {'automatic' | 'classic'}
+         */
+        reactRuntime: "automatic",
     },
     // ... other options ...
 }

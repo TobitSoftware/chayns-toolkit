@@ -41,6 +41,7 @@ const outputSchema = z
 			.default("4.2"),
 		exposeModules: z.record(z.string(), z.string()).optional(),
 		disableReactSharing: z.boolean().default(false),
+		reactRuntime: z.union([z.literal("automatic"), z.literal("classic")]).default("classic"),
 		entryPoints: z
 			.record(
 				z.string(),

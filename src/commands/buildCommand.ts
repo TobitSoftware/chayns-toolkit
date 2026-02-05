@@ -32,6 +32,7 @@ export function buildCommand({
 				cssVersion: config.output.cssVersion,
 				exposeModules: config.output.exposeModules,
 				disableReactSharing: config.output.disableReactSharing,
+				reactRuntime: config.output.reactRuntime,
 				manifest: config.manifest,
 				entryPoints: config.output.entryPoints,
 				target,

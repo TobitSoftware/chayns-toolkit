@@ -67,6 +67,7 @@ interface CreateConfigOptions {
 	exposeModules?: {}
 	entryPoints: EntryPoints
 	target: "client" | "server" | null
+	reactRuntime?: "automatic" | "classic"
 	disableReactSharing?: boolean
 	manifest?: {
 		host?: boolean
@@ -89,6 +90,7 @@ export async function createWebpackConfig({
 	entryPoints,
 	target,
 	serverSideRendering,
+	reactRuntime,
 	disableReactSharing = false,
 	manifest = {},
 }: CreateConfigOptions): Promise<RsbuildConfig> {
@@ -103,7 +105,11 @@ export async function createWebpackConfig({
 
 	const plugins: Rspack.Configuration["plugins"] = []
 	const rsBuildPlugins = [
-		pluginReact(),
+		pluginReact({
+			swcReactOptions: {
+				runtime: reactRuntime,
+			},
+		}),
 		pluginSass(),
 		pluginAssetsRetry(),
 		pluginCssMinimizer(),
