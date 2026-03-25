@@ -47,7 +47,7 @@
 		"test": "jest"
 	},
 	"dependencies": {
-		"@babel/preset-env": "^7.29.0",
+		"@babel/preset-env": "^7.29.2",
 		"@babel/preset-react": "^7.28.5",
 		"@chayns-toolkit/eslint-config": "^3.0.2",
 		"@module-federation/enhanced": "^2.2.3",
