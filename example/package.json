@@ -21,16 +21,16 @@
     },
     "dependencies": {
         "@chayns-components/core": "^5.0.0-beta.1297",
-        "@linaria/react": "^6.3.0",
+        "@linaria/react": "^7.0.1",
         "@types/lodash-es": "^4.17.12",
-        "chayns-api": "^2.4.27",
-        "lodash-es": "^4.17.21",
+        "chayns-api": "^2.6.9",
+        "lodash-es": "^4.17.23",
         "react": "^18.3.1",
         "react-dom": "^18.3.1"
     },
     "devDependencies": {
         "@babel/plugin-proposal-pipeline-operator": "^7.26.7",
-        "@rsbuild/plugin-babel": "^1.0.3",
+        "@rsbuild/plugin-babel": "^1.1.2",
         "@testing-library/react": "^16.2.0",
         "@testing-library/user-event": "^14.6.1",
         "@types/react": "^18.3.18",
@@ -41,7 +41,10 @@
     },
     "overrides": {
         "chayns-api": {
-            "@module-federation/enhanced": "^0.21.6"
+            "@module-federation/enhanced": "^2.2.3"
+        },
+        "@rspack/core": {
+            "@module-federation/runtime-tools": "^2.2.3"
         }
     }
 }
