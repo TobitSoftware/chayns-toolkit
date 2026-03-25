@@ -112,5 +112,10 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"overrides": {
+		"@rspack/core": {
+			"@module-federation/runtime-tools": "^2.2.3"
+		}
 	}
 }
