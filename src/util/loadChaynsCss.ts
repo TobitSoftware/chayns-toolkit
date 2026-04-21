@@ -13,6 +13,18 @@ export const getCssTag = (version = "4.2") => {
 	return `<script>(${script})()</script>`
 }
 
+export const getCssScriptContent = (version = "4.2") => {
+	const url = new URL(`https://style.tobit.cloud/css/v${version}`)
+	if (
+		["development", "qa", "staging"].includes(process.env.BUILD_ENV) ||
+		process.env.NODE_ENV === "development"
+	) {
+		url.host = "style-staging.tobit.cloud"
+	}
+	const script = loadCss.toString().replace("##url##", url.toString())
+	return `(${script})()`
+}
+
 // Replaced compatibility script
 // Should be removed when styles are in chayns-components and/or in static style css
 const loadCss = () => {
@@ -22,7 +34,7 @@ const loadCss = () => {
 
 	apiUrl.searchParams.set(
 		"siteId",
-		parameters.get("stylesiteid") || parameters.get("siteid") || ""
+		parameters.get("stylesiteid") || parameters.get("siteid") || "",
 	)
 	if (parameters.has("colormode")) {
 		apiUrl.searchParams.set("colormode", parameters.get("colormode") || "")

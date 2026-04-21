@@ -7,11 +7,9 @@ import { pluginCssMinimizer } from "@rsbuild/plugin-css-minimizer"
 import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry"
 import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
-import HtmlWebpackPlugin from "html-webpack-plugin"
-import HtmlWebpackTagsPlugin from "html-webpack-tags-plugin"
 import type { PackageJson } from "type-fest"
 import { project } from "./project"
-import { getCssTag } from "./loadChaynsCss"
+import { getCssScriptContent } from "./loadChaynsCss"
 import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 
 import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
@@ -126,31 +124,13 @@ export async function createWebpackConfig({
 
 	const entries: RsbuildEntry = {}
 
-	Object.entries(entryPoints).forEach(([k, { pathHtml, pathIndex, templateParameters }]) => {
-		entries[k] = pathIndex
+	Object.entries(entryPoints).forEach(([k, { pathHtml, pathIndex }]) => {
 		if (pathHtml) {
-			plugins.push(
-				new HtmlWebpackPlugin({
-					template: pathHtml,
-					filename: `${k}.html`,
-					chunks: [k],
-					templateParameters: {
-						CHAYNS_TOOLKIT_CSS_TAG: getCssTag(cssVersion),
-						...templateParameters,
-					},
-				}),
-			)
+			entries[k] = pathIndex
+		} else {
+			entries[k] = { import: pathIndex, html: false }
 		}
 	})
-
-	if (injectDevtoolsScript && target !== "server") {
-		plugins.push(
-			new HtmlWebpackTagsPlugin({
-				scripts: ["http://localhost:8097"],
-				append: false,
-			}),
-		)
-	}
 
 	if (!packageName) throw Error("The name field in package.json has to be provided.")
 
@@ -159,7 +139,7 @@ export async function createWebpackConfig({
 			// Override the default index entry when using exposeModules without
 			// explicit entry points, so that an empty or unnecessary index.js file
 			// is not required.
-			entries.index = undefined!
+			entries.index = { import: undefined!, html: false }
 		}
 		// The shareScope must not be manually set here.
 		// Setting it would prevent this module from consuming shared dependencies.
@@ -332,6 +312,32 @@ export async function createWebpackConfig({
 			entry: entries,
 		},
 		plugins: rsBuildPlugins,
+		html: {
+			template: ({ value, entryName }) => entryPoints[entryName]?.pathHtml ?? value,
+			templateParameters: (defaultParams, { entryName }) => ({
+				...defaultParams,
+				// kept for backward compatibility with existing consumer templates
+				CHAYNS_TOOLKIT_CSS_TAG: "",
+				...entryPoints[entryName]?.templateParameters,
+			}),
+			tags: [
+				{
+					tag: "script",
+					head: true,
+					append: false,
+					children: getCssScriptContent(cssVersion),
+				},
+				...(injectDevtoolsScript && target !== "server"
+					? [
+							{
+								tag: "script" as const,
+								attrs: { src: "http://localhost:8097" },
+								append: false,
+							},
+						]
+					: []),
+			],
+		},
 		tools,
 		output: {
 			target: target === "server" ? "node" : "web",
