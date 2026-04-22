@@ -317,6 +317,7 @@ export async function createWebpackConfig({
 			templateParameters: (defaultParams, { entryName }) => ({
 				...defaultParams,
 				// kept for backward compatibility with existing consumer templates
+				// TODO remove in next major
 				CHAYNS_TOOLKIT_CSS_TAG: "",
 				...entryPoints[entryName]?.templateParameters,
 			}),
