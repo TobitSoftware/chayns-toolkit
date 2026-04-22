@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { moduleFederationPlugin } from "@module-federation/enhanced"
-import { type PostCSSOptions, ToolsConfig } from "@rsbuild/core/dist-types/types"
+import { HtmlTagDescriptor, type PostCSSOptions, ToolsConfig } from "@rsbuild/core/dist-types/types"
 import { pluginReact } from "@rsbuild/plugin-react"
 import { pluginSass } from "@rsbuild/plugin-sass"
 import { pluginCssMinimizer } from "@rsbuild/plugin-css-minimizer"
@@ -9,7 +9,7 @@ import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
 import type { PackageJson } from "type-fest"
 import { project } from "./project"
-import { getCssScriptContent } from "./loadChaynsCss"
+import { getCssTag } from "./loadChaynsCss"
 import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 
 import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
@@ -272,6 +272,40 @@ export async function createWebpackConfig({
 				.loader("@wyw-in-js/webpack-loader")
 		}
 	}
+
+	let htmlTags: HtmlTagDescriptor[] | undefined =
+		injectDevtoolsScript && target !== "server"
+			? [
+					{
+						tag: "script" as const,
+						attrs: { src: "http://localhost:8097" },
+						append: false,
+					},
+				]
+			: undefined
+
+	const runtimeVars = process.env.RUNTIME_VARS?.split(",").map((v) => v.trim())
+
+	if (runtimeVars) {
+		Object.keys(publicVars).forEach((key) => {
+			const varName = key.replace(/^(process\.env\.|import\.meta\.env\.)/, "")
+			if (runtimeVars.includes(varName)) {
+				const buildTimeFallback = publicVars[key]
+				publicVars[key] =
+					`((typeof window !== 'undefined' && window._env_ && window._env_["${packageName}"] && window._env_["${packageName}"].${varName}) || ${buildTimeFallback})`
+			}
+		})
+		htmlTags ??= []
+		htmlTags.push({
+			tag: "script",
+			head: true,
+			append: false,
+			attrs: {
+				src: "./env-config.js",
+			},
+		})
+	}
+
 	return {
 		performance:
 			parsed.BUNDLE_ANALYZE === "true" || analyze
@@ -315,28 +349,10 @@ export async function createWebpackConfig({
 			template: ({ value, entryName }) => entryPoints[entryName]?.pathHtml ?? value,
 			templateParameters: (defaultParams, { entryName }) => ({
 				...defaultParams,
-				// kept for backward compatibility with existing consumer templates
-				// TODO remove in next major
-				CHAYNS_TOOLKIT_CSS_TAG: "",
+				CHAYNS_TOOLKIT_CSS_TAG: getCssTag(cssVersion),
 				...entryPoints[entryName]?.templateParameters,
 			}),
-			tags: [
-				{
-					tag: "script",
-					head: true,
-					append: false,
-					children: getCssScriptContent(cssVersion),
-				},
-				...(injectDevtoolsScript && target !== "server"
-					? [
-							{
-								tag: "script" as const,
-								attrs: { src: "http://localhost:8097" },
-								append: false,
-							},
-						]
-					: []),
-			],
+			tags: htmlTags,
 		},
 		tools,
 		output: {

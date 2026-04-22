@@ -100,6 +100,7 @@ export function devCommand({
 				credentials: true,
 				origin: true,
 			}
+			webpackConfig.server.htmlFallback = false
 			webpackConfig.dev ??= {}
 			webpackConfig.dev.lazyCompilation = false
 
