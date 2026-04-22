@@ -214,7 +214,6 @@ export async function createWebpackConfig({
 				},
 			},
 		},
-		htmlPlugin: false,
 		postcss: prefixCss
 			? (opts) => {
 					if (!opts.postcssOptions) {
