@@ -41,10 +41,10 @@
     },
     "overrides": {
         "chayns-api": {
-            "@module-federation/enhanced": "^2.2.3"
+            "@module-federation/enhanced": "^2.4.0"
         },
         "@rspack/core": {
-            "@module-federation/runtime-tools": "^2.2.3"
+            "@module-federation/runtime-tools": "^2.4.0"
         }
     }
 }

@@ -50,16 +50,15 @@
 		"@babel/preset-env": "^7.29.2",
 		"@babel/preset-react": "^7.28.5",
 		"@chayns-toolkit/eslint-config": "^3.0.2",
-		"@module-federation/enhanced": "^2.2.3",
-		"@module-federation/node": "2.7.37",
-		"@rsbuild/core": "^1.7.3",
-		"@rsbuild/plugin-assets-retry": "^1.5.2",
+		"@module-federation/node": "^2.7.42",
+		"@rsbuild/core": "^2.0.3",
+		"@rsbuild/plugin-assets-retry": "^2.0.0",
 		"@rsbuild/plugin-babel": "^1.1.2",
-		"@rsbuild/plugin-css-minimizer": "^1.1.1",
+		"@rsbuild/plugin-css-minimizer": "^2.0.0",
 		"@rsbuild/plugin-node-polyfill": "^1.4.4",
-		"@rsbuild/plugin-react": "^1.4.6",
-		"@rsbuild/plugin-sass": "^1.5.1",
-		"@rsbuild/plugin-svgr": "^1.3.1",
+		"@rsbuild/plugin-react": "^2.0.0",
+		"@rsbuild/plugin-sass": "^1.5.2",
+		"@rsbuild/plugin-svgr": "^2.0.1",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@wyw-in-js/webpack-loader": "^1.0.6",
 		"ajv": "^8.18.0",
@@ -70,15 +69,18 @@
 		"react-refresh": "^0.18.0",
 		"serve-handler": "^6.1.7",
 		"webpack": "^5.105.4",
+		"webpack-bundle-analyzer": "^5.3.0",
 		"zod": "^3.25.76"
 	},
 	"devDependencies": {
+		"@module-federation/enhanced": "^2.4.0",
 		"@types/eslint": "^9.6.1",
 		"@types/jest": "^29.5.14",
 		"@types/mock-fs": "^4.13.4",
 		"@types/node": "^20.19.37",
 		"@types/semver": "^7.7.1",
 		"@types/serve-handler": "^6.1.4",
+		"@types/webpack-bundle-analyzer": "^4.7.0",
 		"chalk": "^4.1.2",
 		"commander": "^13.1.0",
 		"esbuild": "^0.27.4",
@@ -94,6 +96,7 @@
 		"typescript": "^5.9.3"
 	},
 	"peerDependencies": {
+		"@module-federation/enhanced": "^2.4.0",
 		"react-devtools": ">=4",
 		"typescript": "^4.9.0 || ^5.0.0"
 	},
@@ -110,10 +113,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"overrides": {
-		"@rspack/core": {
-			"@module-federation/runtime-tools": "^2.2.3"
-		}
 	}
 }

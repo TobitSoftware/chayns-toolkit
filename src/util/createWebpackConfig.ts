@@ -15,6 +15,7 @@ import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
 import { pluginNodePolyfill } from "@rsbuild/plugin-node-polyfill"
 import { pluginBabel } from "@rsbuild/plugin-babel"
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
 
 const getDefaultFilename = () =>
 	process.env.NODE_ENV === "production"
@@ -120,6 +121,10 @@ export async function createWebpackConfig({
 
 	if (serverSideRendering && target === "client") {
 		rsBuildPlugins.push(pluginNodePolyfill())
+	}
+
+	if (parsed.BUNDLE_ANALYZE === "true" || analyze) {
+		plugins.push(new BundleAnalyzerPlugin())
 	}
 
 	const entries: RsbuildEntry = {}
@@ -307,19 +312,6 @@ export async function createWebpackConfig({
 	}
 
 	return {
-		performance:
-			parsed.BUNDLE_ANALYZE === "true" || analyze
-				? {
-						bundleAnalyze: {
-							analyzerMode: "server",
-							openAnalyzer: true,
-						},
-					}
-				: undefined,
-		// @ts-expect-error missing in types
-		context: {
-			rootPath: project.resolvePath("."),
-		},
 		source: {
 			tsconfigPath: project.hasFile("tsconfig.json")
 				? project.resolvePath("tsconfig.json")
