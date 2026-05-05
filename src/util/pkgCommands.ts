@@ -1,57 +1,53 @@
 import { fm } from "./format"
 import { PackageManager } from "./getPackageManager"
 
+const installCommands: Record<PackageManager, string> = {
+	npm: "npm i",
+	pnpm: "pnpm add",
+	yarn: "yarn add",
+}
+
+const removeCommands: Record<PackageManager, string> = {
+	npm: "npm remove",
+	pnpm: "pnpm remove",
+	yarn: "yarn remove",
+}
+
 export const pkgCommands = {
 	install(
 		packageManager: PackageManager | undefined,
 		packages: string | string[],
-		asDevDependencies = false
+		asDevDependencies = false,
+		forceProduction = false,
 	): string {
-		let command = "npm i "
+		const parts: string[] = []
+		parts.push(installCommands[packageManager ?? "npm"])
 
-		if (packageManager === "yarn") command = `yarn add `
-
-		if (Array.isArray(packages)) {
-			command += packages.join(" ")
-		} else {
-			command += packages
+		if (asDevDependencies) {
+			parts.push("-D")
+		} else if (forceProduction) {
+			parts.push("-P")
 		}
 
-		if (asDevDependencies) command += " -D"
+		parts.push(Array.isArray(packages) ? packages.join(" ") : packages)
 
-		return fm.command(command)
+		return fm.command(parts.join(" "))
 	},
 
-	remove(
-		packageManager: PackageManager | undefined,
-		packages: string | string[]
-	): string {
-		let command = packageManager === "yarn" ? "yarn remove " : "npm remove "
+	remove(packageManager: PackageManager | undefined, packages: string | string[]): string {
+		const parts: string[] = []
+		parts.push(removeCommands[packageManager ?? "npm"])
 
-		command += Array.isArray(packages) ? packages.join(" ") : packages
+		parts.push(Array.isArray(packages) ? packages.join(" ") : packages)
 
-		return fm.command(command)
+		return fm.command(parts.join(" "))
 	},
 
 	move(
 		packageManager: PackageManager | undefined,
 		packages: string | string[],
-		to: "dev" | "prod"
+		to: "dev" | "prod",
 	): string {
-		const packageString = Array.isArray(packages)
-			? packages.join(" ")
-			: packages
-
-		if (packageManager === "yarn") {
-			return fm.command(
-				`yarn remove ${packageString} && yarn add ${packageString}${
-					to === "dev" ? " -D" : ""
-				}`
-			)
-		}
-
-		return fm.command(
-			`npm install ${packageString}${to === "dev" ? " -D" : ""}`
-		)
+		return pkgCommands.install(packageManager, packages, to === "dev", true)
 	},
 }

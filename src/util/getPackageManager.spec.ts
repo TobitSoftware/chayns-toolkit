@@ -22,6 +22,14 @@ test("should identify npm", () => {
 	expect(getPackageManager()).toBe("npm")
 })
 
+test("should identify pnpm", () => {
+	mock({
+		[path.resolve("pnpm-lock.yaml")]: "",
+	})
+
+	expect(getPackageManager()).toBe("pnpm")
+})
+
 test("should identify yarn in a monorepo", () => {
 	mock({
 		[path.resolve("../../yarn.lock")]: "",
