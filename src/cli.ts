@@ -2,7 +2,6 @@ import { Command } from "commander"
 import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
-import { testCommand } from "./commands/testCommand"
 import { loadEnvironment } from "./features/environment/loadEnvironment"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
@@ -60,25 +59,6 @@ program
 		} catch (e) {
 			output.error(e as string)
 		}
-	})
-
-program
-	.command("test")
-	.description("executes all Jest tests for this project")
-	.option("-w, --watch", "watch for changes to rerun tests", false)
-	.option(
-		"--setupFile <path>",
-		"file that should be executed before the tests are initialized",
-		"",
-	)
-	.action(async (options: { watch: boolean; setupFile: string }) => {
-		try {
-			await runSteps([testCommand(options)])
-		} catch (e) {
-			output.error(e as string)
-		}
-
-		console.info("")
 	})
 
 program.parse(process.argv)

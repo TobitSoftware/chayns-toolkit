@@ -23,7 +23,11 @@ module.exports = {
 				"commands/build",
 				"commands/lint",
 				"commands/serve",
-				"commands/test",
+				{
+					type: "doc",
+					id: "commands/test",
+					label: "Test (legacy)",
+				},
 			],
 		},
 		{

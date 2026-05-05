@@ -66,10 +66,10 @@ export function devCommand({
 						`You need to install the ${fm.code`react-devtools`} package to use the ${fm.command`--devtools`} option.`,
 					)
 					output.blank(
-						`Run ${pkgCommands.move(
+						`Run ${pkgCommands.install(
 							packageManager,
 							"react-devtools",
-							"dev",
+							true,
 						)} to add it as a ${fm.code`devDependency`}.\n`,
 					)
 					process.exit(1)

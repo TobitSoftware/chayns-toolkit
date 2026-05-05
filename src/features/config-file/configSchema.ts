@@ -1,6 +1,5 @@
 import { z } from "zod"
 import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
-import type { JestConfig } from "../../commands/testCommand"
 
 const developmentSchema = z.object({
 	host: z.string().max(255).default("adaptive"),
@@ -89,7 +88,6 @@ export const configSchema = z.object({
 		)
 		.returns(z.custom<RsbuildConfig>())
 		.optional(),
-	jest: z.function().args(z.custom<JestConfig>()).returns(z.custom<JestConfig>()).optional(),
 })
 
 export type ToolkitConfig = z.input<typeof configSchema>

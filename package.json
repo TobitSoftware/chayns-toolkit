@@ -44,7 +44,7 @@
 		"lint": "eslint src/ --ext js,jsx,ts,tsx",
 		"prepare": "husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks",
 		"prepublishOnly": "npm run build && npm run build-types",
-		"test": "jest"
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"@babel/preset-env": "^7.29.3",
@@ -59,12 +59,10 @@
 		"@rsbuild/plugin-react": "^2.0.0",
 		"@rsbuild/plugin-sass": "^1.5.2",
 		"@rsbuild/plugin-svgr": "^2.0.2",
-		"@testing-library/jest-dom": "^6.9.1",
 		"@wyw-in-js/webpack-loader": "^1.1.0",
 		"ajv": "^8.20.0",
 		"eslint": "^9.39.4",
 		"eslint-formatter-pretty": "^6.0.1",
-		"jest": "^29.7.0",
 		"postcss-prefix-selector": "^2.1.1",
 		"react-refresh": "^0.18.0",
 		"serve-handler": "^6.1.7",
@@ -74,8 +72,8 @@
 	},
 	"devDependencies": {
 		"@module-federation/enhanced": "^2.4.0",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@types/eslint": "^9.6.1",
-		"@types/jest": "^29.5.14",
 		"@types/mock-fs": "^4.13.4",
 		"@types/node": "^22.19.17",
 		"@types/semver": "^7.7.1",
@@ -87,13 +85,15 @@
 		"fast-glob": "^3.3.3",
 		"fs-extra": "^11.3.4",
 		"husky": "^9.1.7",
+		"jsdom": "^29.1.1",
 		"mock-fs": "^5.5.0",
 		"prettier": "^3.8.3",
 		"prettier-plugin-packagejson": "^3.0.2",
 		"pretty-quick": "^4.2.2",
 		"shx": "^0.4.0",
 		"type-fest": "^5.6.0",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"vitest": "^4.1.5"
 	},
 	"peerDependencies": {
 		"@module-federation/enhanced": "^2.4.0",

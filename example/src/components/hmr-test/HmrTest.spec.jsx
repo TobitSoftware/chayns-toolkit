@@ -1,24 +1,39 @@
-import { render } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
-import React from "react"
-import HmrTest from "./HmrTest"
+import { PageProvider } from '@chayns-components/core';
+import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ChaynsProvider } from 'chayns-api';
+import React from 'react';
+import { expect, test } from 'vitest';
+import HmrTest from './HmrTest';
 
-global.window.chayns = {
-	env: {
-		language: "de",
-		site: {
-			color: "#000000",
-		},
-		parameters: {},
-	},
-}
+const chaynsApiMock = {
+    data: {
+        site: {
+            siteId: '00000-00000',
+            colorMode: 0,
+            color: '#FF0000',
+        },
+        environment: {},
+    },
+    functions: {
+        addWindowMetricsListener: () => {},
+        getWindowMetrics: () => ({}),
+    },
+};
 
-test("should increase count after clicking", () => {
-	const { getByText } = render(<HmrTest />)
+test('should increase count after clicking', async () => {
+    const { getByText } = render(
+        <ChaynsProvider data={chaynsApiMock.data} functions={chaynsApiMock.functions} isModule>
+            <PageProvider>
+                <HmrTest />
+            </PageProvider>
+        </ChaynsProvider>,
+    );
+    const user = userEvent.setup();
 
-	const node = getByText("I've been clicked 0 times.")
+    const node = getByText("I've been clicked 0 times.");
 
-	userEvent.click(node)
+    await user.click(node);
 
-	expect(getByText("I've been clicked 1 times.")).toBeInTheDocument()
-})
+    expect(getByText("I've been clicked 1 times.")).toBeDefined();
+});
