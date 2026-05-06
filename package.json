@@ -47,7 +47,7 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
-		"@babel/preset-env": "^7.29.3",
+		"@babel/preset-env": "^7.29.5",
 		"@babel/preset-react": "^7.28.5",
 		"@chayns-toolkit/eslint-config": "^3.0.2",
 		"@module-federation/node": "^2.7.42",
