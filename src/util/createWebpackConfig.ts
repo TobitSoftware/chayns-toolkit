@@ -13,6 +13,7 @@ import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry"
 import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
 import type { PackageJson } from "type-fest"
+import { isPackageInstalled } from "./isPackageInstalled"
 import { project } from "./project"
 import { getCssTag } from "./loadChaynsCss"
 
@@ -71,6 +72,11 @@ interface CreateConfigOptions {
 	entryPoints: EntryPoints
 	target: "client" | "server" | null
 	reactRuntime?: "automatic" | "classic"
+	reactCompiler?:
+		| boolean
+		| {
+				target?: string
+		  }
 	disableReactSharing?: boolean
 	manifest?: {
 		host?: boolean
@@ -78,6 +84,19 @@ interface CreateConfigOptions {
 		externalAssets?: string[]
 		textStringLibraries?: string[]
 	}
+}
+
+function getReactCompilerTarget(packageJson: PackageJson, targetOverride?: string): string {
+	if (targetOverride) {
+		return targetOverride
+	}
+
+	const reactVersion =
+		packageJson.dependencies?.react ??
+		packageJson.peerDependencies?.react ??
+		packageJson.devDependencies?.react
+
+	return reactVersion?.match(/\d+/)?.[0] ?? "18"
 }
 
 export async function createWebpackConfig({
@@ -94,6 +113,7 @@ export async function createWebpackConfig({
 	target,
 	serverSideRendering,
 	reactRuntime,
+	reactCompiler,
 	disableReactSharing = false,
 	manifest = {},
 }: CreateConfigOptions): Promise<RsbuildConfig> {
@@ -105,6 +125,21 @@ export async function createWebpackConfig({
 	const { parsed, publicVars } = loadEnv({
 		mode: buildEnv,
 	})
+
+	const isLinariaUsed = isPackageInstalled(packageJson, "@linaria/core")
+	const isReactCompilerInstalled = isPackageInstalled(packageJson, "babel-plugin-react-compiler")
+
+	const isReactCompilerEnabled =
+		typeof reactCompiler === "boolean"
+			? reactCompiler
+			: reactCompiler !== undefined
+				? true
+				: isReactCompilerInstalled
+
+	const reactCompilerTarget =
+		typeof reactCompiler === "object" && reactCompiler !== null
+			? reactCompiler.target
+			: undefined
 
 	const plugins: Rspack.Configuration["plugins"] = []
 	const rsBuildPlugins = [
@@ -254,25 +289,25 @@ export async function createWebpackConfig({
 			: undefined,
 	}
 
-	let isLinariaUsed = false
-
-	try {
-		require.resolve("@linaria/core", { paths: [project.resolvePath("node_modules")] })
-		isLinariaUsed = true
-	} catch {
-		// Linaria is not used
-	}
-
-	if (isLinariaUsed) {
+	if (isLinariaUsed || isReactCompilerEnabled) {
 		rsBuildPlugins.push(
 			pluginBabel({
 				babelLoaderOptions: (options, { addPresets }) => {
 					options.sourceMaps = false
+					if (isReactCompilerEnabled) {
+						options.plugins ??= []
+						options.plugins.unshift([
+							"babel-plugin-react-compiler",
+							{ target: getReactCompilerTarget(packageJson, reactCompilerTarget) },
+						])
+					}
 					addPresets(["@babel/preset-react"])
 				},
 			}),
 		)
+	}
 
+	if (isLinariaUsed) {
 		tools.bundlerChain = (chain, { CHAIN_ID }) => {
 			chain.module
 				.rule(CHAIN_ID.RULE.JS)

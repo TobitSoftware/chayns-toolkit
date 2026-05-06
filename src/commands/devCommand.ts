@@ -45,6 +45,7 @@ export function devCommand({
 				exposeModules: config.output.exposeModules,
 				disableReactSharing: config.output.disableReactSharing,
 				reactRuntime: config.output.reactRuntime,
+				reactCompiler: config.output.reactCompiler,
 				manifest: config.manifest,
 				entryPoints: config.output.entryPoints,
 				target,

@@ -57,10 +57,35 @@ module.exports = {
          * @type {'automatic' | 'classic'}
          */
         reactRuntime: "automatic",
+        /**
+         * Enables and configures the React Compiler.
+         *
+         * By default, the compiler is automatically enabled when
+         * `babel-plugin-react-compiler` is installed.
+         *
+         * Use `false` to disable that auto-enable behavior, `true` to force it on,
+         * or provide an object to configure it explicitly.
+         *
+         * @type {boolean | { target?: string }}
+         */
+        reactCompiler: {
+            target: "18",
+        },
     },
     // ... other options ...
 }
 ```
+
+## React Compiler
+
+If `babel-plugin-react-compiler` is installed, `chayns-toolkit` enables the React Compiler
+automatically.
+
+You can override this behavior via `output.reactCompiler`:
+
+- `false` disables the compiler even if the package is installed
+- `true` forces it on
+- `{ target: "18" }` enables it and configures the target explicitly
 
 ## Single File Builds
 

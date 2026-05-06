@@ -41,6 +41,14 @@ const outputSchema = z
 		exposeModules: z.record(z.string(), z.string()).optional(),
 		disableReactSharing: z.boolean().default(false),
 		reactRuntime: z.union([z.literal("automatic"), z.literal("classic")]).default("classic"),
+		reactCompiler: z
+			.union([
+				z.boolean(),
+				z.object({
+					target: z.string().optional(),
+				}),
+			])
+			.optional(),
 		entryPoints: z
 			.record(
 				z.string(),

@@ -77,9 +77,29 @@ module.exports = {
 ### Adding react-compiler
 
 Add the required devDependencies:
-`npm i @rsbuild/plugin-babel babel-plugin-react-compiler eslint-plugin-react-compiler -D`
+`npm i babel-plugin-react-compiler eslint-plugin-react-compiler -D`
 
-When using react version prior to 19 also add: `npm i react-compiler-runtime -D`
+When using React versions prior to 19 also add: `npm i react-compiler-runtime -D`
+
+The toolkit enables the React Compiler automatically when `babel-plugin-react-compiler` is
+installed.
+
+If you want to configure or override it explicitly, use `output.reactCompiler`:
+
+```js title="/toolkit.config.js"
+module.exports = {
+    output: {
+        reactCompiler: {
+            target: "18",
+        },
+    },
+}
+```
+
+### v3
+
+chayns-toolkit v3 did not include the React Compiler by default, but you can still add it manually
+to your configuration:
 
 ```js
 const { pluginBabel } = require("@rsbuild/plugin-babel")
@@ -93,12 +113,12 @@ module.exports = {
                     opts.plugins?.unshift([
                         "babel-plugin-react-compiler",
                         {
-                            // specify target react version, can be omitted for versions prior to 19
+                            // specify target react version, required for versions prior to 19
                             target: "18", // '17' || '18' || '19'
                         },
                     ])
                 },
-            })
+            }),
         )
 
         return config
@@ -118,7 +138,7 @@ to `babel-loader`:
 module.exports = {
     webpack(config) {
         const babelRule = config.module.rules.find(
-            (rule) => rule.use.loader && rule.use.loader.includes("babel-loader")
+            (rule) => rule.use.loader && rule.use.loader.includes("babel-loader"),
         )
 
         if (!babelRule) return config
