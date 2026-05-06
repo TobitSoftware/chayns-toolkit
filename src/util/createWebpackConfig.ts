@@ -1,6 +1,11 @@
 /* eslint-disable */
 import { moduleFederationPlugin } from "@module-federation/enhanced"
-import { HtmlTagDescriptor, type PostCSSOptions, ToolsConfig } from "@rsbuild/core/dist-types/types"
+import {
+	type HtmlTagDescriptor,
+	type PostCSSOptions,
+	type RsbuildConfig,
+	type ToolsConfig,
+} from "@rsbuild/core"
 import { pluginReact } from "@rsbuild/plugin-react"
 import { pluginSass } from "@rsbuild/plugin-sass"
 import { pluginCssMinimizer } from "@rsbuild/plugin-css-minimizer"
@@ -10,7 +15,6 @@ import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
 import type { PackageJson } from "type-fest"
 import { project } from "./project"
 import { getCssTag } from "./loadChaynsCss"
-import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
 
 import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
 import { pluginNodePolyfill } from "@rsbuild/plugin-node-polyfill"

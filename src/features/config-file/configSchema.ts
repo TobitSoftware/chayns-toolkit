@@ -1,5 +1,5 @@
 import { z } from "zod"
-import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
+import type { RsbuildConfig } from "@rsbuild/core"
 
 const developmentSchema = z.object({
 	host: z.string().max(255).default("adaptive"),

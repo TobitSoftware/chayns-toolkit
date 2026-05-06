@@ -1,4 +1,4 @@
-import { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
+import type { RsbuildConfig } from "@rsbuild/core"
 import { usedConfigFilename } from "../features/config-file/loadConfig"
 import { fm } from "./format"
 
