@@ -49,6 +49,11 @@ type EntryPoints = {
 	[key: string]: EntryPoint
 }
 
+type ReactRequiredVersions = {
+	react?: string
+	reactDom?: string
+}
+
 interface CreateConfigOptions {
 	mode: Mode
 	analyze: boolean
@@ -69,6 +74,7 @@ interface CreateConfigOptions {
 	prefixCss?: boolean
 	cssVersion?: string
 	exposeModules?: {}
+	reactRequiredVersions?: string | ReactRequiredVersions
 	entryPoints: EntryPoints
 	target: "client" | "server" | null
 	reactRuntime?: "automatic" | "classic"
@@ -99,6 +105,31 @@ function getReactCompilerTarget(packageJson: PackageJson, targetOverride?: strin
 	return reactVersion?.match(/\d+/)?.[0] ?? "18"
 }
 
+export function resolveReactRequiredVersions(
+	packageJson: PackageJson,
+	reactRequiredVersions?: string | ReactRequiredVersions,
+): ReactRequiredVersions {
+	const defaultReactVersion =
+		packageJson.peerDependencies?.react ?? packageJson.dependencies?.react
+	const defaultReactDomVersion =
+		packageJson.peerDependencies?.["react-dom"] ?? packageJson.dependencies?.["react-dom"]
+
+	if (typeof reactRequiredVersions === "string") {
+		return {
+			react: reactRequiredVersions,
+			reactDom: reactRequiredVersions,
+		}
+	}
+
+	return {
+		react: reactRequiredVersions?.react ?? defaultReactVersion,
+		reactDom:
+			reactRequiredVersions?.reactDom ??
+			reactRequiredVersions?.react ??
+			defaultReactDomVersion,
+	}
+}
+
 export async function createWebpackConfig({
 	mode,
 	analyze,
@@ -109,6 +140,7 @@ export async function createWebpackConfig({
 	prefixCss = false,
 	cssVersion = "4.2",
 	exposeModules,
+	reactRequiredVersions,
 	entryPoints,
 	target,
 	serverSideRendering,
@@ -140,6 +172,10 @@ export async function createWebpackConfig({
 		typeof reactCompiler === "object" && reactCompiler !== null
 			? reactCompiler.target
 			: undefined
+	const resolvedReactRequiredVersions = resolveReactRequiredVersions(
+		packageJson,
+		reactRequiredVersions,
+	)
 
 	const plugins: Rspack.Configuration["plugins"] = []
 	const rsBuildPlugins = [
@@ -190,13 +226,10 @@ export async function createWebpackConfig({
 		// Consuming modules always use the default share scope.
 		const shared: ConstructorParameters<typeof ModuleFederationPlugin>[0]["shared"] = {
 			react: {
-				requiredVersion:
-					packageJson.peerDependencies?.react || packageJson?.dependencies?.react,
+				requiredVersion: resolvedReactRequiredVersions.react,
 			},
 			"react-dom": {
-				requiredVersion:
-					packageJson.peerDependencies?.["react-dom"] ||
-					packageJson?.dependencies?.["react-dom"],
+				requiredVersion: resolvedReactRequiredVersions.reactDom,
 			},
 		}
 
@@ -368,9 +401,7 @@ export async function createWebpackConfig({
 				"import.meta.env.__PACKAGE_NAME__": JSON.stringify(
 					packageJson.name?.replace(/-/g, "_"),
 				),
-				__REQUIRED_REACT_VERSION__: JSON.stringify(
-					packageJson.peerDependencies?.react || packageJson?.dependencies?.react,
-				),
+				__REQUIRED_REACT_VERSION__: JSON.stringify(resolvedReactRequiredVersions.react),
 				...publicVars,
 			},
 			entry: entries,

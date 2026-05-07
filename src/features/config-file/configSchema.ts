@@ -39,6 +39,20 @@ const outputSchema = z
 			.regex(/^\d+\.\d+$/)
 			.default("4.2"),
 		exposeModules: z.record(z.string(), z.string()).optional(),
+		reactRequiredVersions: z
+			.union([
+				z.string().min(1),
+				z
+					.object({
+						react: z.string().min(1).optional(),
+						reactDom: z.string().min(1).optional(),
+					})
+					.refine(
+						(data) => Boolean(data.react || data.reactDom),
+						"Need to define at least one key for output.reactRequiredVersions",
+					),
+			])
+			.optional(),
 		disableReactSharing: z.boolean().default(false),
 		reactRuntime: z.union([z.literal("automatic"), z.literal("classic")]).default("classic"),
 		reactCompiler: z

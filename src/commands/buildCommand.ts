@@ -31,6 +31,7 @@ export function buildCommand({
 				prefixCss: config.output.prefixCss,
 				cssVersion: config.output.cssVersion,
 				exposeModules: config.output.exposeModules,
+				reactRequiredVersions: config.output.reactRequiredVersions,
 				disableReactSharing: config.output.disableReactSharing,
 				reactRuntime: config.output.reactRuntime,
 				reactCompiler: config.output.reactCompiler,

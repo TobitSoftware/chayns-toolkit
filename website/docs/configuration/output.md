@@ -71,10 +71,35 @@ module.exports = {
         reactCompiler: {
             target: "18",
         },
+        /**
+         * Overrides the `requiredVersion` used for Module Federation shared
+         * React packages.
+         *
+         * Use a string to force the same version/range for `react`, `react-dom`
+         * and `react-dom/client`, or use an object for per-package overrides.
+         *
+         * @type {string | { react?: string, reactDom?: string }}
+         */
+        reactRequiredVersions: {
+            react: "^19.0.0",
+            reactDom: "^19.0.0",
+        },
     },
     // ... other options ...
 }
 ```
+
+## React Required Versions for Module Federation
+
+By default, `chayns-toolkit` derives the Module Federation `shared.requiredVersion` values from
+`peerDependencies` first and then from `dependencies`.
+
+If your package intentionally allows a broader range such as `18 || 19`, but your federated module
+must use a stricter version at runtime, you can override that via `output.reactRequiredVersions`.
+
+- `"^19.0.0"` applies the same override to `react`, `react-dom` and `react-dom/client`
+- `{ react: "^18.0.0" }` also uses that value as fallback for `react-dom`
+- `{ react: "^18.0.0", reactDom: "^19.0.0" }` lets you override them independently
 
 ## React Compiler
 
