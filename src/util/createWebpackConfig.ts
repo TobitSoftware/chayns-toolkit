@@ -224,7 +224,7 @@ export async function createWebpackConfig({
 						},
 					}
 				: false,
-			name: packageName?.split("-").join("_"),
+			name: packageName?.replace(/^@/, "").replace(/\//g, "__").replace(/-/g, "_"),
 			filename: "v2.remoteEntry.js",
 			runtimePlugins:
 				target === "server"
