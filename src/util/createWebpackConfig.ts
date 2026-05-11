@@ -419,6 +419,7 @@ export async function createWebpackConfig({
 		tools,
 		output: {
 			target: target === "server" ? "node" : "web",
+			module: target === "server" && exposeModules ? false : undefined,
 			sourceMap: {
 				js: mode === "development" ? "cheap-module-source-map" : "hidden-source-map",
 			},
