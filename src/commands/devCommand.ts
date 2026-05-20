@@ -1,8 +1,9 @@
-import { exec as execCommand, spawn } from "child_process"
+import { exec as execCommand } from "child_process"
 import { createRsbuild } from "@rsbuild/core"
 import fs, { watchFile } from "fs"
 import { unwatchFile } from "node:fs"
 import { createWebpackConfig } from "../util/createWebpackConfig"
+import { createExecController } from "../util/execController"
 import { fm } from "../util/format"
 import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
@@ -24,57 +25,7 @@ export function devCommand({
 	exec,
 }: DevCommandArgs): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson, packageManager }) => {
-		let runningCommand: ReturnType<typeof spawn> | undefined
-
-		const stopExecCommand = async () => {
-			if (!runningCommand || runningCommand.exitCode !== null || runningCommand.killed) {
-				runningCommand = undefined
-				return
-			}
-
-			const processToStop = runningCommand
-			runningCommand = undefined
-
-			await new Promise<void>((resolve) => {
-				processToStop.once("exit", () => {
-					resolve()
-				})
-				processToStop.kill()
-			})
-		}
-
-		const startExecCommand = async () => {
-			if (!exec) {
-				return
-			}
-
-			if (runningCommand) {
-				await stopExecCommand()
-			}
-
-			output.info(`Starting command: ${exec}`)
-
-			const child = spawn(exec, {
-				env: process.env,
-				shell: true,
-				stdio: "inherit",
-			})
-
-			runningCommand = child
-
-			child.once("error", (error) => {
-				if (runningCommand === child) {
-					runningCommand = undefined
-				}
-				output.error(`Failed to start command \"${exec}\": ${error.message}`)
-			})
-
-			child.once("exit", () => {
-				if (runningCommand === child) {
-					runningCommand = undefined
-				}
-			})
-		}
+		const execController = createExecController(exec)
 
 		const { port, host, cert, key } = config.development
 
@@ -170,15 +121,15 @@ export function devCommand({
 					return
 				}
 
-				await startExecCommand()
+				await execController.start()
 			})
 
 			rsbuild.onCloseDevServer(async () => {
-				await stopExecCommand()
+				await execController.stop()
 			})
 
 			process.once("exit", () => {
-				runningCommand?.kill()
+				execController.kill()
 			})
 		}
 
