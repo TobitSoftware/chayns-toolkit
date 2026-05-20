@@ -102,6 +102,7 @@ type CreateEnvironmentConfigOptions = Pick<
 	| "injectDevtoolsScript"
 	| "manifest"
 	| "mode"
+	| "outputFilename"
 > & {
 	buildVersion: string
 	env: "web" | "node" | "web-worker"
@@ -115,12 +116,31 @@ const getEnvironmentDistPathConfig = (
 	pathPrefix?: string,
 ) => {
 	if (!pathPrefix) return undefined
+
+	const staticPrefix = `${pathPrefix}static`
+	const jsDir = env === "node" ? `${staticPrefix}/js` : `${staticPrefix}/js`
+	const jsAsyncDir = `${staticPrefix}/js/async`
+	const cssDir = `${staticPrefix}/css`
+	const cssAsyncDir = `${staticPrefix}/css/async`
+
 	return {
-		js: env === "node" ? pathPrefix : `${pathPrefix}static/js`,
-		jsAsync: env === "node" ? pathPrefix : `${pathPrefix}static/js`,
-		json: pathPrefix,
+		js: jsDir,
+		jsAsync: jsAsyncDir,
+		css: cssDir,
+		cssAsync: cssAsyncDir,
+		svg: `${staticPrefix}/svg`,
+		font: `${staticPrefix}/font`,
+		html: pathPrefix,
+		wasm: `${staticPrefix}/wasm`,
+		image: `${staticPrefix}/image`,
+		media: `${staticPrefix}/media`,
+		assets: `${staticPrefix}/assets`,
+		favicon: pathPrefix,
 	}
 }
+
+const getDefaultNonHtmlEntryFilename = (mode: Mode) =>
+	mode === "production" ? "[name].im.js" : "[name].js"
 
 const shouldIncludeEntryPointInEnvironment = (
 	entryPoint: EntryPoint,
@@ -136,6 +156,8 @@ const shouldIncludeEntryPointInEnvironment = (
 const createEnvironmentEntries = (
 	entryPoints: EntryPoints,
 	env: CreateEnvironmentConfigOptions["env"],
+	mode: Mode,
+	outputFilename?: CreateConfigOptions["outputFilename"],
 ): RsbuildEntry => {
 	const entries: RsbuildEntry = {}
 
@@ -149,7 +171,11 @@ const createEnvironmentEntries = (
 			return
 		}
 
-		entries[entryName] = { import: entryPoint.pathIndex, html: false }
+		entries[entryName] = {
+			import: entryPoint.pathIndex,
+			html: false,
+			filename: outputFilename?.js ?? getDefaultNonHtmlEntryFilename(mode),
+		}
 	})
 
 	return entries
@@ -199,6 +225,63 @@ export function resolveReactRequiredVersions(
 	}
 }
 
+const stripPathPrefix = (value: string, pathPrefix?: string) => {
+	if (!pathPrefix) {
+		return value
+	}
+
+	return value.startsWith(pathPrefix) ? value.slice(pathPrefix.length) : value
+}
+
+const normalizeManifestDataPaths = (
+	manifestData: {
+		allFiles: string[]
+		entries: Record<
+			string,
+			{
+				initial?: { js?: string[]; css?: string[] }
+				async?: { js?: string[]; css?: string[] }
+				html?: string[]
+				assets?: string[]
+			}
+		>
+		integrity?: Record<string, string>
+	},
+	pathPrefix?: string,
+) => {
+	manifestData.allFiles = manifestData.allFiles.map((file) => stripPathPrefix(file, pathPrefix))
+
+	Object.values(manifestData.entries).forEach((entry) => {
+		if (entry.initial?.js) {
+			entry.initial.js = entry.initial.js.map((file) => stripPathPrefix(file, pathPrefix))
+		}
+		if (entry.initial?.css) {
+			entry.initial.css = entry.initial.css.map((file) => stripPathPrefix(file, pathPrefix))
+		}
+		if (entry.async?.js) {
+			entry.async.js = entry.async.js.map((file) => stripPathPrefix(file, pathPrefix))
+		}
+		if (entry.async?.css) {
+			entry.async.css = entry.async.css.map((file) => stripPathPrefix(file, pathPrefix))
+		}
+		if (entry.html) {
+			entry.html = entry.html.map((file) => stripPathPrefix(file, pathPrefix))
+		}
+		if (entry.assets) {
+			entry.assets = entry.assets.map((file) => stripPathPrefix(file, pathPrefix))
+		}
+	})
+
+	if (manifestData.integrity) {
+		manifestData.integrity = Object.fromEntries(
+			Object.entries(manifestData.integrity).map(([file, integrity]) => [
+				stripPathPrefix(file, pathPrefix),
+				integrity,
+			]),
+		)
+	}
+}
+
 async function createEnvironmentConfig({
 	analyze,
 	buildVersion,
@@ -209,12 +292,13 @@ async function createEnvironmentConfig({
 	injectDevtoolsScript = false,
 	manifest = {},
 	mode,
+	outputFilename,
 	packageName,
 	pathPrefix,
 	reactRequiredVersions,
 	env,
 }: CreateEnvironmentConfigOptions): Promise<RsbuildConfig["environments"]> {
-	const entries = createEnvironmentEntries(entryPoints, env)
+	const entries = createEnvironmentEntries(entryPoints, env, mode, outputFilename)
 	const supportsModuleFederation = env !== "web-worker"
 
 	if (Object.keys(entries).length === 0 && !(exposeModules && supportsModuleFederation)) {
@@ -335,6 +419,9 @@ async function createEnvironmentConfig({
 				manifest:
 					manifest?.host && env === "web"
 						? {
+								filename: pathPrefix
+									? `${pathPrefix}static/manifest.json`
+									: undefined,
 								generate: ({ manifestData }) => {
 									const filterFiles = (files: string[]) =>
 										files.filter((file) => !file.endsWith(".map"))
@@ -345,6 +432,13 @@ async function createEnvironmentConfig({
 											value.assets = filterFiles(value.assets)
 										}
 									})
+
+									normalizeManifestDataPaths(
+										manifestData as typeof manifestData & {
+											integrity?: Record<string, string>
+										},
+										pathPrefix,
+									)
 
 									if (manifest?.externalAssets) {
 										;(manifestData as Record<string, unknown>).staticFiles =
@@ -448,6 +542,7 @@ export async function createWebpackConfig({
 				exposeModules,
 				manifest,
 				mode,
+				outputFilename,
 				packageName,
 				pathPrefix: "server/",
 				reactRequiredVersions: resolvedReactRequiredVersions,
@@ -467,6 +562,7 @@ export async function createWebpackConfig({
 			injectDevtoolsScript,
 			manifest,
 			mode,
+			outputFilename,
 			packageName,
 			pathPrefix: serverSideRendering ? "client/" : undefined,
 			reactRequiredVersions: resolvedReactRequiredVersions,
@@ -484,6 +580,7 @@ export async function createWebpackConfig({
 			exposeModules,
 			manifest,
 			mode,
+			outputFilename,
 			packageName,
 			pathPrefix: serverSideRendering ? "client/" : undefined,
 			reactRequiredVersions: resolvedReactRequiredVersions,
