@@ -87,6 +87,10 @@ test("splits entry points across web, node and worker environments", async () =>
 				pathIndex: "./src/index",
 				pathHtml: "./src/index.html",
 			},
+			client: {
+				pathIndex: "./src/index.client",
+				target: "web",
+			},
 			server: {
 				pathIndex: "./src/server",
 				target: "node",
@@ -101,13 +105,14 @@ test("splits entry points across web, node and worker environments", async () =>
 	expect(Object.keys(config.environments ?? {})).toStrictEqual(["node", "web", "web-worker"])
 	expect(config.environments?.web?.source?.entry).toStrictEqual({
 		index: "./src/index",
+		client: { import: "./src/index.client", html: false },
 	})
 	expect(config.environments?.node?.source?.entry).toStrictEqual({
-		index: { import: "./src/index", html: false, filename: "[name].im.js" },
-		server: { import: "./src/server", html: false, filename: "[name].im.js" },
+		index: { import: "./src/index", filename: "server/[name].js" },
+		server: { import: "./src/server", html: false, filename: "server/[name].js" },
 	})
 	expect(config.environments?.["web-worker"]?.source?.entry).toStrictEqual({
-		worker: { import: "./src/worker", html: false, filename: "[name].im.js" },
+		worker: { import: "./src/worker", html: false, filename: "client/[name].js" },
 	})
 	expect(config.environments?.web?.output).toMatchObject({
 		target: "web",
@@ -170,7 +175,7 @@ test("does not configure module federation for web-worker environments", async (
 	})
 
 	expect(config.environments?.["web-worker"]?.source?.entry).toStrictEqual({
-		worker: { import: "./src/worker", html: false, filename: "[name].im.js" },
+		worker: { import: "./src/worker", html: false, filename: "client/[name].js" },
 	})
 	expect(config.environments?.["web-worker"]?.tools).toBeUndefined()
 	expect(config.environments?.web?.source?.entry).toStrictEqual({
@@ -270,4 +275,47 @@ test("writes host manifest into client/static and strips the client prefix from 
 		"static/js/index.im.js": "sha256-test",
 	})
 	expect(generatedManifest.buildVersion).toContain("production-fallback-")
+})
+
+test("allows overriding the filename per entry point", async () => {
+	const config = await createWebpackConfig({
+		mode: "production",
+		analyze: false,
+		singleBundle: false,
+		serverSideRendering: true,
+		packageJson: {
+			name: "test-package",
+			peerDependencies: {
+				react: "^19.0.0",
+				"react-dom": "^19.0.0",
+			},
+		},
+		entryPoints: {
+			client: {
+				pathIndex: "./src/index.client",
+				target: "web",
+				filename: "static/js/index.client.js",
+			},
+			server: {
+				pathIndex: "./src/server",
+				target: "node",
+				filename: "server-entry.js",
+			},
+		},
+	})
+
+	expect(config.environments?.web?.source?.entry).toStrictEqual({
+		client: {
+			import: "./src/index.client",
+			html: false,
+			filename: "client/static/js/index.client.js",
+		},
+	})
+	expect(config.environments?.node?.source?.entry).toStrictEqual({
+		server: {
+			import: "./src/server",
+			html: false,
+			filename: "server/server-entry.js",
+		},
+	})
 })

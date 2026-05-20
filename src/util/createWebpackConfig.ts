@@ -40,6 +40,7 @@ type Mode = "development" | "production" | "none"
 export type EntryPoint = {
 	pathHtml?: string
 	pathIndex: string
+	filename?: string
 	templateParameters?: {
 		[key: string]: string
 	}
@@ -139,8 +140,13 @@ const getEnvironmentDistPathConfig = (
 	}
 }
 
-const getDefaultNonHtmlEntryFilename = (mode: Mode) =>
-	mode === "production" ? "[name].im.js" : "[name].js"
+const prefixEntryFilename = (filename: string | undefined, pathPrefix?: string) => {
+	if (!filename || !pathPrefix || filename.startsWith(pathPrefix)) {
+		return filename
+	}
+
+	return `${pathPrefix}${filename}`
+}
 
 const shouldIncludeEntryPointInEnvironment = (
 	entryPoint: EntryPoint,
@@ -156,7 +162,7 @@ const shouldIncludeEntryPointInEnvironment = (
 const createEnvironmentEntries = (
 	entryPoints: EntryPoints,
 	env: CreateEnvironmentConfigOptions["env"],
-	mode: Mode,
+	pathPrefix?: string,
 	outputFilename?: CreateConfigOptions["outputFilename"],
 ): RsbuildEntry => {
 	const entries: RsbuildEntry = {}
@@ -167,15 +173,31 @@ const createEnvironmentEntries = (
 		}
 
 		if (env === "web" && entryPoint.pathHtml) {
-			entries[entryName] = entryPoint.pathIndex
-			return
+			if (!entryPoint.filename) {
+				entries[entryName] = entryPoint.pathIndex
+				return
+			}
 		}
 
-		entries[entryName] = {
+		const entry: NonNullable<RsbuildEntry[string]> = {
 			import: entryPoint.pathIndex,
-			html: false,
-			filename: outputFilename?.js ?? getDefaultNonHtmlEntryFilename(mode),
 		}
+
+		if (!entryPoint.pathHtml) {
+			entry.html = false
+		}
+
+		const resolvedFilename =
+			prefixEntryFilename(entryPoint.filename, pathPrefix) ??
+			(env === "web"
+				? undefined
+				: prefixEntryFilename(outputFilename?.js ?? "[name].js", pathPrefix))
+
+		if (resolvedFilename) {
+			entry.filename = resolvedFilename
+		}
+
+		entries[entryName] = entry
 	})
 
 	return entries
@@ -298,7 +320,7 @@ async function createEnvironmentConfig({
 	reactRequiredVersions,
 	env,
 }: CreateEnvironmentConfigOptions): Promise<RsbuildConfig["environments"]> {
-	const entries = createEnvironmentEntries(entryPoints, env, mode, outputFilename)
+	const entries = createEnvironmentEntries(entryPoints, env, pathPrefix, outputFilename)
 	const supportsModuleFederation = env !== "web-worker"
 
 	if (Object.keys(entries).length === 0 && !(exposeModules && supportsModuleFederation)) {

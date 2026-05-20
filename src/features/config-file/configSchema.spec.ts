@@ -57,6 +57,7 @@ test("accepts environment targets for entry points", () => {
 			entryPoints: {
 				index: {
 					pathIndex: "./src/index",
+					filename: "custom/[name].js",
 				},
 				server: {
 					pathIndex: "./src/server",
@@ -72,4 +73,5 @@ test("accepts environment targets for entry points", () => {
 
 	expect(config.output.entryPoints.server.target).toBe("node")
 	expect(config.output.entryPoints.worker.target).toBe("web-worker")
+	expect(config.output.entryPoints.index.filename).toBe("custom/[name].js")
 })

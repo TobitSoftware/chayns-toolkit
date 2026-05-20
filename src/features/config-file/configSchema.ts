@@ -69,6 +69,7 @@ const outputSchema = z
 				z.object({
 					pathIndex: z.string(),
 					pathHtml: z.string().optional(),
+					filename: z.string().optional(),
 					templateParameters: z.record(z.string(), z.string()).optional(),
 					target: z
 						.union([z.literal("node"), z.literal("web"), z.literal("web-worker")])
