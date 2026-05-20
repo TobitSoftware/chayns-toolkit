@@ -16,11 +16,12 @@ program
 	.command("dev")
 	.description("start up a development server with hot module replacement")
 	.option("-d, --devtools", "open react-devtools in a separate window", false)
-	.action(async (options: { devtools: boolean }) => {
+	.option("-e, --exec <command>", "run a command after a successful compile")
+	.action(async (options: { devtools: boolean; exec?: string }) => {
 		loadEnvironment(true)
 		await runSteps(
 			[checkForTypeScript, checkSSLConfig],
-			[devCommand({ devtools: options.devtools })],
+			[devCommand({ devtools: options.devtools, exec: options.exec })],
 		)
 	})
 
