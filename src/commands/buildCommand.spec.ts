@@ -157,6 +157,15 @@ test("starts preview server with development server settings when preview is ena
 	const params = createStepParams()
 	params.config.development.cert = "./cert.pem"
 	params.config.development.key = "./key.pem"
+	mocks.runCompiler.mockImplementation(async () => {
+		await afterBuildHandler?.({
+			stats: {
+				hasErrors: () => false,
+			},
+		})
+
+		return undefined
+	})
 
 	await buildCommand({ analyze: false, preview: true, watch: true })(params)
 
@@ -178,6 +187,47 @@ test("starts preview server with development server settings when preview is ena
 	expect(mocks.runCompiler).toHaveBeenCalledWith(expect.anything(), { watch: true })
 	expect(previewMock).toHaveBeenCalledTimes(1)
 	expect(mocks.output.info).toHaveBeenCalledWith("Preview is running at: http://localhost:1234")
+})
+
+test("coalesces duplicate exec restarts triggered in quick succession", async () => {
+	const firstChild = createChildProcessMock()
+	const secondChild = createChildProcessMock()
+	mocks.spawn.mockImplementationOnce(() => firstChild).mockImplementationOnce(() => secondChild)
+	mocks.runCompiler.mockImplementation(async () => {
+		await afterBuildHandler?.({
+			stats: {
+				hasErrors: () => false,
+			},
+		})
+
+		const startOne = afterBuildHandler?.({
+			stats: {
+				hasErrors: () => false,
+			},
+		})
+		const startTwo = afterBuildHandler?.({
+			stats: {
+				hasErrors: () => false,
+			},
+		})
+
+		await Promise.all([startOne, startTwo])
+
+		return undefined
+	})
+
+	await buildCommand({
+		analyze: false,
+		exec: "node ./build/node-http-server.js",
+		preview: false,
+		watch: true,
+	})(createStepParams())
+
+	expect(mocks.spawn).toHaveBeenCalledTimes(2)
+	expect(firstChild.kill).toHaveBeenCalledTimes(1)
+	expect(mocks.output.info).toHaveBeenCalledWith(
+		"Restarting command: node ./build/node-http-server.js",
+	)
 })
 
 test("starts exec command after a successful build", async () => {

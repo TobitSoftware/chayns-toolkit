@@ -23,6 +23,14 @@ export function buildCommand({
 	return async ({ config, packageJson }) => {
 		const execController = createExecController(exec)
 
+		const startPreviewServer = async (rsbuild: Awaited<ReturnType<typeof createRsbuild>>) => {
+			const { urls } = await rsbuild.preview()
+
+			urls.forEach((url) => {
+				output.info(`Preview is running at: ${url}`)
+			})
+		}
+
 		let webpackConfig = await createWebpackConfig({
 			mode: "production",
 			analyze,
@@ -70,6 +78,7 @@ export function buildCommand({
 		}
 
 		const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
+		let waitForPreviewStart: Promise<void> | undefined
 
 		if (exec) {
 			rsbuild.onAfterBuild(async ({ stats }) => {
@@ -86,6 +95,26 @@ export function buildCommand({
 
 			process.once("exit", () => {
 				execController.kill()
+			})
+		}
+
+		if (preview && watch) {
+			let previewStarted = false
+			waitForPreviewStart = new Promise((resolve, reject) => {
+				rsbuild.onAfterBuild(async ({ stats }) => {
+					if (previewStarted || !stats || stats.hasErrors()) {
+						return
+					}
+
+					previewStarted = true
+
+					try {
+						await startPreviewServer(rsbuild)
+						resolve()
+					} catch (error) {
+						reject(error instanceof Error ? error : new Error(String(error)))
+					}
+				})
 			})
 		}
 
@@ -110,11 +139,11 @@ export function buildCommand({
 		}
 
 		if (preview) {
-			const { urls } = await rsbuild.preview()
-
-			urls.forEach((url) => {
-				output.info(`Preview is running at: ${url}`)
-			})
+			if (watch) {
+				await waitForPreviewStart
+			} else {
+				await startPreviewServer(rsbuild)
+			}
 		}
 	}
 }
