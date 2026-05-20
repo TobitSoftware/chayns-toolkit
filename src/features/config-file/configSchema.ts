@@ -70,6 +70,9 @@ const outputSchema = z
 					pathIndex: z.string(),
 					pathHtml: z.string().optional(),
 					templateParameters: z.record(z.string(), z.string()).optional(),
+					target: z
+						.union([z.literal("node"), z.literal("web"), z.literal("web-worker")])
+						.optional(),
 				}),
 			)
 			.default({}),
@@ -104,7 +107,6 @@ export const configSchema = z.object({
 			z.custom<RsbuildConfig>(),
 			z.object({
 				dev: z.boolean(),
-				target: z.union([z.literal("server"), z.literal("client"), z.null()]),
 				watch: z.boolean().default(false),
 			}),
 		)

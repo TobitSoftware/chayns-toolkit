@@ -43,6 +43,7 @@ export type EntryPoint = {
 	templateParameters?: {
 		[key: string]: string
 	}
+	target?: "node" | "web" | "web-worker"
 }
 
 type EntryPoints = {
@@ -76,7 +77,6 @@ interface CreateConfigOptions {
 	exposeModules?: {}
 	reactRequiredVersions?: string | ReactRequiredVersions
 	entryPoints: EntryPoints
-	target: "client" | "server" | null
 	reactRuntime?: "automatic" | "classic"
 	reactCompiler?:
 		| boolean
@@ -90,6 +90,75 @@ interface CreateConfigOptions {
 		externalAssets?: string[]
 		textStringLibraries?: string[]
 	}
+}
+
+type CreateEnvironmentConfigOptions = Pick<
+	CreateConfigOptions,
+	| "analyze"
+	| "cssVersion"
+	| "disableReactSharing"
+	| "entryPoints"
+	| "exposeModules"
+	| "injectDevtoolsScript"
+	| "manifest"
+	| "mode"
+> & {
+	buildVersion: string
+	env: "web" | "node" | "web-worker"
+	packageName: string
+	pathPrefix?: string
+	reactRequiredVersions: ReactRequiredVersions
+}
+
+const getEnvironmentDistPathConfig = (
+	env: CreateEnvironmentConfigOptions["env"],
+	pathPrefix?: string,
+) => {
+	if (!pathPrefix) return undefined
+	return {
+		js: env === "node" ? pathPrefix : `${pathPrefix}static/js`,
+		jsAsync: env === "node" ? pathPrefix : `${pathPrefix}static/js`,
+		json: pathPrefix,
+	}
+}
+
+const shouldIncludeEntryPointInEnvironment = (
+	entryPoint: EntryPoint,
+	env: CreateEnvironmentConfigOptions["env"],
+) => {
+	if (env === "web-worker") {
+		return entryPoint.target === "web-worker"
+	}
+
+	return !entryPoint.target || entryPoint.target === env
+}
+
+const createEnvironmentEntries = (
+	entryPoints: EntryPoints,
+	env: CreateEnvironmentConfigOptions["env"],
+): RsbuildEntry => {
+	const entries: RsbuildEntry = {}
+
+	Object.entries(entryPoints).forEach(([entryName, entryPoint]) => {
+		if (!shouldIncludeEntryPointInEnvironment(entryPoint, env)) {
+			return
+		}
+
+		if (env === "web" && entryPoint.pathHtml) {
+			entries[entryName] = entryPoint.pathIndex
+			return
+		}
+
+		entries[entryName] = { import: entryPoint.pathIndex, html: false }
+	})
+
+	return entries
+}
+
+const getModuleFederationFilename = (pathPrefix?: string) => {
+	const baseFilename = "v2.remoteEntry.js"
+
+	return pathPrefix ? `${pathPrefix}${baseFilename}` : baseFilename
 }
 
 function getReactCompilerTarget(packageJson: PackageJson, targetOverride?: string): string {
@@ -130,106 +199,45 @@ export function resolveReactRequiredVersions(
 	}
 }
 
-export async function createWebpackConfig({
-	mode,
+async function createEnvironmentConfig({
 	analyze,
-	outputFilename,
-	injectDevtoolsScript,
-	path: outputPath,
-	packageJson,
-	prefixCss = false,
-	cssVersion = "4.2",
-	exposeModules,
-	reactRequiredVersions,
-	entryPoints,
-	target,
-	serverSideRendering,
-	reactRuntime,
-	reactCompiler,
+	buildVersion,
+	cssVersion,
 	disableReactSharing = false,
+	entryPoints,
+	exposeModules,
+	injectDevtoolsScript = false,
 	manifest = {},
-}: CreateConfigOptions): Promise<RsbuildConfig> {
-	const packageName = packageJson.name
-	const buildEnv = process.env.BUILD_ENV || (mode === "production" ? "production" : "development")
-	const buildVersion =
-		process.env.BUILD_VERSION || `${buildEnv}-fallback-${new Date().toISOString()}`
+	mode,
+	packageName,
+	pathPrefix,
+	reactRequiredVersions,
+	env,
+}: CreateEnvironmentConfigOptions): Promise<RsbuildConfig["environments"]> {
+	const entries = createEnvironmentEntries(entryPoints, env)
+	const supportsModuleFederation = env !== "web-worker"
 
-	const { parsed, publicVars } = loadEnv({
-		mode: buildEnv,
-	})
-
-	const isLinariaUsed = isPackageInstalled(packageJson, "@linaria/core")
-	const isReactCompilerInstalled = isPackageInstalled(packageJson, "babel-plugin-react-compiler")
-
-	const isReactCompilerEnabled =
-		typeof reactCompiler === "boolean"
-			? reactCompiler
-			: reactCompiler !== undefined
-				? true
-				: isReactCompilerInstalled
-
-	const reactCompilerTarget =
-		typeof reactCompiler === "object" && reactCompiler !== null
-			? reactCompiler.target
-			: undefined
-	const resolvedReactRequiredVersions = resolveReactRequiredVersions(
-		packageJson,
-		reactRequiredVersions,
-	)
-
-	const plugins: Rspack.Configuration["plugins"] = []
-	const rsBuildPlugins = [
-		pluginReact({
-			swcReactOptions: {
-				runtime: reactRuntime,
-			},
-		}),
-		pluginSass(),
-		pluginAssetsRetry(),
-		pluginCssMinimizer(),
-		pluginSvgr({
-			svgrOptions: {
-				exportType: "default",
-			},
-		}),
-	]
-
-	if (serverSideRendering && target === "client") {
-		rsBuildPlugins.push(pluginNodePolyfill())
+	if (Object.keys(entries).length === 0 && !(exposeModules && supportsModuleFederation)) {
+		return {}
 	}
 
-	if (parsed.BUNDLE_ANALYZE === "true" || analyze) {
+	const plugins: Rspack.Configuration["plugins"] = []
+
+	if (analyze || process.env.BUNDLE_ANALYZE === "true") {
 		plugins.push(new BundleAnalyzerPlugin())
 	}
 
-	const entries: RsbuildEntry = {}
-
-	Object.entries(entryPoints).forEach(([k, { pathHtml, pathIndex }]) => {
-		if (pathHtml) {
-			entries[k] = pathIndex
-		} else {
-			entries[k] = { import: pathIndex, html: false }
-		}
-	})
-
-	if (!packageName) throw Error("The name field in package.json has to be provided.")
-
-	if (exposeModules) {
+	if (exposeModules && supportsModuleFederation) {
 		if (Object.keys(entries).length === 0) {
-			// Override the default index entry when using exposeModules without
-			// explicit entry points, so that an empty or unnecessary index.js file
-			// is not required.
 			entries.index = { import: undefined!, html: false }
 		}
-		// The shareScope must not be manually set here.
-		// Setting it would prevent this module from consuming shared dependencies.
-		// Consuming modules always use the default share scope.
+
 		const shared: ConstructorParameters<typeof ModuleFederationPlugin>[0]["shared"] = {
 			react: {
-				requiredVersion: resolvedReactRequiredVersions.react,
+				requiredVersion: reactRequiredVersions.react,
 			},
 			"react-dom": {
-				requiredVersion: resolvedReactRequiredVersions.reactDom,
+				requiredVersion: reactRequiredVersions.reactDom,
 			},
 		}
 
@@ -258,17 +266,230 @@ export async function createWebpackConfig({
 					}
 				: false,
 			name: packageName?.replace(/^@/, "").replace(/\//g, "__").replace(/-/g, "_"),
-			filename: "v2.remoteEntry.js",
+			filename: getModuleFederationFilename(pathPrefix),
 			runtimePlugins:
-				target === "server"
+				env === "node"
 					? [require.resolve("@module-federation/node/runtimePlugin")]
 					: undefined,
 			exposes: exposeModules,
-			library: target === "server" ? { type: "commonjs-module" } : undefined,
+			library: env === "node" ? { type: "commonjs-module" } : undefined,
 			shared: mode !== "development" && disableReactSharing !== true ? shared : undefined,
 		} satisfies moduleFederationPlugin.ModuleFederationPluginOptions
 		plugins.push(new ModuleFederationPlugin(moduleFederationConfig))
 	}
+
+	let htmlTags: HtmlTagDescriptor[] | undefined =
+		env === "web" && injectDevtoolsScript
+			? [
+					{
+						tag: "script" as const,
+						attrs: { src: "http://localhost:8097" },
+						append: false,
+					},
+				]
+			: undefined
+
+	if (env === "web" && process.env.RUNTIME_VARS) {
+		htmlTags ??= []
+		htmlTags.push({
+			tag: "script",
+			head: true,
+			append: false,
+			attrs: {
+				src: "./env-config.js",
+			},
+		})
+	}
+
+	return {
+		[env]: {
+			source: {
+				entry: entries,
+			},
+			html:
+				env === "web"
+					? {
+							template: ({ value, entryName }) =>
+								entryPoints[entryName]?.pathHtml ?? value,
+							templateParameters: (defaultParams, { entryName }) => ({
+								...defaultParams,
+								CHAYNS_TOOLKIT_CSS_TAG: getCssTag(cssVersion),
+								...entryPoints[entryName]?.templateParameters,
+							}),
+							tags: htmlTags,
+						}
+					: undefined,
+			tools:
+				plugins.length > 0
+					? {
+							rspack: {
+								plugins,
+							},
+						}
+					: undefined,
+			output: {
+				target: env,
+				module: env === "node" && exposeModules ? false : undefined,
+				assetPrefix: env === "node" ? undefined : "auto",
+				distPath: getEnvironmentDistPathConfig(env, pathPrefix),
+				manifest:
+					manifest?.host && env === "web"
+						? {
+								generate: ({ manifestData }) => {
+									const filterFiles = (files: string[]) =>
+										files.filter((file) => !file.endsWith(".map"))
+
+									manifestData.allFiles = filterFiles(manifestData.allFiles)
+									Object.values(manifestData.entries).forEach((value) => {
+										if (value.assets) {
+											value.assets = filterFiles(value.assets)
+										}
+									})
+
+									if (manifest?.externalAssets) {
+										;(manifestData as Record<string, unknown>).staticFiles =
+											manifest.externalAssets
+									}
+
+									if (manifest?.textStringLibraries) {
+										;(
+											manifestData as Record<string, unknown>
+										).textStringLibraries = manifest.textStringLibraries
+									}
+
+									;(manifestData as Record<string, unknown>).buildVersion =
+										buildVersion
+
+									return manifestData
+								},
+							}
+						: false,
+			},
+			plugins: env === "web" && pathPrefix ? [pluginNodePolyfill()] : undefined,
+		},
+	}
+}
+
+export async function createWebpackConfig({
+	mode,
+	analyze,
+	outputFilename,
+	injectDevtoolsScript,
+	path: outputPath,
+	packageJson,
+	prefixCss = false,
+	cssVersion = "4.2",
+	exposeModules,
+	reactRequiredVersions,
+	entryPoints,
+	serverSideRendering,
+	reactRuntime,
+	reactCompiler,
+	disableReactSharing = false,
+	manifest = {},
+}: CreateConfigOptions): Promise<RsbuildConfig> {
+	const packageName = packageJson.name
+	const buildEnv = process.env.BUILD_ENV || (mode === "production" ? "production" : "development")
+	const buildVersion =
+		process.env.BUILD_VERSION || `${buildEnv}-fallback-${new Date().toISOString()}`
+
+	const { publicVars } = loadEnv({
+		mode: buildEnv,
+	})
+
+	const isLinariaUsed = isPackageInstalled(packageJson, "@linaria/core")
+	const isReactCompilerInstalled = isPackageInstalled(packageJson, "babel-plugin-react-compiler")
+
+	const isReactCompilerEnabled =
+		typeof reactCompiler === "boolean"
+			? reactCompiler
+			: reactCompiler !== undefined
+				? true
+				: isReactCompilerInstalled
+
+	const reactCompilerTarget =
+		typeof reactCompiler === "object" && reactCompiler !== null
+			? reactCompiler.target
+			: undefined
+	const resolvedReactRequiredVersions = resolveReactRequiredVersions(
+		packageJson,
+		reactRequiredVersions,
+	)
+	const shouldAnalyze = process.env.BUNDLE_ANALYZE === "true" || analyze
+
+	const rsBuildPlugins = [
+		pluginReact({
+			swcReactOptions: {
+				runtime: reactRuntime,
+			},
+		}),
+		pluginSass(),
+		pluginAssetsRetry(),
+		pluginCssMinimizer(),
+		pluginSvgr({
+			svgrOptions: {
+				exportType: "default",
+			},
+		}),
+	]
+
+	if (!packageName) throw Error("The name field in package.json has to be provided.")
+
+	const environments: RsbuildConfig["environments"] = {}
+	if (serverSideRendering) {
+		Object.assign(
+			environments,
+			await createEnvironmentConfig({
+				analyze: shouldAnalyze,
+				buildVersion,
+				cssVersion,
+				disableReactSharing,
+				entryPoints,
+				exposeModules,
+				manifest,
+				mode,
+				packageName,
+				pathPrefix: "server/",
+				reactRequiredVersions: resolvedReactRequiredVersions,
+				env: "node",
+			}),
+		)
+	}
+	Object.assign(
+		environments,
+		await createEnvironmentConfig({
+			analyze: shouldAnalyze,
+			buildVersion,
+			cssVersion,
+			disableReactSharing,
+			entryPoints,
+			exposeModules,
+			injectDevtoolsScript,
+			manifest,
+			mode,
+			packageName,
+			pathPrefix: serverSideRendering ? "client/" : undefined,
+			reactRequiredVersions: resolvedReactRequiredVersions,
+			env: "web",
+		}),
+	)
+	Object.assign(
+		environments,
+		await createEnvironmentConfig({
+			analyze: shouldAnalyze,
+			buildVersion,
+			cssVersion,
+			disableReactSharing,
+			entryPoints,
+			exposeModules,
+			manifest,
+			mode,
+			packageName,
+			pathPrefix: serverSideRendering ? "client/" : undefined,
+			reactRequiredVersions: resolvedReactRequiredVersions,
+			env: "web-worker",
+		}),
+	)
 
 	const tools: ToolsConfig = {
 		rspack: {
@@ -282,7 +503,6 @@ export async function createWebpackConfig({
 					? `${packageName}__${buildEnv}__${process.env.BUILD_VERSION || 1}`
 					: packageName,
 			},
-			plugins,
 			module: {
 				parser: {
 					javascript: {
@@ -350,17 +570,6 @@ export async function createWebpackConfig({
 		}
 	}
 
-	let htmlTags: HtmlTagDescriptor[] | undefined =
-		injectDevtoolsScript && target !== "server"
-			? [
-					{
-						tag: "script" as const,
-						attrs: { src: "http://localhost:8097" },
-						append: false,
-					},
-				]
-			: undefined
-
 	const runtimeVars = process.env.RUNTIME_VARS?.split(",").map((v) => v.trim())
 
 	if (runtimeVars) {
@@ -371,15 +580,6 @@ export async function createWebpackConfig({
 				publicVars[key] =
 					`((typeof window !== 'undefined' && window._env_ && window._env_["${packageName}"] && window._env_["${packageName}"].${varName}) || ${buildTimeFallback})`
 			}
-		})
-		htmlTags ??= []
-		htmlTags.push({
-			tag: "script",
-			head: true,
-			append: false,
-			attrs: {
-				src: "./env-config.js",
-			},
 		})
 	}
 
@@ -404,27 +604,14 @@ export async function createWebpackConfig({
 				__REQUIRED_REACT_VERSION__: JSON.stringify(resolvedReactRequiredVersions.react),
 				...publicVars,
 			},
-			entry: entries,
 		},
 		plugins: rsBuildPlugins,
-		html: {
-			template: ({ value, entryName }) => entryPoints[entryName]?.pathHtml ?? value,
-			templateParameters: (defaultParams, { entryName }) => ({
-				...defaultParams,
-				CHAYNS_TOOLKIT_CSS_TAG: getCssTag(cssVersion),
-				...entryPoints[entryName]?.templateParameters,
-			}),
-			tags: htmlTags,
-		},
 		tools,
 		output: {
-			target: target === "server" ? "node" : "web",
-			module: target === "server" && exposeModules ? false : undefined,
 			sourceMap: {
 				js: mode === "development" ? "cheap-module-source-map" : "hidden-source-map",
 			},
 			cleanDistPath: mode === "production",
-			assetPrefix: target === "server" ? undefined : "auto",
 			overrideBrowserslist:
 				mode === "production"
 					? ["cover 90%", "not dead", "not op_mini all", "Firefox ESR", "not android < 5"]
@@ -433,40 +620,10 @@ export async function createWebpackConfig({
 			distPath: {
 				root: outputPath || "build",
 			},
-			manifest:
-				manifest?.host && target !== "server"
-					? {
-							generate: ({ manifestData }) => {
-								const filterFiles = (files: string[]) =>
-									files.filter((file) => !file.endsWith(".map"))
-
-								manifestData.allFiles = filterFiles(manifestData.allFiles)
-								Object.values(manifestData.entries).forEach((value) => {
-									if (value.assets) {
-										value.assets = filterFiles(value.assets)
-									}
-								})
-
-								if (manifest?.externalAssets) {
-									;(manifestData as Record<string, unknown>).staticFiles =
-										manifest.externalAssets
-								}
-
-								if (manifest?.textStringLibraries) {
-									;(manifestData as Record<string, unknown>).textStringLibraries =
-										manifest.textStringLibraries
-								}
-
-								;(manifestData as Record<string, unknown>).buildVersion =
-									buildVersion
-
-								return manifestData
-							},
-						}
-					: false,
 		},
 		dev: {
 			assetPrefix: "auto",
 		},
+		environments,
 	}
 }
