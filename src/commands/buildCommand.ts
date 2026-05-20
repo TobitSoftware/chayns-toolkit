@@ -1,4 +1,5 @@
 import { createRsbuild } from "@rsbuild/core"
+import { spawn } from "child_process"
 import fs from "fs"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
@@ -8,16 +9,70 @@ import { runCompiler } from "../util/webpackPromises"
 
 interface BuildOptions {
 	analyze: boolean
+	exec?: string
 	preview: boolean
 	watch: boolean
 }
 
 export function buildCommand({
 	analyze,
+	exec,
 	preview,
 	watch,
 }: BuildOptions): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson }) => {
+		let runningCommand: ReturnType<typeof spawn> | undefined
+
+		const stopExecCommand = async () => {
+			if (!runningCommand || runningCommand.exitCode !== null || runningCommand.killed) {
+				runningCommand = undefined
+				return
+			}
+
+			const processToStop = runningCommand
+			runningCommand = undefined
+
+			await new Promise<void>((resolve) => {
+				processToStop.once("exit", () => {
+					resolve()
+				})
+				processToStop.kill()
+			})
+		}
+
+		const startExecCommand = async () => {
+			if (!exec) {
+				return
+			}
+
+			if (runningCommand) {
+				await stopExecCommand()
+			}
+
+			output.info(`Starting command: ${exec}`)
+
+			const child = spawn(exec, {
+				env: process.env,
+				shell: true,
+				stdio: "inherit",
+			})
+
+			runningCommand = child
+
+			child.once("error", (error) => {
+				if (runningCommand === child) {
+					runningCommand = undefined
+				}
+				output.error(`Failed to start command \"${exec}\": ${error.message}`)
+			})
+
+			child.once("exit", () => {
+				if (runningCommand === child) {
+					runningCommand = undefined
+				}
+			})
+		}
+
 		let webpackConfig = await createWebpackConfig({
 			mode: "production",
 			analyze,
@@ -65,6 +120,24 @@ export function buildCommand({
 		}
 
 		const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
+
+		if (exec) {
+			rsbuild.onAfterBuild(async ({ stats }) => {
+				if (!stats || stats.hasErrors()) {
+					return
+				}
+
+				await startExecCommand()
+			})
+
+			rsbuild.onCloseBuild(async () => {
+				await stopExecCommand()
+			})
+
+			process.once("exit", () => {
+				runningCommand?.kill()
+			})
+		}
 
 		output.info(`Bundling your code...`)
 

@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
 	createRsbuild: vi.fn(),
 	createWebpackConfig: vi.fn(),
 	modifyWebpackConfig: vi.fn(),
+	spawn: vi.fn(),
 	runCompiler: vi.fn(),
 	output: {
 		info: vi.fn(),
@@ -36,6 +37,13 @@ vi.mock("../util/output", () => ({
 	output: mocks.output,
 }))
 
+vi.mock("child_process", () => ({
+	default: {
+		spawn: mocks.spawn,
+	},
+	spawn: mocks.spawn,
+}))
+
 vi.mock("fs", () => ({
 	default: {
 		readFileSync: mocks.readFileSync,
@@ -43,6 +51,33 @@ vi.mock("fs", () => ({
 }))
 
 const previewMock = vi.fn()
+let afterBuildHandler:
+	| ((params: { stats?: { hasErrors: () => boolean } }) => Promise<void> | void)
+	| undefined
+let closeBuildHandler: (() => Promise<void> | void) | undefined
+
+const createChildProcessMock = () => {
+	const listeners: Record<string, Array<(...args: unknown[]) => void>> = {}
+	const child = {
+		exitCode: null as number | null,
+		killed: false,
+		kill: vi.fn(() => {
+			child.killed = true
+			child.exitCode = 0
+			listeners.exit?.forEach((listener) => {
+				listener(0, null)
+			})
+			return true
+		}),
+		once: vi.fn((event: string, listener: (...args: unknown[]) => void) => {
+			listeners[event] ??= []
+			listeners[event].push(listener)
+			return child
+		}),
+	}
+
+	return child
+}
 
 const createStepParams = (): StepParams => ({
 	config: {
@@ -86,14 +121,23 @@ const createStepParams = (): StepParams => ({
 beforeEach(() => {
 	vi.clearAllMocks()
 	previewMock.mockReset()
+	afterBuildHandler = undefined
+	closeBuildHandler = undefined
 	mocks.createWebpackConfig.mockResolvedValue({})
 	mocks.modifyWebpackConfig.mockImplementation(({ config }: { config: RsbuildConfig }) => config)
 	mocks.createRsbuild.mockResolvedValue({
+		onAfterBuild: vi.fn((handler) => {
+			afterBuildHandler = handler as typeof afterBuildHandler
+		}),
+		onCloseBuild: vi.fn((handler) => {
+			closeBuildHandler = handler as typeof closeBuildHandler
+		}),
 		preview: previewMock,
 	})
 	mocks.runCompiler.mockResolvedValue({
 		hasErrors: () => false,
 	})
+	mocks.spawn.mockImplementation(() => createChildProcessMock())
 	previewMock.mockResolvedValue({
 		urls: ["http://localhost:1234"],
 		port: 1234,
@@ -134,6 +178,76 @@ test("starts preview server with development server settings when preview is ena
 	expect(mocks.runCompiler).toHaveBeenCalledWith(expect.anything(), { watch: true })
 	expect(previewMock).toHaveBeenCalledTimes(1)
 	expect(mocks.output.info).toHaveBeenCalledWith("Preview is running at: http://localhost:1234")
+})
+
+test("starts exec command after a successful build", async () => {
+	mocks.runCompiler.mockImplementation(async () => {
+		await afterBuildHandler?.({
+			stats: {
+				hasErrors: () => false,
+			},
+		})
+
+		return {
+			hasErrors: () => false,
+		}
+	})
+
+	await buildCommand({
+		analyze: false,
+		exec: "node ./build/node-http-server.js",
+		preview: false,
+		watch: false,
+	})(createStepParams())
+
+	expect(mocks.spawn).toHaveBeenCalledWith("node ./build/node-http-server.js", {
+		env: process.env,
+		shell: true,
+		stdio: "inherit",
+	})
+	expect(mocks.output.info).toHaveBeenCalledWith(
+		"Starting command: node ./build/node-http-server.js",
+	)
+})
+
+test("restarts exec command after successful rebuilds and cleans it up on close", async () => {
+	const firstChild = createChildProcessMock()
+	const secondChild = createChildProcessMock()
+	mocks.spawn.mockImplementationOnce(() => firstChild).mockImplementationOnce(() => secondChild)
+	mocks.runCompiler.mockImplementation(async () => {
+		await afterBuildHandler?.({
+			stats: {
+				hasErrors: () => false,
+			},
+		})
+		await afterBuildHandler?.({
+			stats: {
+				hasErrors: () => true,
+			},
+		})
+		await afterBuildHandler?.({
+			stats: {
+				hasErrors: () => false,
+			},
+		})
+
+		return undefined
+	})
+
+	await buildCommand({
+		analyze: false,
+		exec: "node ./build/node-http-server.js",
+		preview: false,
+		watch: true,
+	})(createStepParams())
+
+	expect(mocks.spawn).toHaveBeenCalledTimes(2)
+	expect(firstChild.kill).toHaveBeenCalledTimes(1)
+	expect(secondChild.kill).not.toHaveBeenCalled()
+
+	await closeBuildHandler?.()
+
+	expect(secondChild.kill).toHaveBeenCalledTimes(1)
 })
 
 test("starts preview server directly after a non-watch build", async () => {
