@@ -1,4 +1,5 @@
 import { createRsbuild } from "@rsbuild/core"
+import fs from "fs"
 import { createWebpackConfig } from "../util/createWebpackConfig"
 import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
 import { output } from "../util/output"
@@ -7,11 +8,13 @@ import { runCompiler } from "../util/webpackPromises"
 
 interface BuildOptions {
 	analyze: boolean
+	preview: boolean
 	watch: boolean
 }
 
 export function buildCommand({
 	analyze,
+	preview,
 	watch,
 }: BuildOptions): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson }) => {
@@ -45,6 +48,22 @@ export function buildCommand({
 			})
 		}
 
+		if (preview) {
+			const { port, host, cert, key, strictPort } = config.development
+
+			webpackConfig.server ||= {}
+			webpackConfig.server.host = host
+			webpackConfig.server.port = port
+			webpackConfig.server.strictPort = strictPort
+
+			if (cert && key) {
+				webpackConfig.server.https = {
+					cert: fs.readFileSync(cert),
+					key: fs.readFileSync(key),
+				}
+			}
+		}
+
 		const rsbuild = await createRsbuild({ rsbuildConfig: webpackConfig })
 
 		output.info(`Bundling your code...`)
@@ -65,6 +84,14 @@ export function buildCommand({
 				console.error(error)
 			})
 			output.exit(1)
+		}
+
+		if (preview) {
+			const { urls } = await rsbuild.preview()
+
+			urls.forEach((url) => {
+				output.info(`Preview is running at: ${url}`)
+			})
 		}
 	}
 }

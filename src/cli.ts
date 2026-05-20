@@ -28,11 +28,18 @@ program
 	.command("build")
 	.description("bundles your code for production")
 	.option("-a, --analyze", "analyze your bundle size", false)
+	.option("-p, --preview", "start a preview server after building", false)
 	.option("-w, --watch", "watch for file changes", false)
-	.action(async (options: { analyze: boolean; watch: boolean }) => {
+	.action(async (options: { analyze: boolean; preview: boolean; watch: boolean }) => {
 		try {
 			loadEnvironment(false)
-			await runSteps([buildCommand({ analyze: options.analyze, watch: options.watch })])
+			await runSteps([
+				buildCommand({
+					analyze: options.analyze,
+					preview: options.preview,
+					watch: options.watch,
+				}),
+			])
 		} catch (e) {
 			output.error(e as string)
 			output.exit(1)
