@@ -412,6 +412,9 @@ async function createEnvironmentConfig({
 			source: {
 				entry: entries,
 			},
+			dev: {
+				assetPrefix: env === "node" ? false : undefined,
+			},
 			html:
 				env === "web"
 					? {
