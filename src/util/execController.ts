@@ -1,4 +1,4 @@
-import { spawn } from "child_process"
+import { execFile, spawn } from "child_process"
 import { output } from "./output"
 
 const EXEC_RESTART_DELAY_MS = 200
@@ -8,6 +8,29 @@ type PendingActionType = "start" | "stop"
 const waitForExecRestartDelay = async () => {
 	await new Promise((resolve) => {
 		setTimeout(resolve, EXEC_RESTART_DELAY_MS)
+	})
+}
+
+const terminateProcess = async (processToStop: ReturnType<typeof spawn>) => {
+	if (process.platform === "win32" && processToStop.pid) {
+		await new Promise<void>((resolve) => {
+			execFile(
+				"taskkill",
+				["/pid", String(processToStop.pid), "/t", "/f"],
+				{ windowsHide: true },
+				() => {
+					resolve()
+				},
+			)
+		})
+		return
+	}
+
+	await new Promise<void>((resolve) => {
+		processToStop.once("exit", () => {
+			resolve()
+		})
+		processToStop.kill()
 	})
 }
 
@@ -54,12 +77,7 @@ export function createExecController(command?: string) {
 		runningCommand = undefined
 		output.info(`Stopping command: ${command}`)
 
-		await new Promise<void>((resolve) => {
-			processToStop.once("exit", () => {
-				resolve()
-			})
-			processToStop.kill()
-		})
+		await terminateProcess(processToStop)
 
 		await waitForExecRestartDelay()
 	}
@@ -105,7 +123,9 @@ export function createExecController(command?: string) {
 	}
 
 	const kill = () => {
-		runningCommand?.kill()
+		if (runningCommand) {
+			void terminateProcess(runningCommand)
+		}
 	}
 
 	return {

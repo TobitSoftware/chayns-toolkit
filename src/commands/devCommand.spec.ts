@@ -6,6 +6,7 @@ import { devCommand } from "./devCommand"
 const mocks = vi.hoisted(() => ({
 	createRsbuild: vi.fn(),
 	createWebpackConfig: vi.fn(),
+	execFile: vi.fn(),
 	modifyWebpackConfig: vi.fn(),
 	output: {
 		info: vi.fn(),
@@ -31,9 +32,11 @@ vi.mock("@rsbuild/core", () => ({
 vi.mock("child_process", () => ({
 	default: {
 		exec: mocks.exec,
+		execFile: mocks.execFile,
 		spawn: mocks.spawn,
 	},
 	exec: mocks.exec,
+	execFile: mocks.execFile,
 	spawn: mocks.spawn,
 }))
 
@@ -96,6 +99,7 @@ const createChildProcessMock = () => {
 	const child = {
 		exitCode: null as number | null,
 		killed: false,
+		pid: Math.floor(Math.random() * 100000) + 1,
 		kill: vi.fn(() => {
 			child.killed = true
 			child.exitCode = 0
@@ -180,6 +184,15 @@ beforeEach(() => {
 			urls: ["http://localhost:1234"],
 		}),
 	})
+	mocks.execFile.mockImplementation((file, args, options, callback) => {
+		if (typeof options === "function") {
+			options(null, "", "")
+			return
+		}
+		if (typeof callback === "function") {
+			callback(null, "", "")
+		}
+	})
 	mocks.spawn.mockImplementation(() => createChildProcessMock())
 	mocks.readFileSync.mockReturnValue(Buffer.from("cert"))
 })
@@ -239,10 +252,21 @@ test("restarts exec command on successful recompiles and cleans up on close", as
 	})
 
 	expect(mocks.spawn).toHaveBeenCalledTimes(2)
-	expect(firstChild.kill).toHaveBeenCalledTimes(1)
-	expect(secondChild.kill).not.toHaveBeenCalled()
+	expect(mocks.execFile).toHaveBeenNthCalledWith(
+		1,
+		"taskkill",
+		["/pid", String(firstChild.pid), "/t", "/f"],
+		{ windowsHide: true },
+		expect.any(Function),
+	)
 
 	await closeDevServerHandler?.()
 
-	expect(secondChild.kill).toHaveBeenCalledTimes(1)
+	expect(mocks.execFile).toHaveBeenNthCalledWith(
+		2,
+		"taskkill",
+		["/pid", String(secondChild.pid), "/t", "/f"],
+		{ windowsHide: true },
+		expect.any(Function),
+	)
 })

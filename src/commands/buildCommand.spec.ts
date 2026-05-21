@@ -6,6 +6,7 @@ import type { StepParams } from "../util/runSteps"
 const mocks = vi.hoisted(() => ({
 	createRsbuild: vi.fn(),
 	createWebpackConfig: vi.fn(),
+	execFile: vi.fn(),
 	modifyWebpackConfig: vi.fn(),
 	spawn: vi.fn(),
 	runCompiler: vi.fn(),
@@ -39,8 +40,10 @@ vi.mock("../util/output", () => ({
 
 vi.mock("child_process", () => ({
 	default: {
+		execFile: mocks.execFile,
 		spawn: mocks.spawn,
 	},
+	execFile: mocks.execFile,
 	spawn: mocks.spawn,
 }))
 
@@ -61,6 +64,7 @@ const createChildProcessMock = () => {
 	const child = {
 		exitCode: null as number | null,
 		killed: false,
+		pid: Math.floor(Math.random() * 100000) + 1,
 		kill: vi.fn(() => {
 			child.killed = true
 			child.exitCode = 0
@@ -136,6 +140,15 @@ beforeEach(() => {
 	})
 	mocks.runCompiler.mockResolvedValue({
 		hasErrors: () => false,
+	})
+	mocks.execFile.mockImplementation((file, args, options, callback) => {
+		if (typeof options === "function") {
+			options(null, "", "")
+			return
+		}
+		if (typeof callback === "function") {
+			callback(null, "", "")
+		}
 	})
 	mocks.spawn.mockImplementation(() => createChildProcessMock())
 	previewMock.mockResolvedValue({
@@ -233,7 +246,12 @@ test("coalesces duplicate exec restarts triggered in quick succession", async ()
 	})(createStepParams())
 
 	expect(mocks.spawn).toHaveBeenCalledTimes(2)
-	expect(firstChild.kill).toHaveBeenCalledTimes(1)
+	expect(mocks.execFile).toHaveBeenCalledWith(
+		"taskkill",
+		["/pid", String(firstChild.pid), "/t", "/f"],
+		{ windowsHide: true },
+		expect.any(Function),
+	)
 	expect(mocks.output.info).toHaveBeenCalledWith(
 		"Restarting command: node ./build/node-http-server.js",
 	)
@@ -301,12 +319,23 @@ test("restarts exec command after successful rebuilds and cleans it up on close"
 	})(createStepParams())
 
 	expect(mocks.spawn).toHaveBeenCalledTimes(2)
-	expect(firstChild.kill).toHaveBeenCalledTimes(1)
-	expect(secondChild.kill).not.toHaveBeenCalled()
+	expect(mocks.execFile).toHaveBeenNthCalledWith(
+		1,
+		"taskkill",
+		["/pid", String(firstChild.pid), "/t", "/f"],
+		{ windowsHide: true },
+		expect.any(Function),
+	)
 
 	await closeBuildHandler?.()
 
-	expect(secondChild.kill).toHaveBeenCalledTimes(1)
+	expect(mocks.execFile).toHaveBeenNthCalledWith(
+		2,
+		"taskkill",
+		["/pid", String(secondChild.pid), "/t", "/f"],
+		{ windowsHide: true },
+		expect.any(Function),
+	)
 })
 
 test("starts preview server directly after a non-watch build", async () => {
