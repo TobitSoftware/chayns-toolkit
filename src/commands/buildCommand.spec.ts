@@ -174,7 +174,16 @@ test("starts preview server with development server settings when preview is ena
 	expect(mocks.createRsbuild).toHaveBeenCalledWith({
 		rsbuildConfig: {
 			server: {
+				cors: {
+					credentials: true,
+					origin: true,
+				},
 				host: "localhost",
+				headers: {
+					"Access-Control-Allow-Headers": "Authorization, Content-Type, X-Requested-With",
+					"Access-Control-Allow-Private-Network": "true",
+				},
+				htmlFallback: false,
 				port: 1234,
 				strictPort: true,
 				https: {

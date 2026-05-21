@@ -68,6 +68,15 @@ export function buildCommand({
 			webpackConfig.server.host = host
 			webpackConfig.server.port = port
 			webpackConfig.server.strictPort = strictPort
+			webpackConfig.server.headers = {
+				"Access-Control-Allow-Headers": "Authorization, Content-Type, X-Requested-With",
+				"Access-Control-Allow-Private-Network": "true",
+			}
+			webpackConfig.server.cors = {
+				credentials: true,
+				origin: true,
+			}
+			webpackConfig.server.htmlFallback = false
 
 			if (cert && key) {
 				webpackConfig.server.https = {
