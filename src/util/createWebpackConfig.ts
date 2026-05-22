@@ -345,6 +345,9 @@ async function createEnvironmentConfig({
 			"react-dom": {
 				requiredVersion: reactRequiredVersions.reactDom,
 			},
+			"react-dom/server": {
+				requiredVersion: reactRequiredVersions.reactDom,
+			},
 		}
 
 		try {
