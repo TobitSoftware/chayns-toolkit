@@ -168,7 +168,9 @@ export async function createWebpackConfig({
 					packageJson?.dependencies?.["react-dom"],
 			},
 			"react-dom/server": {
-				requiredVersion: reactRequiredVersions.reactDom,
+				requiredVersion:
+					packageJson.peerDependencies?.["react-dom"] ||
+					packageJson?.dependencies?.["react-dom"],
 			},
 		}
 
