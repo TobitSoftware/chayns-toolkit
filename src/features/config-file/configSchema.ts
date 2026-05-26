@@ -4,12 +4,6 @@ import type { RsbuildConfig } from "@rsbuild/core"
 const developmentSchema = z.object({
 	host: z.string().max(255).default("adaptive"),
 	port: z.coerce.number().positive().max(65535).default(1234),
-	ports: z
-		.object({
-			client: z.coerce.number().positive().max(65535).default(1234),
-			server: z.coerce.number().positive().max(65535).default(1235),
-		})
-		.default({}),
 	strictPort: z.boolean().default(false),
 	cert: z.string().optional(),
 	key: z.string().optional(),

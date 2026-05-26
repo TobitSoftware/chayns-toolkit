@@ -88,10 +88,6 @@ const createStepParams = (): StepParams => ({
 		development: {
 			host: "localhost",
 			port: 1234,
-			ports: {
-				client: 1234,
-				server: 1235,
-			},
 			strictPort: true,
 			cert: undefined,
 			key: undefined,
