@@ -72,11 +72,25 @@ module.exports = {
             target: "18",
         },
         /**
+         * Expose modules via Module Federation.
+         * See the Module Federation documentation for more details.
+         *
+         * @type {Record<string, string>}
+         */
+        exposeModules: {
+            "./MyComponent": "./src/MyComponent",
+        },
+        /**
+         * Disable automatic React sharing in Module Federation.
+         *
+         * @type {boolean}
+         */
+        disableReactSharing: false,
+        /**
          * Overrides the `requiredVersion` used for Module Federation shared
          * React packages.
          *
-         * Use a string to force the same version/range for `react`, `react-dom`
-         * and `react-dom/client`, or use an object for per-package overrides.
+         * See the Module Federation documentation for details.
          *
          * @type {string | { react?: string, reactDom?: string }}
          */
@@ -89,18 +103,6 @@ module.exports = {
 }
 ```
 
-## React Required Versions for Module Federation
-
-By default, `chayns-toolkit` derives the Module Federation `shared.requiredVersion` values from
-`peerDependencies` first and then from `dependencies`.
-
-If your package intentionally allows a broader range such as `18 || 19`, but your federated module
-must use a stricter version at runtime, you can override that via `output.reactRequiredVersions`.
-
-- `"^19.0.0"` applies the same override to `react`, `react-dom` and `react-dom/client`
-- `{ react: "^18.0.0" }` also uses that value as fallback for `react-dom`
-- `{ react: "^18.0.0", reactDom: "^19.0.0" }` lets you override them independently
-
 ## React Compiler
 
 If `babel-plugin-react-compiler` is installed, `chayns-toolkit` enables the React Compiler
@@ -111,6 +113,15 @@ You can override this behavior via `output.reactCompiler`:
 - `false` disables the compiler even if the package is installed
 - `true` forces it on
 - `{ target: "18" }` enables it and configures the target explicitly
+
+## Module Federation
+
+To expose modules that can be consumed by other applications at runtime, configure the
+`exposeModules` option. This enables [Module Federation](../features/module-federation.md).
+
+For detailed information about Module Federation, including version compatibility requirements with
+`chayns-api` and overriding React required versions, see the
+[Module Federation documentation](../features/module-federation.md).
 
 ## Single File Builds
 
