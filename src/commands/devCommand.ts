@@ -33,7 +33,6 @@ export function devCommand({
 			analyze: false,
 			mode: "development" as const,
 			outputFilename: config.output.filename,
-			singleBundle: config.output.singleBundle,
 			serverSideRendering: config.output.serverSideRendering === "all",
 			packageJson,
 			injectDevtoolsScript: devtools,

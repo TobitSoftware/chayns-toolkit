@@ -73,7 +73,6 @@ test("splits entry points across web, node and worker environments", async () =>
 	const config = await createWebpackConfig({
 		mode: "production",
 		analyze: false,
-		singleBundle: false,
 		serverSideRendering: true,
 		packageJson: {
 			name: "test-package",
@@ -154,7 +153,6 @@ test("does not configure module federation for web-worker environments", async (
 	const config = await createWebpackConfig({
 		mode: "production",
 		analyze: false,
-		singleBundle: false,
 		serverSideRendering: true,
 		packageJson: {
 			name: "test-package",
@@ -190,7 +188,6 @@ test("writes host manifest into client/static and strips the client prefix from 
 	const config = await createWebpackConfig({
 		mode: "production",
 		analyze: false,
-		singleBundle: false,
 		serverSideRendering: true,
 		packageJson: {
 			name: "test-package",
@@ -281,7 +278,6 @@ test("allows overriding the filename per entry point", async () => {
 	const config = await createWebpackConfig({
 		mode: "production",
 		analyze: false,
-		singleBundle: false,
 		serverSideRendering: true,
 		packageJson: {
 			name: "test-package",

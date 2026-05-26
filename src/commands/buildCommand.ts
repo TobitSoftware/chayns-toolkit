@@ -35,7 +35,6 @@ export function buildCommand({
 			mode: "production",
 			analyze,
 			outputFilename: config.output.filename,
-			singleBundle: config.output.singleBundle,
 			serverSideRendering: config.output.serverSideRendering !== false,
 			path: config.output.path,
 			packageJson,

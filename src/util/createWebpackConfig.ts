@@ -59,7 +59,6 @@ type ReactRequiredVersions = {
 interface CreateConfigOptions {
 	mode: Mode
 	analyze: boolean
-	singleBundle: boolean
 	serverSideRendering: boolean
 	outputFilename?: {
 		html?: string

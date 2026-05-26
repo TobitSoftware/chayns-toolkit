@@ -98,7 +98,6 @@ const createStepParams = (): StepParams => ({
 		},
 		output: {
 			filename: undefined,
-			singleBundle: false,
 			serverSideRendering: false,
 			path: "build",
 			prefixCss: false,

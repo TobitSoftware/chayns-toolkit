@@ -17,7 +17,6 @@ const developmentSchema = z.object({
 
 const outputSchema = z
 	.object({
-		singleBundle: z.boolean().default(false),
 		filename: z
 			.object({
 				html: z.string().optional(),

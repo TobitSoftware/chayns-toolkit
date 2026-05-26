@@ -12,13 +12,6 @@ All options aswell as the `toolkit.config.js` file itself are optional.
 module.exports = {
     output: {
         /**
-         * Toggles single-file build functionality. Read more below
-         *
-         * @type {boolean}
-         */
-        singleBundle: false,
-
-        /**
          * Change the file-name your of primary output bundle. You can use any
          * of the [webpack substitutions](https://webpack.js.org/configuration/output/#template-strings)
          * as well as the `[package]` substitution, which will be replaced by
@@ -122,9 +115,3 @@ To expose modules that can be consumed by other applications at runtime, configu
 For detailed information about Module Federation, including version compatibility requirements with
 `chayns-api` and overriding React required versions, see the
 [Module Federation documentation](../features/module-federation.md).
-
-## Single File Builds
-
-In single-file build mode, the compiler will inline all assets (CSS, images, etc.) together with all
-JavaScript into a single bundle. This can be useful when building smaller fragments of a UI, e.g.
-some kind of plugin.
