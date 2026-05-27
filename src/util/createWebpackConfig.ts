@@ -341,11 +341,6 @@ async function createEnvironmentConfig({
 			"react-dom/server": {
 				requiredVersion: reactRequiredVersions.reactDom,
 			},
-			"react-dom/server": {
-				requiredVersion:
-					packageJson.peerDependencies?.["react-dom"] ||
-					packageJson?.dependencies?.["react-dom"],
-			},
 		}
 
 		try {
