@@ -106,6 +106,10 @@
 			"optional": true
 		}
 	},
+	"optionalDependencies": {
+		"@emnapi/core": "^1.7.1",
+		"@emnapi/runtime": "^1.7.1"
+	},
 	"engines": {
 		"node": ">=22"
 	},
