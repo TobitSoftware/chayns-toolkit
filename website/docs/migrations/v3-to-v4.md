@@ -97,7 +97,7 @@ Version 4 adds support for modern tooling and configurations:
 - **React Required Versions** - Override required React versions for Module Federation shared
   dependencies via `output.reactRequiredVersions`
 
-See the [configuration documentation](../configuration) for details on these features.
+See the [configuration documentation](../configuration/output.md) for details on these features.
 
 ## Summary Checklist
 
