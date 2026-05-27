@@ -50,6 +50,8 @@
 		"@babel/preset-env": "^7.29.5",
 		"@babel/preset-react": "^7.28.5",
 		"@chayns-toolkit/eslint-config": "^3.0.2",
+		"@emnapi/core": "^1.10.0",
+		"@emnapi/runtime": "^1.10.0",
 		"@module-federation/node": "^2.7.42",
 		"@rsbuild/core": "^2.0.3",
 		"@rsbuild/plugin-assets-retry": "^2.0.0",
@@ -105,10 +107,6 @@
 		"typescript": {
 			"optional": true
 		}
-	},
-	"optionalDependencies": {
-		"@emnapi/core": "^1.7.1",
-		"@emnapi/runtime": "^1.7.1"
 	},
 	"engines": {
 		"node": ">=22"
