@@ -117,10 +117,13 @@ module.exports = {
 The dynamic `import()` in your entry point creates the required async boundary, allowing Module
 Federation to properly initialize shared dependencies before loading your application code.
 
-:::tip Example Implementation The
-[example project](https://github.com/TobitSoftware/chayns-toolkit/tree/master/example) in the
+:::tip Example Implementation
+
+The [example project](https://github.com/TobitSoftware/chayns-toolkit/tree/master/example) in the
 chayns-toolkit repository uses this bootstrap pattern. You can refer to `src/index.jsx` and
-`src/bootstrap.tsx` for a working implementation. :::
+`src/bootstrap.tsx` for a working implementation.
+
+:::
 
 ### When Is This Required?
 

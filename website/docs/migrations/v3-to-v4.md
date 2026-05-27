@@ -78,6 +78,12 @@ since v3.0.0.
 
 **Migration:** Remove any `singleBundle` configuration from your `toolkit.config.ts`.
 
+### Development Ports Option Removed
+
+The `development.ports` option has been **removed** from the toolkit configuration.
+
+**Migration:** Remove any `development.ports` configuration from your `toolkit.config.ts`.
+
 ## New Features
 
 Version 4 adds support for modern tooling and configurations:
@@ -88,7 +94,8 @@ Version 4 adds support for modern tooling and configurations:
 - **Entry Point Targets** - Specify `target` per entry point in `output.entryPoints` (e.g., for
   service workers)
 - **JSX Runtime** - Configure React runtime mode (e.g., `"automatic"`)
-- **Required React Version** - Enforce minimum React version in your project
+- **React Required Versions** - Override required React versions for Module Federation shared
+  dependencies via `output.reactRequiredVersions`
 
 See the [configuration documentation](../configuration) for details on these features.
 
@@ -98,3 +105,4 @@ See the [configuration documentation](../configuration) for details on these fea
 - [ ] Migrate from `toolkit test` to Vitest
 - [ ] Update remote entry paths if using SSR
 - [ ] Remove `singleBundle` config if present
+- [ ] Remove `development.ports` config if present
