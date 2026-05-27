@@ -20,7 +20,7 @@ import { getCssTag } from "./loadChaynsCss"
 import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack"
 import { pluginNodePolyfill } from "@rsbuild/plugin-node-polyfill"
 import { pluginBabel } from "@rsbuild/plugin-babel"
-import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
+import { RsdoctorRspackPlugin } from "@rsdoctor/rspack-plugin"
 
 const getDefaultFilename = () =>
 	process.env.NODE_ENV === "production"
@@ -94,7 +94,6 @@ interface CreateConfigOptions {
 
 type CreateEnvironmentConfigOptions = Pick<
 	CreateConfigOptions,
-	| "analyze"
 	| "cssVersion"
 	| "disableReactSharing"
 	| "entryPoints"
@@ -304,7 +303,6 @@ const normalizeManifestDataPaths = (
 }
 
 async function createEnvironmentConfig({
-	analyze,
 	buildVersion,
 	cssVersion,
 	disableReactSharing = false,
@@ -327,10 +325,6 @@ async function createEnvironmentConfig({
 	}
 
 	const plugins: Rspack.Configuration["plugins"] = []
-
-	if (analyze || process.env.BUNDLE_ANALYZE === "true") {
-		plugins.push(new BundleAnalyzerPlugin())
-	}
 
 	if (exposeModules && supportsModuleFederation) {
 		if (Object.keys(entries).length === 0) {
@@ -561,7 +555,6 @@ export async function createWebpackConfig({
 		Object.assign(
 			environments,
 			await createEnvironmentConfig({
-				analyze: shouldAnalyze,
 				buildVersion,
 				cssVersion,
 				disableReactSharing,
@@ -580,7 +573,6 @@ export async function createWebpackConfig({
 	Object.assign(
 		environments,
 		await createEnvironmentConfig({
-			analyze: shouldAnalyze,
 			buildVersion,
 			cssVersion,
 			disableReactSharing,
@@ -599,7 +591,6 @@ export async function createWebpackConfig({
 	Object.assign(
 		environments,
 		await createEnvironmentConfig({
-			analyze: shouldAnalyze,
 			buildVersion,
 			cssVersion,
 			disableReactSharing,
@@ -627,6 +618,14 @@ export async function createWebpackConfig({
 					? `${packageName}__${buildEnv}__${process.env.BUILD_VERSION || 1}`
 					: packageName,
 			},
+			plugins: shouldAnalyze
+				? [
+						new RsdoctorRspackPlugin({
+							disableClientServer: false,
+							features: ["bundle", "plugins", "loader", "treeShaking"],
+						}),
+					]
+				: [],
 			module: {
 				parser: {
 					javascript: {
