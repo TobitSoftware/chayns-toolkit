@@ -5,12 +5,13 @@
 		"module": "CommonJS",
 		"noEmit": true,
 		"outDir": "lib",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"rootDir": "src",
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"target": "ES2020"
+		"target": "ES2020",
+		"types": ["node", "vitest/globals"]
 	},
-	"exclude": ["node_modules", "lib", "example"]
+	"exclude": ["node_modules", "lib", "example", "tests", "vitest.config.mts"]
 }

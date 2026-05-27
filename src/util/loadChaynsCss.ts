@@ -22,7 +22,7 @@ const loadCss = () => {
 
 	apiUrl.searchParams.set(
 		"siteId",
-		parameters.get("stylesiteid") || parameters.get("siteid") || ""
+		parameters.get("stylesiteid") || parameters.get("siteid") || "",
 	)
 	if (parameters.has("colormode")) {
 		apiUrl.searchParams.set("colormode", parameters.get("colormode") || "")

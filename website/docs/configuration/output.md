@@ -12,13 +12,6 @@ All options aswell as the `toolkit.config.js` file itself are optional.
 module.exports = {
     output: {
         /**
-         * Toggles single-file build functionality. Read more below
-         *
-         * @type {boolean}
-         */
-        singleBundle: false,
-
-        /**
          * Change the file-name your of primary output bundle. You can use any
          * of the [webpack substitutions](https://webpack.js.org/configuration/output/#template-strings)
          * as well as the `[package]` substitution, which will be replaced by
@@ -52,13 +45,73 @@ module.exports = {
          * The css version which should be used for the CHAYNS_TOOLKIT_CSS_TAG variable
          */
         cssVersion: "4.2",
+        /**
+         * The option to use for transforming React JSX. The default value is "automatic", which means that the new JSX transform will be used. If you want to use the old JSX transform, you can set this option to "classic". Note that the old JSX transform is deprecated and will be removed in a future version of React.
+         * @type {'automatic' | 'classic'}
+         */
+        reactRuntime: "automatic",
+        /**
+         * Enables and configures the React Compiler.
+         *
+         * By default, the compiler is automatically enabled when
+         * `babel-plugin-react-compiler` is installed.
+         *
+         * Use `false` to disable that auto-enable behavior, `true` to force it on,
+         * or provide an object to configure it explicitly.
+         *
+         * @type {boolean | { target?: string }}
+         */
+        reactCompiler: {
+            target: "18",
+        },
+        /**
+         * Expose modules via Module Federation.
+         * See the Module Federation documentation for more details.
+         *
+         * @type {Record<string, string>}
+         */
+        exposeModules: {
+            "./MyComponent": "./src/MyComponent",
+        },
+        /**
+         * Disable automatic React sharing in Module Federation.
+         *
+         * @type {boolean}
+         */
+        disableReactSharing: false,
+        /**
+         * Overrides the `requiredVersion` used for Module Federation shared
+         * React packages.
+         *
+         * See the Module Federation documentation for details.
+         *
+         * @type {string | { react?: string, reactDom?: string }}
+         */
+        reactRequiredVersions: {
+            react: "^19.0.0",
+            reactDom: "^19.0.0",
+        },
     },
     // ... other options ...
 }
 ```
 
-## Single File Builds
+## React Compiler
 
-In single-file build mode, the compiler will inline all assets (CSS, images, etc.) together with all
-JavaScript into a single bundle. This can be useful when building smaller fragments of a UI, e.g.
-some kind of plugin.
+If `babel-plugin-react-compiler` is installed, `chayns-toolkit` enables the React Compiler
+automatically.
+
+You can override this behavior via `output.reactCompiler`:
+
+- `false` disables the compiler even if the package is installed
+- `true` forces it on
+- `{ target: "18" }` enables it and configures the target explicitly
+
+## Module Federation
+
+To expose modules that can be consumed by other applications at runtime, configure the
+`exposeModules` option. This enables [Module Federation](../features/module-federation.md).
+
+For detailed information about Module Federation, including version compatibility requirements with
+`chayns-api` and overriding React required versions, see the
+[Module Federation documentation](../features/module-federation.md).

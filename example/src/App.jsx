@@ -10,6 +10,7 @@ import UrlLoaderTest from 'components/url-loader-test/UrlLoaderTest';
 import PipelineOperatorTest from 'components/pipeline-operator-test/PipelineOperatorTest';
 import React, { Suspense } from 'react';
 import './App.css';
+import Linaria from './components/linaria/Linaria';
 
 const LazyComponent = React.lazy(
     () => import('./components/code-splitting-test/CodeSplittingTest'),
@@ -20,7 +21,9 @@ export default function App() {
 
     return (
         <>
+            <h1>chayns-toolkit example</h1>
             <CssModules />
+            <Linaria />
             <HmrTest />
             <FileLoaderTest />
             <UrlLoaderTest />

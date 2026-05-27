@@ -1,16 +1,9 @@
 import { z } from "zod"
-import type { RsbuildConfig } from "@rsbuild/core/dist-types/types/config"
-import type { JestConfig } from "../../commands/testCommand"
+import type { RsbuildConfig } from "@rsbuild/core"
 
 const developmentSchema = z.object({
 	host: z.string().max(255).default("adaptive"),
 	port: z.coerce.number().positive().max(65535).default(1234),
-	ports: z
-		.object({
-			client: z.coerce.number().positive().max(65535).default(1234),
-			server: z.coerce.number().positive().max(65535).default(1235),
-		})
-		.default({}),
 	strictPort: z.boolean().default(false),
 	cert: z.string().optional(),
 	key: z.string().optional(),
@@ -18,7 +11,6 @@ const developmentSchema = z.object({
 
 const outputSchema = z
 	.object({
-		singleBundle: z.boolean().default(false),
 		filename: z
 			.object({
 				html: z.string().optional(),
@@ -40,14 +32,41 @@ const outputSchema = z
 			.regex(/^\d+\.\d+$/)
 			.default("4.2"),
 		exposeModules: z.record(z.string(), z.string()).optional(),
+		reactRequiredVersions: z
+			.union([
+				z.string().min(1),
+				z
+					.object({
+						react: z.string().min(1).optional(),
+						reactDom: z.string().min(1).optional(),
+					})
+					.refine(
+						(data) => Boolean(data.react || data.reactDom),
+						"Need to define at least one key for output.reactRequiredVersions",
+					),
+			])
+			.optional(),
 		disableReactSharing: z.boolean().default(false),
+		reactRuntime: z.union([z.literal("automatic"), z.literal("classic")]).default("classic"),
+		reactCompiler: z
+			.union([
+				z.boolean(),
+				z.object({
+					target: z.string().optional(),
+				}),
+			])
+			.optional(),
 		entryPoints: z
 			.record(
 				z.string(),
 				z.object({
 					pathIndex: z.string(),
 					pathHtml: z.string().optional(),
+					filename: z.string().optional(),
 					templateParameters: z.record(z.string(), z.string()).optional(),
+					target: z
+						.union([z.literal("node"), z.literal("web"), z.literal("web-worker")])
+						.optional(),
 				}),
 			)
 			.default({}),
@@ -82,13 +101,11 @@ export const configSchema = z.object({
 			z.custom<RsbuildConfig>(),
 			z.object({
 				dev: z.boolean(),
-				target: z.union([z.literal("server"), z.literal("client"), z.null()]),
 				watch: z.boolean().default(false),
 			}),
 		)
 		.returns(z.custom<RsbuildConfig>())
 		.optional(),
-	jest: z.function().args(z.custom<JestConfig>()).returns(z.custom<JestConfig>()).optional(),
 })
 
 export type ToolkitConfig = z.input<typeof configSchema>

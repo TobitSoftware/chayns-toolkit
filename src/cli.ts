@@ -2,7 +2,6 @@ import { Command } from "commander"
 import { buildCommand } from "./commands/buildCommand"
 import { devCommand } from "./commands/devCommand"
 import { lintCommand } from "./commands/lintCommand"
-import { testCommand } from "./commands/testCommand"
 import { loadEnvironment } from "./features/environment/loadEnvironment"
 import { checkSSLConfig } from "./features/ssl-check/checkSSLConfig"
 import { checkForTypeScript } from "./features/typescript/checkForTypeScript"
@@ -17,11 +16,12 @@ program
 	.command("dev")
 	.description("start up a development server with hot module replacement")
 	.option("-d, --devtools", "open react-devtools in a separate window", false)
-	.action(async (options: { devtools: boolean }) => {
+	.option("-e, --exec <command>", "run a command after a successful compile")
+	.action(async (options: { devtools: boolean; exec?: string }) => {
 		loadEnvironment(true)
 		await runSteps(
 			[checkForTypeScript, checkSSLConfig],
-			[devCommand({ devtools: options.devtools })],
+			[devCommand({ devtools: options.devtools, exec: options.exec })],
 		)
 	})
 
@@ -29,18 +29,29 @@ program
 	.command("build")
 	.description("bundles your code for production")
 	.option("-a, --analyze", "analyze your bundle size", false)
+	.option("-e, --exec <command>", "run a command after a successful build")
+	.option("-p, --preview", "start a preview server after building", false)
 	.option("-w, --watch", "watch for file changes", false)
-	.action(async (options: { analyze: boolean; watch: boolean }) => {
-		try {
-			loadEnvironment(false)
-			await runSteps([buildCommand({ analyze: options.analyze, watch: options.watch })])
-		} catch (e) {
-			output.error(e as string)
-			output.exit(1)
-		}
+	.action(
+		async (options: { analyze: boolean; exec?: string; preview: boolean; watch: boolean }) => {
+			try {
+				loadEnvironment(false)
+				await runSteps([
+					buildCommand({
+						analyze: options.analyze,
+						exec: options.exec,
+						preview: options.preview,
+						watch: options.watch,
+					}),
+				])
+			} catch (e) {
+				output.error(e as string)
+				output.exit(1)
+			}
 
-		console.info("")
-	})
+			console.info("")
+		},
+	)
 
 program
 	.command("lint")
@@ -60,25 +71,6 @@ program
 		} catch (e) {
 			output.error(e as string)
 		}
-	})
-
-program
-	.command("test")
-	.description("executes all Jest tests for this project")
-	.option("-w, --watch", "watch for changes to rerun tests", false)
-	.option(
-		"--setupFile <path>",
-		"file that should be executed before the tests are initialized",
-		"",
-	)
-	.action(async (options: { watch: boolean; setupFile: string }) => {
-		try {
-			await runSteps([testCommand(options)])
-		} catch (e) {
-			output.error(e as string)
-		}
-
-		console.info("")
 	})
 
 program.parse(process.argv)
