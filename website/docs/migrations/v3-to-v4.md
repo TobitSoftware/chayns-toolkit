@@ -71,6 +71,39 @@ Projects with Server-Side Rendering (SSR) enabled will experience a change in th
 
 This only affects projects with `output.serverSideRendering` enabled.
 
+### Server-Side Rendering Simplified
+
+The `output.serverSideRendering` configuration has been simplified. Previously, there were three
+possible values: `false`, `true`/`"build-only"`, and `"all"`. This caused inconsistent behavior
+between development and production builds.
+
+**V4 Behavior:**
+
+- `serverSideRendering: true`, `"build-only"`, and `"all"` are now all **treated the same**
+- This ensures consistent `/client/` and `/server/` paths between dev and build commands
+- If `/client/` paths exist, `/server/` bundles are always available
+- The values `"all"` and `"build-only"` are **deprecated** and will be removed in v5.0.0
+
+**Migration:**
+
+```diff
+  export default {
+    output: {
+-     serverSideRendering: "all",
++     serverSideRendering: true,
+
+-     serverSideRendering: "build-only",
++     serverSideRendering: true,
+    }
+  }
+```
+
+If you already use `serverSideRendering: true`, no changes are needed. However, be aware that:
+
+- In development, the server environment will now also be built (like in production)
+- This ensures path consistency but may slightly increase dev build times
+- If you only need client-side rendering, use `serverSideRendering: false`
+
 ### SingleBundle Option Removed
 
 The `singleBundle` option has been **removed** completely. This option was already non-functional
@@ -104,5 +137,6 @@ See the [configuration documentation](../configuration/output.md) for details on
 - [ ] Test custom webpack functions (if used) - `target` parameter removed
 - [ ] Migrate from `toolkit test` to Vitest
 - [ ] Update remote entry paths if using SSR
+- [ ] Check SSR config - `true`/`"build-only"` now behave like `"all"` (server built in dev too)
 - [ ] Remove `singleBundle` config if present
 - [ ] Remove `development.ports` config if present

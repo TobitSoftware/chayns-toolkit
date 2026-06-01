@@ -33,7 +33,7 @@ export function devCommand({
 			analyze: false,
 			mode: "development" as const,
 			outputFilename: config.output.filename,
-			serverSideRendering: config.output.serverSideRendering === "all",
+			serverSideRendering: config.output.serverSideRendering !== false,
 			packageJson,
 			injectDevtoolsScript: devtools,
 			prefixCss: config.output.prefixCss,

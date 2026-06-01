@@ -63,6 +63,16 @@ export async function loadConfig(): Promise<ParsedToolkitConfig> {
 			validatedValue.development.host = https ? "0.0.0.0" : "localhost"
 		}
 
+		if (
+			validatedValue.output.serverSideRendering === "all" ||
+			validatedValue.output.serverSideRendering === "build-only"
+		) {
+			output.warn(
+				`${fm.code(`output.serverSideRendering: "${validatedValue.output.serverSideRendering}"`)} is deprecated. Use ${fm.code("output.serverSideRendering: true")} instead. The values "all" and "build-only" will be removed in a future version.`,
+			)
+			validatedValue.output.serverSideRendering = true
+		}
+
 		return validatedValue
 	} catch (error: unknown) {
 		if (error instanceof ZodError) {
