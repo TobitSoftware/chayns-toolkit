@@ -441,9 +441,7 @@ async function createEnvironmentConfig({
 				manifest:
 					manifest?.host && env === "web"
 						? {
-								filename: pathPrefix
-									? `${pathPrefix}static/manifest.json`
-									: undefined,
+								filename: `${pathPrefix ?? ""}static/manifest.json`,
 								generate: ({ manifestData }) => {
 									const filterFiles = (files: string[]) =>
 										files.filter((file) => !file.endsWith(".map"))
