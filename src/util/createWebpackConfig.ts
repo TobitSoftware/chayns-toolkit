@@ -365,6 +365,7 @@ async function createEnvironmentConfig({
 							}
 							options.stats.metaData.buildInfo.buildVersion = buildVersion
 						},
+						filePath: pathPrefix,
 					}
 				: false,
 			name: packageName?.replace(/^@/, "").replace(/\//g, "__").replace(/-/g, "_"),
