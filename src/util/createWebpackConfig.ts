@@ -269,33 +269,35 @@ const normalizeManifestDataPaths = (
 	},
 	pathPrefix?: string,
 ) => {
-	manifestData.allFiles = manifestData.allFiles.map((file) => stripPathPrefix(file, pathPrefix))
+	const stripPrefix = (file: string) => stripPathPrefix(file, pathPrefix)
+
+	manifestData.allFiles = manifestData.allFiles.map(stripPrefix)
 
 	Object.values(manifestData.entries).forEach((entry) => {
 		if (entry.initial?.js) {
-			entry.initial.js = entry.initial.js.map((file) => stripPathPrefix(file, pathPrefix))
+			entry.initial.js = entry.initial.js.map(stripPrefix)
 		}
 		if (entry.initial?.css) {
-			entry.initial.css = entry.initial.css.map((file) => stripPathPrefix(file, pathPrefix))
+			entry.initial.css = entry.initial.css.map(stripPrefix)
 		}
 		if (entry.async?.js) {
-			entry.async.js = entry.async.js.map((file) => stripPathPrefix(file, pathPrefix))
+			entry.async.js = entry.async.js.map(stripPrefix)
 		}
 		if (entry.async?.css) {
-			entry.async.css = entry.async.css.map((file) => stripPathPrefix(file, pathPrefix))
+			entry.async.css = entry.async.css.map(stripPrefix)
 		}
 		if (entry.html) {
-			entry.html = entry.html.map((file) => stripPathPrefix(file, pathPrefix))
+			entry.html = entry.html.map(stripPrefix)
 		}
 		if (entry.assets) {
-			entry.assets = entry.assets.map((file) => stripPathPrefix(file, pathPrefix))
+			entry.assets = entry.assets.map(stripPrefix)
 		}
 	})
 
 	if (manifestData.integrity) {
 		manifestData.integrity = Object.fromEntries(
 			Object.entries(manifestData.integrity).map(([file, integrity]) => [
-				stripPathPrefix(file, pathPrefix),
+				stripPrefix(file),
 				integrity,
 			]),
 		)
@@ -364,6 +366,56 @@ async function createEnvironmentConfig({
 									manifest.textStringLibraries
 							}
 							options.stats.metaData.buildInfo.buildVersion = buildVersion
+
+							// Fix paths - remove pathPrefix if present
+							if (pathPrefix) {
+								const stripPrefix = (path: string) =>
+									stripPathPrefix(path, pathPrefix)
+
+								if (options.stats.metaData?.remoteEntry?.name) {
+									options.stats.metaData.remoteEntry.name = stripPrefix(
+										options.stats.metaData.remoteEntry.name,
+									)
+								}
+
+								options.stats.shared?.forEach((shared: any) => {
+									if (shared.assets?.js?.sync) {
+										shared.assets.js.sync =
+											shared.assets.js.sync.map(stripPrefix)
+									}
+									if (shared.assets?.js?.async) {
+										shared.assets.js.async =
+											shared.assets.js.async.map(stripPrefix)
+									}
+									if (shared.assets?.css?.sync) {
+										shared.assets.css.sync =
+											shared.assets.css.sync.map(stripPrefix)
+									}
+									if (shared.assets?.css?.async) {
+										shared.assets.css.async =
+											shared.assets.css.async.map(stripPrefix)
+									}
+								})
+
+								options.stats.exposes?.forEach((expose: any) => {
+									if (expose.assets?.js?.sync) {
+										expose.assets.js.sync =
+											expose.assets.js.sync.map(stripPrefix)
+									}
+									if (expose.assets?.js?.async) {
+										expose.assets.js.async =
+											expose.assets.js.async.map(stripPrefix)
+									}
+									if (expose.assets?.css?.sync) {
+										expose.assets.css.sync =
+											expose.assets.css.sync.map(stripPrefix)
+									}
+									if (expose.assets?.css?.async) {
+										expose.assets.css.async =
+											expose.assets.css.async.map(stripPrefix)
+									}
+								})
+							}
 						},
 						filePath: pathPrefix,
 					}
