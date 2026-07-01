@@ -738,8 +738,9 @@ export async function createWebpackConfig({
 		tools.bundlerChain = (chain, { CHAIN_ID }) => {
 			chain.module
 				.rule(CHAIN_ID.RULE.JS)
-				.use(CHAIN_ID.USE.SWC)
-				.after(CHAIN_ID.USE.BABEL)
+				.oneOf(CHAIN_ID.ONE_OF.JS_MAIN)
+				.use("wyw-in-js")
+				.after(CHAIN_ID.USE.SWC)
 				.loader("@wyw-in-js/webpack-loader")
 		}
 	}
