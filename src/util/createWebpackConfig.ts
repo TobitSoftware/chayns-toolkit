@@ -725,10 +725,12 @@ export async function createWebpackConfig({
 						options.plugins ??= []
 						options.plugins.unshift([
 							"babel-plugin-react-compiler",
-							{ target: getReactCompilerTarget(packageJson, reactCompilerTarget) },
+							{
+								target: getReactCompilerTarget(packageJson, reactCompilerTarget),
+							},
 						])
 					}
-					addPresets(["@babel/preset-react"])
+					addPresets(["@babel/preset-react", { runtime: reactRuntime }])
 				},
 			}),
 		)
