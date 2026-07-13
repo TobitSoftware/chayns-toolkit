@@ -108,6 +108,7 @@ type CreateEnvironmentConfigOptions = Pick<
 	packageName: string
 	pathPrefix?: string
 	reactRequiredVersions: ReactRequiredVersions
+	shouldAnalyze?: boolean
 }
 
 const getEnvironmentDistPathConfig = (
@@ -315,6 +316,7 @@ async function createEnvironmentConfig({
 	mode,
 	outputFilename,
 	packageName,
+	shouldAnalyze = false,
 	pathPrefix,
 	reactRequiredVersions,
 	env,
@@ -454,6 +456,15 @@ async function createEnvironmentConfig({
 				src: "./env-config.js",
 			},
 		})
+	}
+
+	if (shouldAnalyze) {
+		plugins.push(
+			new RsdoctorRspackPlugin({
+				disableClientServer: false,
+				features: ["bundle", "plugins", "loader", "treeShaking"],
+			}),
+		)
 	}
 
 	return {
@@ -615,6 +626,7 @@ export async function createWebpackConfig({
 				mode,
 				outputFilename,
 				packageName,
+				shouldAnalyze,
 				pathPrefix: "server/",
 				reactRequiredVersions: resolvedReactRequiredVersions,
 				env: "node",
@@ -634,6 +646,7 @@ export async function createWebpackConfig({
 			mode,
 			outputFilename,
 			packageName,
+			shouldAnalyze,
 			pathPrefix: serverSideRendering ? "client/" : undefined,
 			reactRequiredVersions: resolvedReactRequiredVersions,
 			env: "web",
@@ -651,6 +664,7 @@ export async function createWebpackConfig({
 			mode,
 			outputFilename,
 			packageName,
+			shouldAnalyze,
 			pathPrefix: serverSideRendering ? "client/" : undefined,
 			reactRequiredVersions: resolvedReactRequiredVersions,
 			env: "web-worker",
@@ -669,14 +683,6 @@ export async function createWebpackConfig({
 					? `${packageName}__${buildEnv}__${process.env.BUILD_VERSION || 1}`
 					: packageName,
 			},
-			plugins: shouldAnalyze
-				? [
-						new RsdoctorRspackPlugin({
-							disableClientServer: false,
-							features: ["bundle", "plugins", "loader", "treeShaking"],
-						}),
-					]
-				: [],
 			module: {
 				parser: {
 					javascript: {
