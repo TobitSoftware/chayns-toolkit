@@ -339,6 +339,9 @@ async function createEnvironmentConfig({
 			react: {
 				requiredVersion: reactRequiredVersions.react,
 			},
+			"react/jsx-runtime": {
+				requiredVersion: reactRequiredVersions.react,
+			},
 			"react-dom": {
 				requiredVersion: reactRequiredVersions.reactDom,
 			},
