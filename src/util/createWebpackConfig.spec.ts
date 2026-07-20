@@ -315,3 +315,82 @@ test("allows overriding the filename per entry point", async () => {
 		},
 	})
 })
+
+test("keeps non-federated js entry points out of the module federation environment", async () => {
+	const config = await createWebpackConfig({
+		mode: "production",
+		analyze: false,
+		serverSideRendering: true,
+		packageJson: {
+			name: "test-package",
+			peerDependencies: {
+				react: "^19.0.0",
+				"react-dom": "^19.0.0",
+			},
+		},
+		exposeModules: {
+			"./App": "./src/App",
+		},
+		entryPoints: {
+			index: {
+				pathIndex: "./src/index",
+				pathHtml: "./src/index.html",
+			},
+			helperScript: {
+				pathIndex: "./src/helper-script",
+				target: "web",
+				filename: "static/js/helperScript.js",
+				moduleFederation: false,
+			},
+		},
+	})
+
+	expect(config.environments?.web?.source?.entry).toStrictEqual({
+		index: "./src/index",
+	})
+	expect(config.environments?.["web-non-federated"]?.source?.entry).toStrictEqual({
+		helperScript: {
+			import: "./src/helper-script",
+			html: false,
+			filename: "client/static/js/helperScript.js",
+		},
+	})
+	expect(config.environments?.["web-non-federated"]?.tools).toBeUndefined()
+})
+
+test("keeps non-federated html entry points out of the module federation environment", async () => {
+	const config = await createWebpackConfig({
+		mode: "production",
+		analyze: false,
+		serverSideRendering: true,
+		packageJson: {
+			name: "test-package",
+			peerDependencies: {
+				react: "^19.0.0",
+				"react-dom": "^19.0.0",
+			},
+		},
+		exposeModules: {
+			"./App": "./src/App",
+		},
+		entryPoints: {
+			index: {
+				pathIndex: "./src/index",
+				pathHtml: "./src/index.html",
+			},
+			settings: {
+				pathIndex: "./src/settings",
+				pathHtml: "./src/settings.html",
+				moduleFederation: false,
+			},
+		},
+	})
+
+	expect(config.environments?.web?.source?.entry).toStrictEqual({
+		index: "./src/index",
+	})
+	expect(config.environments?.["web-non-federated"]?.source?.entry).toStrictEqual({
+		settings: "./src/settings",
+	})
+	expect(config.environments?.["web-non-federated"]?.tools).toBeUndefined()
+})

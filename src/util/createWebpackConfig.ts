@@ -41,6 +41,7 @@ export type EntryPoint = {
 	pathHtml?: string
 	pathIndex: string
 	filename?: string
+	moduleFederation?: boolean
 	templateParameters?: {
 		[key: string]: string
 	}
@@ -104,7 +105,9 @@ type CreateEnvironmentConfigOptions = Pick<
 	| "outputFilename"
 > & {
 	buildVersion: string
+	environmentName?: string
 	env: "web" | "node" | "web-worker"
+	entryPointFilter?: (entryName: string, entryPoint: EntryPoint) => boolean
 	packageName: string
 	pathPrefix?: string
 	reactRequiredVersions: ReactRequiredVersions
@@ -163,11 +166,15 @@ const createEnvironmentEntries = (
 	env: CreateEnvironmentConfigOptions["env"],
 	pathPrefix?: string,
 	outputFilename?: CreateConfigOptions["outputFilename"],
+	entryPointFilter?: CreateEnvironmentConfigOptions["entryPointFilter"],
 ): RsbuildEntry => {
 	const entries: RsbuildEntry = {}
 
 	Object.entries(entryPoints).forEach(([entryName, entryPoint]) => {
 		if (!shouldIncludeEntryPointInEnvironment(entryPoint, env)) {
+			return
+		}
+		if (entryPointFilter && !entryPointFilter(entryName, entryPoint)) {
 			return
 		}
 
@@ -309,7 +316,9 @@ async function createEnvironmentConfig({
 	buildVersion,
 	cssVersion,
 	disableReactSharing = false,
+	environmentName,
 	entryPoints,
+	entryPointFilter,
 	exposeModules,
 	injectDevtoolsScript = false,
 	manifest = {},
@@ -321,7 +330,13 @@ async function createEnvironmentConfig({
 	reactRequiredVersions,
 	env,
 }: CreateEnvironmentConfigOptions): Promise<RsbuildConfig["environments"]> {
-	const entries = createEnvironmentEntries(entryPoints, env, pathPrefix, outputFilename)
+	const entries = createEnvironmentEntries(
+		entryPoints,
+		env,
+		pathPrefix,
+		outputFilename,
+		entryPointFilter,
+	)
 	const supportsModuleFederation = env !== "web-worker"
 
 	if (Object.keys(entries).length === 0 && !(exposeModules && supportsModuleFederation)) {
@@ -471,7 +486,7 @@ async function createEnvironmentConfig({
 	}
 
 	return {
-		[env]: {
+		[environmentName ?? env]: {
 			source: {
 				entry: entries,
 			},
@@ -549,6 +564,16 @@ async function createEnvironmentConfig({
 		},
 	}
 }
+
+const isNonFederatedWebEntryPoint = (entryPoint: EntryPoint) =>
+	entryPoint.target !== "node" &&
+	entryPoint.target !== "web-worker" &&
+	entryPoint.moduleFederation === false
+
+const isFederatedWebEntryPoint = (entryPoint: EntryPoint) =>
+	entryPoint.target !== "node" &&
+	entryPoint.target !== "web-worker" &&
+	entryPoint.moduleFederation !== false
 
 export async function createWebpackConfig({
 	mode,
@@ -636,13 +661,16 @@ export async function createWebpackConfig({
 			}),
 		)
 	}
+	const hasNonFederatedWebEntries = Object.values(entryPoints).some(isNonFederatedWebEntryPoint)
 	Object.assign(
 		environments,
 		await createEnvironmentConfig({
 			buildVersion,
 			cssVersion,
 			disableReactSharing,
+			environmentName: "web",
 			entryPoints,
+			entryPointFilter: (_, entryPoint) => isFederatedWebEntryPoint(entryPoint),
 			exposeModules,
 			injectDevtoolsScript,
 			manifest,
@@ -655,6 +683,28 @@ export async function createWebpackConfig({
 			env: "web",
 		}),
 	)
+	if (hasNonFederatedWebEntries) {
+		Object.assign(
+			environments,
+			await createEnvironmentConfig({
+				buildVersion,
+				cssVersion,
+				disableReactSharing,
+				environmentName: "web-non-federated",
+				entryPoints,
+				entryPointFilter: (_, entryPoint) => isNonFederatedWebEntryPoint(entryPoint),
+				injectDevtoolsScript,
+				manifest,
+				mode,
+				outputFilename,
+				packageName,
+				shouldAnalyze,
+				pathPrefix: serverSideRendering ? "client/" : undefined,
+				reactRequiredVersions: resolvedReactRequiredVersions,
+				env: "web",
+			}),
+		)
+	}
 	Object.assign(
 		environments,
 		await createEnvironmentConfig({
