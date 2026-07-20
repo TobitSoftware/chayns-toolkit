@@ -51,13 +51,14 @@ test("rejects an empty reactRequiredVersions object", () => {
 	).toThrow("Need to define at least one key for output.reactRequiredVersions")
 })
 
-test("accepts environment targets for entry points", () => {
+test("accepts module federation opt-out and environment targets for entry points", () => {
 	const config = configSchema.parse({
 		output: {
 			entryPoints: {
 				index: {
 					pathIndex: "./src/index",
 					filename: "custom/[name].js",
+					moduleFederation: false,
 				},
 				server: {
 					pathIndex: "./src/server",
@@ -74,4 +75,5 @@ test("accepts environment targets for entry points", () => {
 	expect(config.output.entryPoints.server.target).toBe("node")
 	expect(config.output.entryPoints.worker.target).toBe("web-worker")
 	expect(config.output.entryPoints.index.filename).toBe("custom/[name].js")
+	expect(config.output.entryPoints.index.moduleFederation).toBe(false)
 })

@@ -141,6 +141,57 @@ You don't need it when:
 **In practice:** If you're mixing entry points and exposed modules, you almost always need the
 bootstrap pattern, since React is shared by default.
 
+### Disabling Module Federation per Entry Point
+
+Some entry points should stay out of Module Federation even when the project exposes federated
+modules. This can apply to a plain browser helper script, but also to a complete HTML entry point
+that should not load the Module Federation runtime.
+
+For those cases, set `moduleFederation: false` on the specific entry point:
+
+```js title="/toolkit.config.js"
+module.exports = {
+    output: {
+        exposeModules: {
+            "./AppWrapper": "./src/components/AppWrapper",
+        },
+        entryPoints: {
+            index: {
+                pathIndex: "./src/index",
+                pathHtml: "./src/index.html",
+            },
+            settings: {
+                pathIndex: "./src/settings",
+                pathHtml: "./src/settings.html",
+                moduleFederation: false,
+            },
+            helperScript: {
+                pathIndex: "./src/helper-script",
+                filename: "static/js/helperScript.js",
+                moduleFederation: false,
+            },
+        },
+    },
+}
+```
+
+This keeps the marked entry point out of the federated web environment, so it does not receive the
+Module Federation runtime or shared dependency wiring. Internally, that entry point is built in a
+separate non-federated web environment.
+
+Use this when:
+
+- the entry is a separate browser script that should load only its own code
+- the entry is a full HTML page that should run independently from the exposed modules in the same
+  build
+
+This option only disables Module Federation for the specific entry point.
+
+Because the entry point moves into a separate web environment, it no longer shares chunks with the
+federated web entry points from the same build. This is usually a good fit for separate scripts or
+pages that are never loaded together, but it can increase build output size when large dependencies
+are duplicated across both environments.
+
 ### Troubleshooting RUNTIME-005
 
 If you encounter the `RUNTIME-005` error:
