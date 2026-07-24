@@ -789,7 +789,10 @@ export async function createWebpackConfig({
 							},
 						])
 					}
-					addPresets([["@babel/preset-react", { runtime: reactRuntime }]])
+					addPresets([
+						["@babel/preset-react", { runtime: reactRuntime }],
+						"@babel/preset-typescript",
+					])
 				},
 			}),
 		)
