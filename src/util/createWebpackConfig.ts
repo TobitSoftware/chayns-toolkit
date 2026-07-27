@@ -215,7 +215,10 @@ const getModuleFederationFilename = (pathPrefix?: string) => {
 	return pathPrefix ? `${pathPrefix}${baseFilename}` : baseFilename
 }
 
-function getReactCompilerTarget(packageJson: PackageJson, targetOverride?: string): string {
+function getReactCompilerTarget(
+	packageJson: PackageJson,
+	targetOverride?: string,
+): string | undefined {
 	if (targetOverride) {
 		return targetOverride
 	}
@@ -225,7 +228,7 @@ function getReactCompilerTarget(packageJson: PackageJson, targetOverride?: strin
 		packageJson.peerDependencies?.react ??
 		packageJson.devDependencies?.react
 
-	return reactVersion?.match(/\d+/)?.[0] ?? "18"
+	return reactVersion?.match(/\d+/)?.[0]
 }
 
 export function resolveReactRequiredVersions(
@@ -627,6 +630,12 @@ export async function createWebpackConfig({
 			swcReactOptions: {
 				runtime: reactRuntime,
 			},
+			reactCompiler: isReactCompilerEnabled
+				? {
+						target: getReactCompilerTarget(packageJson, reactCompilerTarget) as
+							"17" | "18" | "19",
+					}
+				: undefined,
 		}),
 		pluginSass(),
 		pluginAssetsRetry(),
@@ -775,20 +784,11 @@ export async function createWebpackConfig({
 			: undefined,
 	}
 
-	if (isLinariaUsed || isReactCompilerEnabled) {
+	if (isLinariaUsed) {
 		rsBuildPlugins.push(
 			pluginBabel({
 				babelLoaderOptions: (options, { addPresets }) => {
 					options.sourceMaps = false
-					if (isReactCompilerEnabled) {
-						options.plugins ??= []
-						options.plugins.unshift([
-							"babel-plugin-react-compiler",
-							{
-								target: getReactCompilerTarget(packageJson, reactCompilerTarget),
-							},
-						])
-					}
 					addPresets([["@babel/preset-react", { runtime: reactRuntime }]])
 				},
 			}),
