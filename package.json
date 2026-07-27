@@ -64,11 +64,11 @@
 		"@rsdoctor/rspack-plugin": "^1.5.11",
 		"@wyw-in-js/webpack-loader": "^1.1.0",
 		"ajv": "^8.20.0",
-		"eslint": "^9.39.4",
-		"eslint-formatter-pretty": "^6.0.1",
+		"eslint": "^9.39.5",
+		"eslint-formatter-pretty": "^7.1.0",
 		"postcss-prefix-selector": "^2.1.1",
 		"serve-handler": "^6.1.7",
-		"webpack": "^5.106.2",
+		"webpack": "^5.109.0",
 		"zod": "^3.25.76"
 	},
 	"devDependencies": {
@@ -83,22 +83,22 @@
 		"commander": "^14.0.3",
 		"esbuild": "^0.28.0",
 		"fast-glob": "^3.3.3",
-		"fs-extra": "^11.3.4",
+		"fs-extra": "^11.4.0",
 		"husky": "^9.1.7",
 		"jsdom": "^29.1.1",
 		"mock-fs": "^5.5.0",
-		"prettier": "^3.8.3",
+		"prettier": "^3.9.6",
 		"prettier-plugin-packagejson": "^3.0.2",
 		"pretty-quick": "^4.2.2",
 		"shx": "^0.4.0",
-		"type-fest": "^5.6.0",
+		"type-fest": "^5.8.0",
 		"typescript": "^6.0.3",
-		"vitest": "^4.1.5"
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@module-federation/enhanced": "^2.4.0",
 		"react-devtools": ">=4",
-		"typescript": "^4.9.0 || ^5.0.0 || ^6.0.0"
+		"typescript": "^4.9.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
 	},
 	"peerDependenciesMeta": {
 		"react-devtools": {
