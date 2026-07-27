@@ -53,8 +53,11 @@ module.exports = {
         /**
          * Enables and configures the React Compiler.
          *
-         * By default, the compiler is automatically enabled when
-         * `babel-plugin-react-compiler` is installed.
+         * Prefer configuring this option explicitly.
+         *
+         * For compatibility, the compiler is still automatically enabled when
+         * `babel-plugin-react-compiler` is installed and this option is omitted.
+         * This fallback is deprecated and will be removed in a future version.
          *
          * Use `false` to disable that auto-enable behavior, `true` to force it on,
          * or provide an object to configure it explicitly.
@@ -98,14 +101,19 @@ module.exports = {
 
 ## React Compiler
 
-If `babel-plugin-react-compiler` is installed, `chayns-toolkit` enables the React Compiler
-automatically.
+Enable the React Compiler explicitly via `output.reactCompiler`.
+
+If `babel-plugin-react-compiler` is installed and `output.reactCompiler` is omitted,
+`chayns-toolkit` currently still enables the compiler automatically for compatibility. This fallback
+is deprecated and will be removed in a future version.
 
 You can override this behavior via `output.reactCompiler`:
 
 - `false` disables the compiler even if the package is installed
-- `true` forces it on
-- `{ target: "18" }` enables it and configures the target explicitly
+- `true` forces it on and uses the detected React version as target
+- `{ target: "18" }` enables it and overrides the detected target explicitly
+
+For React 17 and 18 projects, also install `react-compiler-runtime`.
 
 ## Module Federation
 

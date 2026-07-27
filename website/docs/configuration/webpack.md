@@ -76,15 +76,26 @@ module.exports = {
 
 ### Adding react-compiler
 
-Add the required devDependencies:
-`npm i babel-plugin-react-compiler eslint-plugin-react-compiler -D`
+Enable the React Compiler via `output.reactCompiler`.
 
 When using React versions prior to 19 also add: `npm i react-compiler-runtime -D`
 
-The toolkit enables the React Compiler automatically when `babel-plugin-react-compiler` is
-installed.
+If `babel-plugin-react-compiler` is installed and `output.reactCompiler` is omitted, the toolkit
+currently still enables the React Compiler automatically for compatibility. This fallback is
+deprecated and will be removed in a future version.
 
-If you want to configure or override it explicitly, use `output.reactCompiler`:
+If you want to enable it explicitly, use `output.reactCompiler`. The toolkit detects the React
+version and passes it as compiler target:
+
+```js title="/toolkit.config.js"
+module.exports = {
+    output: {
+        reactCompiler: true,
+    },
+}
+```
+
+You can still override the detected target explicitly:
 
 ```js title="/toolkit.config.js"
 module.exports = {

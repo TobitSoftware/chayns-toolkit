@@ -1,4 +1,9 @@
-import { createWebpackConfig, resolveReactRequiredVersions } from "./createWebpackConfig"
+import {
+	createWebpackConfig,
+	isReactCompilerAutoEnabled,
+	resolveReactCompilerConfig,
+	resolveReactRequiredVersions,
+} from "./createWebpackConfig"
 
 test("prefers peer dependency versions by default", () => {
 	expect(
@@ -66,6 +71,37 @@ test("allows overriding react-dom independently", () => {
 	).toStrictEqual({
 		react: "17 || 18 || 19",
 		reactDom: "^19.0.0",
+	})
+})
+
+test("keeps auto-enabling the react compiler for compatibility when babel-plugin-react-compiler is installed", () => {
+	const packageJson = {
+		dependencies: {
+			react: "^18.3.0",
+		},
+		devDependencies: {
+			"babel-plugin-react-compiler": "^1.0.0",
+		},
+	}
+
+	expect(isReactCompilerAutoEnabled(packageJson, undefined)).toBe(true)
+	expect(resolveReactCompilerConfig(packageJson, undefined)).toStrictEqual({
+		target: "18",
+	})
+})
+
+test("allows enabling the react compiler explicitly and infers the react target", () => {
+	expect(
+		resolveReactCompilerConfig(
+			{
+				dependencies: {
+					react: "^18.3.0",
+				},
+			},
+			true,
+		),
+	).toStrictEqual({
+		target: "18",
 	})
 })
 

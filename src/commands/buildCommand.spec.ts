@@ -6,12 +6,14 @@ import type { StepParams } from "../util/runSteps"
 const mocks = vi.hoisted(() => ({
 	createRsbuild: vi.fn(),
 	createWebpackConfig: vi.fn(),
+	isReactCompilerAutoEnabled: vi.fn(() => false),
 	execFile: vi.fn(),
 	modifyWebpackConfig: vi.fn(),
 	spawn: vi.fn(),
 	runCompiler: vi.fn(),
 	output: {
 		info: vi.fn(),
+		hint: vi.fn(),
 		error: vi.fn(),
 		exit: vi.fn(),
 	},
@@ -24,6 +26,7 @@ vi.mock("@rsbuild/core", () => ({
 
 vi.mock("../util/createWebpackConfig", () => ({
 	createWebpackConfig: mocks.createWebpackConfig,
+	isReactCompilerAutoEnabled: mocks.isReactCompilerAutoEnabled,
 }))
 
 vi.mock("../util/modifyWebpackConfig", () => ({
@@ -55,8 +58,7 @@ vi.mock("fs", () => ({
 
 const previewMock = vi.fn()
 let afterBuildHandler:
-	| ((params: { stats?: { hasErrors: () => boolean } }) => Promise<void> | void)
-	| undefined
+	((params: { stats?: { hasErrors: () => boolean } }) => Promise<void> | void) | undefined
 let closeBuildHandler: (() => Promise<void> | void) | undefined
 
 const createChildProcessMock = () => {
@@ -123,6 +125,7 @@ beforeEach(() => {
 	afterBuildHandler = undefined
 	closeBuildHandler = undefined
 	mocks.createWebpackConfig.mockResolvedValue({})
+	mocks.isReactCompilerAutoEnabled.mockReturnValue(false)
 	mocks.modifyWebpackConfig.mockImplementation(({ config }: { config: RsbuildConfig }) => config)
 	mocks.createRsbuild.mockResolvedValue({
 		onAfterBuild: vi.fn((handler) => {
@@ -136,15 +139,23 @@ beforeEach(() => {
 	mocks.runCompiler.mockResolvedValue({
 		hasErrors: () => false,
 	})
-	mocks.execFile.mockImplementation((file, args, options, callback) => {
-		if (typeof options === "function") {
-			options(null, "", "")
-			return
-		}
-		if (typeof callback === "function") {
-			callback(null, "", "")
-		}
-	})
+	mocks.execFile.mockImplementation(
+		(
+			_file: string,
+			_args: string[] | readonly string[] | undefined,
+			options:
+				| ((error: Error | null, stdout: string, stderr: string) => void)
+				| Record<string, unknown>
+				| undefined,
+			callback?: (error: Error | null, stdout: string, stderr: string) => void,
+		) => {
+			if (typeof options === "function") {
+				options(null, "", "")
+				return
+			}
+			callback?.(null, "", "")
+		},
+	)
 	mocks.spawn.mockImplementation(() => createChildProcessMock())
 	previewMock.mockResolvedValue({
 		urls: ["http://localhost:1234"],
@@ -159,6 +170,14 @@ test("does not start preview server when preview is disabled", async () => {
 
 	expect(mocks.runCompiler).toHaveBeenCalledWith(expect.anything(), { watch: false })
 	expect(previewMock).not.toHaveBeenCalled()
+})
+
+test("shows a hint when react compiler is auto-enabled for compatibility", async () => {
+	mocks.isReactCompilerAutoEnabled.mockReturnValue(true)
+
+	await buildCommand({ analyze: false, preview: false, watch: false })(createStepParams())
+
+	expect(mocks.output.hint).toHaveBeenCalledWith(expect.stringContaining("output.reactCompiler"))
 })
 
 test("starts preview server with development server settings when preview is enabled", async () => {

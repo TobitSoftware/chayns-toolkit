@@ -6,10 +6,12 @@ import { devCommand } from "./devCommand"
 const mocks = vi.hoisted(() => ({
 	createRsbuild: vi.fn(),
 	createWebpackConfig: vi.fn(),
+	isReactCompilerAutoEnabled: vi.fn(() => false),
 	execFile: vi.fn(),
 	modifyWebpackConfig: vi.fn(),
 	output: {
 		info: vi.fn(),
+		hint: vi.fn(),
 		error: vi.fn(),
 		blank: vi.fn(),
 	},
@@ -64,6 +66,7 @@ vi.mock("node:fs", () => ({
 
 vi.mock("../util/createWebpackConfig", () => ({
 	createWebpackConfig: mocks.createWebpackConfig,
+	isReactCompilerAutoEnabled: mocks.isReactCompilerAutoEnabled,
 }))
 
 vi.mock("../util/modifyWebpackConfig", () => ({
@@ -119,8 +122,7 @@ const createChildProcessMock = () => {
 }
 
 let afterDevCompileHandler:
-	| ((params: { stats: { hasErrors: () => boolean } }) => Promise<void> | void)
-	| undefined
+	((params: { stats: { hasErrors: () => boolean } }) => Promise<void> | void) | undefined
 let closeDevServerHandler: (() => Promise<void> | void) | undefined
 
 const createStepParams = (): StepParams => ({
@@ -164,6 +166,7 @@ beforeEach(() => {
 	afterDevCompileHandler = undefined
 	closeDevServerHandler = undefined
 	mocks.createWebpackConfig.mockResolvedValue({})
+	mocks.isReactCompilerAutoEnabled.mockReturnValue(false)
 	mocks.modifyWebpackConfig.mockImplementation(({ config }: { config: RsbuildConfig }) => config)
 	mocks.createRsbuild.mockResolvedValue({
 		onAfterDevCompile: vi.fn((handler) => {
@@ -179,15 +182,23 @@ beforeEach(() => {
 			urls: ["http://localhost:1234"],
 		}),
 	})
-	mocks.execFile.mockImplementation((file, args, options, callback) => {
-		if (typeof options === "function") {
-			options(null, "", "")
-			return
-		}
-		if (typeof callback === "function") {
-			callback(null, "", "")
-		}
-	})
+	mocks.execFile.mockImplementation(
+		(
+			_file: string,
+			_args: string[] | readonly string[] | undefined,
+			options:
+				| ((error: Error | null, stdout: string, stderr: string) => void)
+				| Record<string, unknown>
+				| undefined,
+			callback?: (error: Error | null, stdout: string, stderr: string) => void,
+		) => {
+			if (typeof options === "function") {
+				options(null, "", "")
+				return
+			}
+			callback?.(null, "", "")
+		},
+	)
 	mocks.spawn.mockImplementation(() => createChildProcessMock())
 	mocks.readFileSync.mockReturnValue(Buffer.from("cert"))
 })
@@ -209,6 +220,14 @@ test("starts exec command after a successful dev compile", async () => {
 	expect(mocks.output.info).toHaveBeenCalledWith(
 		"Starting command: node ./build/node-http-server.js",
 	)
+})
+
+test("shows a hint when react compiler is auto-enabled for compatibility", async () => {
+	mocks.isReactCompilerAutoEnabled.mockReturnValue(true)
+
+	await devCommand({})(createStepParams())
+
+	expect(mocks.output.hint).toHaveBeenCalledWith(expect.stringContaining("output.reactCompiler"))
 })
 
 test("does not start exec command after a failed dev compile", async () => {

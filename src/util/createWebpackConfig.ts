@@ -57,6 +57,10 @@ type ReactRequiredVersions = {
 	reactDom?: string
 }
 
+type ReactCompilerConfig = {
+	target?: string
+}
+
 interface CreateConfigOptions {
 	mode: Mode
 	analyze: boolean
@@ -79,11 +83,7 @@ interface CreateConfigOptions {
 	reactRequiredVersions?: string | ReactRequiredVersions
 	entryPoints: EntryPoints
 	reactRuntime?: "automatic" | "classic"
-	reactCompiler?:
-		| boolean
-		| {
-				target?: string
-		  }
+	reactCompiler?: boolean | ReactCompilerConfig
 	disableReactSharing?: boolean
 	manifest?: {
 		host?: boolean
@@ -229,6 +229,53 @@ function getReactCompilerTarget(
 		packageJson.devDependencies?.react
 
 	return reactVersion?.match(/\d+/)?.[0]
+}
+
+const normalizeReactCompilerOptions = (
+	packageJson: PackageJson,
+	reactCompiler?: boolean | ReactCompilerConfig,
+): true | { target: "17" | "18" | "19" } | undefined => {
+	if (reactCompiler === false) {
+		return undefined
+	}
+
+	const resolvedTarget = getReactCompilerTarget(
+		packageJson,
+		typeof reactCompiler === "object" && reactCompiler !== null
+			? reactCompiler.target
+			: undefined,
+	) as "17" | "18" | "19" | undefined
+
+	if (reactCompiler === true) {
+		return resolvedTarget ? { target: resolvedTarget } : true
+	}
+
+	if (typeof reactCompiler === "object" && reactCompiler !== null) {
+		return resolvedTarget ? { target: resolvedTarget } : true
+	}
+
+	return undefined
+}
+
+export function isReactCompilerAutoEnabled(
+	packageJson: PackageJson,
+	reactCompiler?: boolean | ReactCompilerConfig,
+): boolean {
+	return (
+		reactCompiler === undefined &&
+		isPackageInstalled(packageJson, "babel-plugin-react-compiler")
+	)
+}
+
+export function resolveReactCompilerConfig(
+	packageJson: PackageJson,
+	reactCompiler?: boolean | ReactCompilerConfig,
+): true | { target: "17" | "18" | "19" } | undefined {
+	if (isReactCompilerAutoEnabled(packageJson, reactCompiler)) {
+		return normalizeReactCompilerOptions(packageJson, true)
+	}
+
+	return normalizeReactCompilerOptions(packageJson, reactCompiler)
 }
 
 export function resolveReactRequiredVersions(
@@ -606,19 +653,7 @@ export async function createWebpackConfig({
 	})
 
 	const isLinariaUsed = isPackageInstalled(packageJson, "@linaria/core")
-	const isReactCompilerInstalled = isPackageInstalled(packageJson, "babel-plugin-react-compiler")
-
-	const isReactCompilerEnabled =
-		typeof reactCompiler === "boolean"
-			? reactCompiler
-			: reactCompiler !== undefined
-				? true
-				: isReactCompilerInstalled
-
-	const reactCompilerTarget =
-		typeof reactCompiler === "object" && reactCompiler !== null
-			? reactCompiler.target
-			: undefined
+	const resolvedReactCompilerConfig = resolveReactCompilerConfig(packageJson, reactCompiler)
 	const resolvedReactRequiredVersions = resolveReactRequiredVersions(
 		packageJson,
 		reactRequiredVersions,
@@ -630,12 +665,7 @@ export async function createWebpackConfig({
 			swcReactOptions: {
 				runtime: reactRuntime,
 			},
-			reactCompiler: isReactCompilerEnabled
-				? {
-						target: getReactCompilerTarget(packageJson, reactCompilerTarget) as
-							"17" | "18" | "19",
-					}
-				: undefined,
+			reactCompiler: resolvedReactCompilerConfig,
 		}),
 		pluginSass(),
 		pluginAssetsRetry(),

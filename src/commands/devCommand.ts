@@ -2,7 +2,7 @@ import { exec as execCommand } from "child_process"
 import { createRsbuild } from "@rsbuild/core"
 import fs, { watchFile } from "fs"
 import { unwatchFile } from "node:fs"
-import { createWebpackConfig } from "../util/createWebpackConfig"
+import { createWebpackConfig, isReactCompilerAutoEnabled } from "../util/createWebpackConfig"
 import { createExecController } from "../util/execController"
 import { fm } from "../util/format"
 import { modifyWebpackConfig, WebpackModifierFunction } from "../util/modifyWebpackConfig"
@@ -26,6 +26,12 @@ export function devCommand({
 }: DevCommandArgs): (stepParams: StepParams) => Promise<void> {
 	return async ({ config, packageJson, packageManager }) => {
 		const execController = createExecController(exec)
+
+		if (isReactCompilerAutoEnabled(packageJson, config.output.reactCompiler)) {
+			output.hint(
+				`${fm.code("babel-plugin-react-compiler")} currently enables the React Compiler automatically. Configure ${fm.code("output.reactCompiler")} explicitly because this compatibility fallback will be removed in a future version.`,
+			)
+		}
 
 		const { port, host, cert, key } = config.development
 
