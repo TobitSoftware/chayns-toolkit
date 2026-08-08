@@ -1,10 +1,14 @@
 import { ZodError } from "zod"
 import { readFileSync } from "node:fs"
-import Module from "node:module"
+import Module, { stripTypeScriptTypes } from "node:module"
 import { project } from "../../util/project"
 import { configSchema, ParsedToolkitConfig, ToolkitConfig } from "./configSchema"
 import { output } from "../../util/output"
 import { fm } from "../../util/format"
+
+const ModuleWithNodeModulePaths = Module as typeof Module & {
+	_nodeModulePaths(from: string): string[]
+}
 
 const JS_CONFIG_FILENAME = "toolkit.config.js"
 const CJS_CONFIG_FILENAME = "toolkit.config.cjs"
@@ -30,12 +34,11 @@ export async function loadConfig(): Promise<ParsedToolkitConfig> {
 	if (usedConfigFilename) {
 		output.info(`loading ${fm.path(usedConfigFilename)}...`)
 		if (usedConfigFilename === TS_CONFIG_FILENAME) {
-			const { default: ts } = await import("typescript")
-			const transpiled = ts.transpile(readFileSync(TS_CONFIG_FILENAME, "utf-8"), {
-				esModuleInterop: true,
-			})
+			const transpiled = stripTypeScriptTypes(readFileSync(TS_CONFIG_FILENAME, "utf-8"))
 			const m = new Module(TS_CONFIG_FILENAME)
-			m.paths = [project.resolvePath("node_modules")]
+			m.paths = ModuleWithNodeModulePaths._nodeModulePaths(
+				project.resolvePath("node_modules"),
+			)
 			// @ts-expect-error internal function
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 			m._compile(transpiled, TS_CONFIG_FILENAME)
