@@ -38,8 +38,8 @@ export async function checkForTypeScript({
 			`To use TypeScript, you have to install the ${fm.code`typescript`} package by running ${pkgCommands.install(
 				packageManager,
 				"typescript",
-				true
-			)}.`
+				true,
+			)}.`,
 		)
 
 		return true
@@ -49,13 +49,10 @@ export async function checkForTypeScript({
 }
 
 async function createTsConfig(): Promise<void> {
-	await project.writeFile(
-		"tsconfig.json",
-		JSON.stringify(defaultTsconfig, undefined, 4)
-	)
+	await project.writeFile("tsconfig.json", JSON.stringify(defaultTsconfig, undefined, 4))
 
 	output.info(
-		`Seems like you want to use TypeScript. A ${fm.path`tsconfig.json`} file has been set up for you.`
+		`Seems like you want to use TypeScript. A ${fm.path`tsconfig.json`} file has been set up for you.`,
 	)
 }
 
@@ -67,10 +64,15 @@ const defaultTsconfig: TsConfigJson = {
 		esModuleInterop: true,
 		experimentalDecorators: true,
 		isolatedModules: true,
-		jsx: "react",
+		jsx: "react-jsx",
 		lib: ["DOM", "ESNext"],
+		module: "Preserve",
+		moduleResolution: "Bundler",
+		target: "ES2020",
 		noEmit: true,
+		resolveJsonModule: true,
 		skipLibCheck: true,
 		strict: true,
+		verbatimModuleSyntax: true,
 	},
 }
