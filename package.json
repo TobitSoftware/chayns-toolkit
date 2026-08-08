@@ -62,7 +62,6 @@
 		"@rsbuild/plugin-sass": "^2.0.1",
 		"@rsbuild/plugin-svgr": "^2.0.5",
 		"@rsdoctor/rspack-plugin": "^1.6.1",
-		"@wyw-in-js/webpack-loader": "^1.1.0",
 		"ajv": "^8.20.0",
 		"eslint": "^9.39.5",
 		"eslint-formatter-pretty": "^7.1.0",
@@ -97,9 +96,13 @@
 	},
 	"peerDependencies": {
 		"@module-federation/enhanced": "^2.4.0",
+		"@wyw-in-js/webpack-loader": "^1.1.0 || ^2.0.0",
 		"react-devtools": ">=4"
 	},
 	"peerDependenciesMeta": {
+		"@wyw-in-js/webpack-loader": {
+			"optional": true
+		},
 		"react-devtools": {
 			"optional": true
 		}
