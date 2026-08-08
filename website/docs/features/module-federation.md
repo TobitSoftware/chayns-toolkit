@@ -143,6 +143,14 @@ bootstrap pattern, since React is shared by default.
 
 ### Disabling Module Federation per Entry Point
 
+:::warning Experimental and deprecated
+
+`moduleFederation: false` is an experimental opt-out and deprecated in its current form. The
+configuration may change in a future release, and chayns-toolkit prints a warning when this option
+is used.
+
+:::
+
 Some entry points should stay out of Module Federation even when the project exposes federated
 modules. This can apply to a plain browser helper script, but also to a complete HTML entry point
 that should not load the Module Federation runtime.

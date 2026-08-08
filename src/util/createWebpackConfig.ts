@@ -41,6 +41,9 @@ export type EntryPoint = {
 	pathHtml?: string
 	pathIndex: string
 	filename?: string
+	/**
+	 * @deprecated Experimental opt-out. This behavior is likely to change.
+	 */
 	moduleFederation?: boolean
 	templateParameters?: {
 		[key: string]: string
@@ -625,6 +628,16 @@ const isFederatedWebEntryPoint = (entryPoint: EntryPoint) =>
 	entryPoint.target !== "web-worker" &&
 	entryPoint.moduleFederation !== false
 
+const warnAboutExperimentalModuleFederationOptOut = (entryPoints: EntryPoints) => {
+	for (const [entryName, entryPoint] of Object.entries(entryPoints)) {
+		if (entryPoint.moduleFederation === false) {
+			console.warn(
+				`[chayns-toolkit] output.entryPoints.${entryName}.moduleFederation: false is experimental and deprecated. The opt-out behavior is likely to change in a future release.`,
+			)
+		}
+	}
+}
+
 export async function createWebpackConfig({
 	mode,
 	analyze,
@@ -643,6 +656,8 @@ export async function createWebpackConfig({
 	disableReactSharing = false,
 	manifest = {},
 }: CreateConfigOptions): Promise<RsbuildConfig> {
+	warnAboutExperimentalModuleFederationOptOut(entryPoints)
+
 	const packageName = packageJson.name
 	const buildEnv = process.env.BUILD_ENV || (mode === "production" ? "production" : "development")
 	const buildVersion =

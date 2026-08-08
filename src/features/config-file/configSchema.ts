@@ -1,6 +1,8 @@
 import { z } from "zod"
 import type { RsbuildConfig } from "@rsbuild/core"
 
+const moduleFederationSchema = z.boolean().optional().describe("Deprecated experimental opt-out")
+
 const developmentSchema = z.object({
 	host: z.string().max(255).default("adaptive"),
 	port: z.coerce.number().positive().max(65535).default(1234),
@@ -63,7 +65,7 @@ const outputSchema = z
 					pathIndex: z.string(),
 					pathHtml: z.string().optional(),
 					filename: z.string().optional(),
-					moduleFederation: z.boolean().optional(),
+					moduleFederation: moduleFederationSchema,
 					templateParameters: z.record(z.string(), z.string()).optional(),
 					target: z
 						.union([z.literal("node"), z.literal("web"), z.literal("web-worker")])

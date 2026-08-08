@@ -353,6 +353,8 @@ test("allows overriding the filename per entry point", async () => {
 })
 
 test("keeps non-federated js entry points out of the module federation environment", async () => {
+	const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
+
 	const config = await createWebpackConfig({
 		mode: "production",
 		analyze: false,
@@ -392,9 +394,15 @@ test("keeps non-federated js entry points out of the module federation environme
 		},
 	})
 	expect(config.environments?.["web-non-federated"]?.tools).toBeUndefined()
+	expect(warnSpy).toHaveBeenCalledWith(
+		"[chayns-toolkit] output.entryPoints.helperScript.moduleFederation: false is experimental and deprecated. The opt-out behavior is likely to change in a future release.",
+	)
+	warnSpy.mockRestore()
 })
 
 test("keeps non-federated html entry points out of the module federation environment", async () => {
+	const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
+
 	const config = await createWebpackConfig({
 		mode: "production",
 		analyze: false,
@@ -429,4 +437,8 @@ test("keeps non-federated html entry points out of the module federation environ
 		settings: "./src/settings",
 	})
 	expect(config.environments?.["web-non-federated"]?.tools).toBeUndefined()
+	expect(warnSpy).toHaveBeenCalledWith(
+		"[chayns-toolkit] output.entryPoints.settings.moduleFederation: false is experimental and deprecated. The opt-out behavior is likely to change in a future release.",
+	)
+	warnSpy.mockRestore()
 })
