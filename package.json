@@ -25,14 +25,20 @@
 	},
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./lib/index.d.ts",
+			"default": "./lib/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"bin": {
 		"chayns-toolkit": "cli.js"
 	},
 	"files": [
 		"lib/*",
 		"eslint/*",
-		"cli.js",
-		"babel.js"
+		"cli.js"
 	],
 	"scripts": {
 		"build": "node ./scripts/build",
