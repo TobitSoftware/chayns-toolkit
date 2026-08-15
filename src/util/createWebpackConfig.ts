@@ -314,15 +314,26 @@ const resolveInstalledPackageVersion = (packageName: string) => {
 		const entryPath = require.resolve(packageName, {
 			paths: [project.resolvePath("node_modules")],
 		})
-		const packagePath = packageName.startsWith("@")
-			? path.join("node_modules", ...packageName.split("/"))
-			: path.join("node_modules", packageName)
-		const packageJsonPath = path.resolve(
-			path.dirname(entryPath),
-			packagePath.endsWith(packageName) ? "../../package.json" : "package.json",
-		)
+		let directory = path.dirname(entryPath)
 
-		return JSON.parse(fs.readFileSync(packageJsonPath, "utf8")).version as string
+		while (directory !== path.dirname(directory)) {
+			const packageJsonPath = path.join(directory, "package.json")
+
+			if (fs.existsSync(packageJsonPath)) {
+				const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8")) as {
+					name?: string
+					version?: string
+				}
+
+				if (packageJson.name === packageName) {
+					return packageJson.version
+				}
+			}
+
+			directory = path.dirname(directory)
+		}
+
+		return undefined
 	} catch {
 		return undefined
 	}
