@@ -82,7 +82,7 @@ const outputSchema = z
 
 const manifestSchema = z.object({
 	host: z.boolean().default(false),
-	module: z.boolean().default(false),
+	module: z.boolean().default(true),
 	externalAssets: z.array(z.string()).optional(),
 	textStringLibraries: z.array(z.string()).optional(),
 })

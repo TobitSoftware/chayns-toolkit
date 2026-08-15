@@ -12,6 +12,8 @@ import { pluginCssMinimizer } from "@rsbuild/plugin-css-minimizer"
 import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry"
 import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
+import * as fs from "fs"
+import * as path from "path"
 import type { PackageJson } from "type-fest"
 import { isPackageInstalled } from "./isPackageInstalled"
 import { project } from "./project"
@@ -114,6 +116,7 @@ type CreateEnvironmentConfigOptions = Pick<
 	packageName: string
 	pathPrefix?: string
 	reactRequiredVersions: ReactRequiredVersions
+	reactShareScope: string
 	shouldAnalyze?: boolean
 }
 
@@ -306,6 +309,25 @@ export function resolveReactRequiredVersions(
 	}
 }
 
+const resolveInstalledPackageVersion = (packageName: string) => {
+	try {
+		const entryPath = require.resolve(packageName, {
+			paths: [project.resolvePath("node_modules")],
+		})
+		const packagePath = packageName.startsWith("@")
+			? path.join("node_modules", ...packageName.split("/"))
+			: path.join("node_modules", packageName)
+		const packageJsonPath = path.resolve(
+			path.dirname(entryPath),
+			packagePath.endsWith(packageName) ? "../../package.json" : "package.json",
+		)
+
+		return JSON.parse(fs.readFileSync(packageJsonPath, "utf8")).version as string
+	} catch {
+		return undefined
+	}
+}
+
 const stripPathPrefix = (value: string, pathPrefix?: string) => {
 	if (!pathPrefix) {
 		return value
@@ -381,6 +403,7 @@ async function createEnvironmentConfig({
 	shouldAnalyze = false,
 	pathPrefix,
 	reactRequiredVersions,
+	reactShareScope,
 	env,
 }: CreateEnvironmentConfigOptions): Promise<RsbuildConfig["environments"]> {
 	const entries = createEnvironmentEntries(
@@ -406,21 +429,28 @@ async function createEnvironmentConfig({
 		const shared: ConstructorParameters<typeof ModuleFederationPlugin>[0]["shared"] = {
 			react: {
 				requiredVersion: reactRequiredVersions.react,
+				shareScope: reactShareScope,
 			},
 			"react/jsx-runtime": {
 				requiredVersion: reactRequiredVersions.react,
+				shareScope: reactShareScope,
 			},
 			"react-dom": {
 				requiredVersion: reactRequiredVersions.reactDom,
+				shareScope: reactShareScope,
 			},
 			"react-dom/server": {
 				requiredVersion: reactRequiredVersions.reactDom,
+				shareScope: reactShareScope,
 			},
 		}
 
 		try {
 			require.resolve("react-dom/client", { paths: [project.resolvePath("node_modules")] })
-			shared["react-dom/client"] = shared["react-dom"]
+			shared["react-dom/client"] = {
+				...shared["react-dom"],
+				shareScope: reactShareScope,
+			}
 		} catch (ex) {
 			//
 		}
@@ -439,6 +469,7 @@ async function createEnvironmentConfig({
 									manifest.textStringLibraries
 							}
 							options.stats.metaData.buildInfo.buildVersion = buildVersion
+							;(options.stats.metaData as any).reactShareScope = reactShareScope
 
 							// Fix paths - remove pathPrefix if present
 							if (pathPrefix) {
@@ -494,6 +525,7 @@ async function createEnvironmentConfig({
 					}
 				: false,
 			name: packageName?.replace(/^@/, "").replace(/\//g, "__").replace(/-/g, "_"),
+			shareScope: reactShareScope,
 			filename: getModuleFederationFilename(pathPrefix),
 			runtimePlugins:
 				env === "node"
@@ -673,6 +705,10 @@ export async function createWebpackConfig({
 		packageJson,
 		reactRequiredVersions,
 	)
+	const installedReactVersion = resolveInstalledPackageVersion("react")
+	const reactShareScope = installedReactVersion
+		? `chayns-react-${installedReactVersion}`
+		: undefined
 	const shouldAnalyze = process.env.BUNDLE_ANALYZE === "true" || analyze
 
 	const rsBuildPlugins = [
@@ -711,6 +747,7 @@ export async function createWebpackConfig({
 				shouldAnalyze,
 				pathPrefix: "server/",
 				reactRequiredVersions: resolvedReactRequiredVersions,
+				reactShareScope: reactShareScope ?? "default",
 				env: "node",
 			}),
 		)
@@ -734,6 +771,7 @@ export async function createWebpackConfig({
 			shouldAnalyze,
 			pathPrefix: serverSideRendering ? "client/" : undefined,
 			reactRequiredVersions: resolvedReactRequiredVersions,
+			reactShareScope: reactShareScope ?? "default",
 			env: "web",
 		}),
 	)
@@ -755,6 +793,7 @@ export async function createWebpackConfig({
 				shouldAnalyze,
 				pathPrefix: serverSideRendering ? "client/" : undefined,
 				reactRequiredVersions: resolvedReactRequiredVersions,
+				reactShareScope: reactShareScope ?? "default",
 				env: "web",
 			}),
 		)
@@ -774,6 +813,7 @@ export async function createWebpackConfig({
 			shouldAnalyze,
 			pathPrefix: serverSideRendering ? "client/" : undefined,
 			reactRequiredVersions: resolvedReactRequiredVersions,
+			reactShareScope: reactShareScope ?? "default",
 			env: "web-worker",
 		}),
 	)
