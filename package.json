@@ -106,9 +106,6 @@
 		"react-devtools": ">=4"
 	},
 	"peerDependenciesMeta": {
-		"@wyw-in-js/webpack-loader": {
-			"optional": true
-		},
 		"react-devtools": {
 			"optional": true
 		}
