@@ -220,7 +220,7 @@ test("does not configure module federation for web-worker environments", async (
 	})
 })
 
-test("writes host manifest into client/static and strips the client prefix from manifest paths", async () => {
+test("writes host manifest for node and web environments", async () => {
 	const config = await createWebpackConfig({
 		mode: "production",
 		analyze: false,
@@ -240,10 +240,21 @@ test("writes host manifest into client/static and strips the client prefix from 
 				pathIndex: "./src/index",
 				pathHtml: "./src/index.html",
 			},
+			helperScript: {
+				pathIndex: "./src/helper-script",
+				target: "web",
+				moduleFederation: false,
+			},
 		},
 	})
 
+	const nodeManifestConfig = config.environments?.node?.output?.manifest
 	const manifestConfig = config.environments?.web?.output?.manifest
+	const nonFederatedManifestConfig = config.environments?.["web-non-federated"]?.output?.manifest
+	expect(nodeManifestConfig).toMatchObject({
+		filename: "server/static/manifest.json",
+	})
+	expect(nonFederatedManifestConfig).toBe(false)
 	expect(manifestConfig).toMatchObject({
 		filename: "client/static/manifest.json",
 	})

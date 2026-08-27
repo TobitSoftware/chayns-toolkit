@@ -573,7 +573,7 @@ async function createEnvironmentConfig({
 				assetPrefix: env === "node" ? undefined : "auto",
 				distPath: getEnvironmentDistPathConfig(env, pathPrefix),
 				manifest:
-					manifest?.host && env === "web"
+					manifest?.host && (env === "node" || environmentName === "web")
 						? {
 								filename: `${pathPrefix ?? ""}static/manifest.json`,
 								generate: ({ manifestData }) => {
