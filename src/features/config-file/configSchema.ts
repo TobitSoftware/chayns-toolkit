@@ -34,6 +34,7 @@ const outputSchema = z
 			.regex(/^\d+\.\d+$/)
 			.default("4.2"),
 		exposeModules: z.record(z.string(), z.string()).optional(),
+		externalRuntime: z.boolean().default(false),
 		reactRequiredVersions: z
 			.union([
 				z.string().min(1),

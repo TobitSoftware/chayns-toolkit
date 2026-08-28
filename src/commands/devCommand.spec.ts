@@ -141,6 +141,7 @@ const createStepParams = (): StepParams => ({
 			prefixCss: false,
 			cssVersion: "4.2",
 			exposeModules: undefined,
+			externalRuntime: false,
 			reactRequiredVersions: undefined,
 			disableReactSharing: false,
 			reactRuntime: "classic",
