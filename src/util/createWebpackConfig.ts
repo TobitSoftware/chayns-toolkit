@@ -12,8 +12,8 @@ import { pluginCssMinimizer } from "@rsbuild/plugin-css-minimizer"
 import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry"
 import { pluginSvgr } from "@rsbuild/plugin-svgr"
 import { loadEnv, Rspack, RsbuildEntry } from "@rsbuild/core"
-import * as fs from "fs"
-import * as path from "path"
+import { findPackageJSON } from "node:module"
+import { readFileSync } from "fs"
 import type { PackageJson } from "type-fest"
 import { isPackageInstalled } from "./isPackageInstalled"
 import { project } from "./project"
@@ -311,29 +311,17 @@ export function resolveReactRequiredVersions(
 
 const resolveInstalledPackageVersion = (packageName: string) => {
 	try {
-		const entryPath = require.resolve(packageName, {
-			paths: [project.resolvePath("node_modules")],
-		})
-		let directory = path.dirname(entryPath)
+		const packageJsonPath = findPackageJSON(packageName, project.resolvePath("package.json"))
 
-		while (directory !== path.dirname(directory)) {
-			const packageJsonPath = path.join(directory, "package.json")
-
-			if (fs.existsSync(packageJsonPath)) {
-				const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8")) as {
-					name?: string
-					version?: string
-				}
-
-				if (packageJson.name === packageName) {
-					return packageJson.version
-				}
-			}
-
-			directory = path.dirname(directory)
+		if (!packageJsonPath) {
+			return undefined
 		}
 
-		return undefined
+		const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as {
+			version?: string
+		}
+
+		return packageJson.version
 	} catch {
 		return undefined
 	}
