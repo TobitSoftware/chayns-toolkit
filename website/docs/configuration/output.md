@@ -77,6 +77,12 @@ module.exports = {
             "./MyComponent": "./src/MyComponent",
         },
         /**
+         * Use an external Module Federation runtime.
+         *
+         * @type {boolean}
+         */
+        externalRuntime: false,
+        /**
          * Disable automatic React sharing in Module Federation.
          *
          * @type {boolean}

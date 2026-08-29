@@ -220,6 +220,44 @@ test("does not configure module federation for web-worker environments", async (
 	})
 })
 
+test("enables the external Module Federation runtime when configured", async () => {
+	const config = await createWebpackConfig({
+		mode: "production",
+		analyze: false,
+		serverSideRendering: false,
+		externalRuntime: true,
+		exposeModules: {
+			"./App": "./src/App",
+		},
+		entryPoints: {},
+		packageJson: {
+			name: "test-package",
+			peerDependencies: {
+				react: "^19.0.0",
+				"react-dom": "^19.0.0",
+			},
+		},
+	})
+
+	const rspackTools = config.environments?.web?.tools?.rspack
+	if (
+		!rspackTools ||
+		typeof rspackTools !== "object" ||
+		!("plugins" in rspackTools) ||
+		!Array.isArray(rspackTools.plugins) ||
+		!rspackTools.plugins[0] ||
+		typeof rspackTools.plugins[0] !== "object"
+	) {
+		throw new Error("Expected rspack plugins to be configured")
+	}
+
+	expect(Reflect.get(rspackTools.plugins[0], "_options")).toMatchObject({
+		experiments: {
+			externalRuntime: true,
+		},
+	})
+})
+
 test("writes host manifest for node and web environments", async () => {
 	const config = await createWebpackConfig({
 		mode: "production",

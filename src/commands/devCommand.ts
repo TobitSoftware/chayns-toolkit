@@ -45,6 +45,7 @@ export function devCommand({
 			prefixCss: config.output.prefixCss,
 			cssVersion: config.output.cssVersion,
 			exposeModules: config.output.exposeModules,
+			externalRuntime: config.output.externalRuntime,
 			reactRequiredVersions: config.output.reactRequiredVersions,
 			disableReactSharing: config.output.disableReactSharing,
 			reactRuntime: config.output.reactRuntime,

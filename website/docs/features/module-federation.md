@@ -25,6 +25,27 @@ module.exports = {
 This will generate a `v2.remoteEntry.js` file in your build output that other applications can use
 to load your exposed modules.
 
+To use an external Module Federation runtime, enable `output.externalRuntime`:
+
+```js title="/toolkit.config.js"
+module.exports = {
+    output: {
+        exposeModules: {
+            "./MyComponent": "./src/MyComponent",
+        },
+        externalRuntime: true,
+    },
+}
+```
+
+When this option is enabled, the generated Module Federation code does not provide its own runtime.
+The host application must provide and initialize the compatible Module Federation runtime before
+loading the remote entry or any exposed module. In the chayns® environment, this runtime is provided
+by `chayns-api`; a version of at least **v3.7.0** is expected to be required.
+
+Do not enable this option unless every host that consumes the remote provides the external runtime.
+Otherwise, loading the remote will fail at runtime.
+
 ## Security & Restrictions
 
 Module Federation in the chayns® ecosystem is restricted to **trusted domains** for security

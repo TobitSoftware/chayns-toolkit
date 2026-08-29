@@ -77,3 +77,18 @@ test("accepts module federation opt-out and environment targets for entry points
 	expect(config.output.entryPoints.index.filename).toBe("custom/[name].js")
 	expect(config.output.entryPoints.index.moduleFederation).toBe(false)
 })
+
+test("accepts the external Module Federation runtime option", () => {
+	const config = configSchema.parse({
+		output: {
+			externalRuntime: true,
+			entryPoints: {
+				index: {
+					pathIndex: "./src/index",
+				},
+			},
+		},
+	})
+
+	expect(config.output.externalRuntime).toBe(true)
+})

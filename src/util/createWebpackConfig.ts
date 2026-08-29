@@ -85,6 +85,7 @@ interface CreateConfigOptions {
 	prefixCss?: boolean
 	cssVersion?: string
 	exposeModules?: {}
+	externalRuntime?: boolean
 	reactRequiredVersions?: string | ReactRequiredVersions
 	entryPoints: EntryPoints
 	reactRuntime?: "automatic" | "classic"
@@ -104,6 +105,7 @@ type CreateEnvironmentConfigOptions = Pick<
 	| "disableReactSharing"
 	| "entryPoints"
 	| "exposeModules"
+	| "externalRuntime"
 	| "injectDevtoolsScript"
 	| "manifest"
 	| "mode"
@@ -394,6 +396,7 @@ async function createEnvironmentConfig({
 	entryPoints,
 	entryPointFilter,
 	exposeModules,
+	externalRuntime = false,
 	injectDevtoolsScript = false,
 	manifest = {},
 	mode,
@@ -453,6 +456,7 @@ async function createEnvironmentConfig({
 
 		const moduleFederationConfig = {
 			dts: false,
+			experiments: externalRuntime ? { externalRuntime: true } : undefined,
 			manifest: manifest?.module
 				? {
 						additionalData: (options) => {
@@ -682,6 +686,7 @@ export async function createWebpackConfig({
 	reactRuntime,
 	reactCompiler,
 	disableReactSharing = false,
+	externalRuntime = false,
 	manifest = {},
 }: CreateConfigOptions): Promise<RsbuildConfig> {
 	warnAboutExperimentalModuleFederationOptOut(entryPoints)
@@ -734,6 +739,7 @@ export async function createWebpackConfig({
 				buildVersion,
 				cssVersion,
 				disableReactSharing,
+				externalRuntime,
 				entryPoints,
 				exposeModules,
 				manifest,
@@ -755,6 +761,7 @@ export async function createWebpackConfig({
 			buildVersion,
 			cssVersion,
 			disableReactSharing,
+			externalRuntime,
 			environmentName: "web",
 			entryPoints,
 			entryPointFilter: (_, entryPoint) => isFederatedWebEntryPoint(entryPoint),
@@ -778,6 +785,7 @@ export async function createWebpackConfig({
 				buildVersion,
 				cssVersion,
 				disableReactSharing,
+				externalRuntime,
 				environmentName: "web-non-federated",
 				entryPoints,
 				entryPointFilter: (_, entryPoint) => isNonFederatedWebEntryPoint(entryPoint),
@@ -800,6 +808,7 @@ export async function createWebpackConfig({
 			buildVersion,
 			cssVersion,
 			disableReactSharing,
+			externalRuntime,
 			entryPoints,
 			exposeModules,
 			manifest,
