@@ -458,10 +458,7 @@ async function createEnvironmentConfig({
 
 		try {
 			require.resolve("react-dom/client", { paths: [project.resolvePath("node_modules")] })
-			shared["react-dom/client"] = {
-				...shared["react-dom"],
-				shareScope: reactShareScope,
-			}
+			shared["react-dom/client"] = shared["react-dom"]
 		} catch (ex) {
 			//
 		}
