@@ -453,6 +453,14 @@ async function createEnvironmentConfig({
 		} catch (ex) {
 			//
 		}
+		try {
+			require.resolve("react/compiler-runtime", {
+				paths: [project.resolvePath("node_modules")],
+			})
+			shared["react/compiler-runtime"] = shared["react"]
+		} catch {
+			//
+		}
 
 		const moduleFederationConfig = {
 			dts: false,
