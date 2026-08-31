@@ -102,6 +102,7 @@ const createStepParams = (): StepParams => ({
 			cssVersion: "4.2",
 			exposeModules: undefined,
 			externalRuntime: false,
+			useRemoteEntryFilename: true,
 			reactRequiredVersions: undefined,
 			disableReactSharing: false,
 			reactRuntime: "classic",

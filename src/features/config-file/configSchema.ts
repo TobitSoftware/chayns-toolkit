@@ -35,6 +35,7 @@ const outputSchema = z
 			.default("4.2"),
 		exposeModules: z.record(z.string(), z.string()).optional(),
 		externalRuntime: z.boolean().default(false),
+		useRemoteEntryFilename: z.boolean().default(true),
 		reactRequiredVersions: z
 			.union([
 				z.string().min(1),

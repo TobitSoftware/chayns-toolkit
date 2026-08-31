@@ -258,6 +258,55 @@ test("enables the external Module Federation runtime when configured", async () 
 	})
 })
 
+test.each([
+	["uses", undefined, "client/v2.remoteEntry.js"],
+	["does not use", false, undefined],
+])(
+	"%s the configured Module Federation remote entry filename",
+	async (_, useRemoteEntryFilename, expectedFilename) => {
+		const config = await createWebpackConfig({
+			mode: "production",
+			analyze: false,
+			serverSideRendering: true,
+			useRemoteEntryFilename,
+			manifest: { module: true },
+			exposeModules: {
+				"./App": "./src/App",
+			},
+			entryPoints: {},
+			packageJson: {
+				name: "test-package",
+				peerDependencies: {
+					react: "^19.0.0",
+					"react-dom": "^19.0.0",
+				},
+			},
+		})
+
+		const rspackTools = config.environments?.web?.tools?.rspack
+		if (
+			!rspackTools ||
+			typeof rspackTools !== "object" ||
+			!("plugins" in rspackTools) ||
+			!Array.isArray(rspackTools.plugins)
+		) {
+			throw new Error("Expected rspack plugins to be configured")
+		}
+
+		const plugin = rspackTools.plugins[0]
+		if (!plugin || typeof plugin !== "object") {
+			throw new Error("Expected a Module Federation plugin")
+		}
+
+		const options = Reflect.get(plugin, "_options") as Record<string, unknown>
+		if (expectedFilename === undefined) {
+			expect(options).not.toHaveProperty("filename")
+		} else {
+			expect(options).toHaveProperty("filename", expectedFilename)
+		}
+	},
+)
+
 test("writes host manifest for node and web environments", async () => {
 	const config = await createWebpackConfig({
 		mode: "production",

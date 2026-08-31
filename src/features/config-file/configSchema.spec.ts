@@ -91,4 +91,20 @@ test("accepts the external Module Federation runtime option", () => {
 	})
 
 	expect(config.output.externalRuntime).toBe(true)
+	expect(config.output.useRemoteEntryFilename).toBe(true)
+})
+
+test("accepts disabling the Module Federation remote entry filename", () => {
+	const config = configSchema.parse({
+		output: {
+			useRemoteEntryFilename: false,
+			entryPoints: {
+				index: {
+					pathIndex: "./src/index",
+				},
+			},
+		},
+	})
+
+	expect(config.output.useRemoteEntryFilename).toBe(false)
 })

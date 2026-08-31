@@ -86,6 +86,7 @@ interface CreateConfigOptions {
 	cssVersion?: string
 	exposeModules?: {}
 	externalRuntime?: boolean
+	useRemoteEntryFilename?: boolean
 	reactRequiredVersions?: string | ReactRequiredVersions
 	entryPoints: EntryPoints
 	reactRuntime?: "automatic" | "classic"
@@ -108,6 +109,7 @@ type CreateEnvironmentConfigOptions = Pick<
 	| "externalRuntime"
 	| "injectDevtoolsScript"
 	| "manifest"
+	| "useRemoteEntryFilename"
 	| "mode"
 	| "outputFilename"
 > & {
@@ -398,6 +400,7 @@ async function createEnvironmentConfig({
 	exposeModules,
 	externalRuntime = false,
 	injectDevtoolsScript = false,
+	useRemoteEntryFilename = true,
 	manifest = {},
 	mode,
 	outputFilename,
@@ -534,7 +537,9 @@ async function createEnvironmentConfig({
 				: false,
 			name: packageName?.replace(/^@/, "").replace(/\//g, "__").replace(/-/g, "_"),
 			shareScope: reactShareScope,
-			filename: getModuleFederationFilename(pathPrefix),
+			...(useRemoteEntryFilename || manifest.module !== true
+				? { filename: getModuleFederationFilename(pathPrefix) }
+				: {}),
 			runtimePlugins:
 				env === "node"
 					? [require.resolve("@module-federation/node/runtimePlugin")]
@@ -696,8 +701,15 @@ export async function createWebpackConfig({
 	disableReactSharing = false,
 	externalRuntime = false,
 	manifest = {},
+	useRemoteEntryFilename = true,
 }: CreateConfigOptions): Promise<RsbuildConfig> {
 	warnAboutExperimentalModuleFederationOptOut(entryPoints)
+
+	if (useRemoteEntryFilename === false && manifest.module !== true) {
+		console.warn(
+			"[chayns-toolkit] output.useRemoteEntryFilename: false is ignored unless manifest.module is true.",
+		)
+	}
 
 	const packageName = packageJson.name
 	const buildEnv = process.env.BUILD_ENV || (mode === "production" ? "production" : "development")
@@ -752,6 +764,7 @@ export async function createWebpackConfig({
 				exposeModules,
 				manifest,
 				mode,
+				useRemoteEntryFilename,
 				outputFilename,
 				packageName,
 				shouldAnalyze,
@@ -776,6 +789,7 @@ export async function createWebpackConfig({
 			exposeModules,
 			injectDevtoolsScript,
 			manifest,
+			useRemoteEntryFilename,
 			mode,
 			outputFilename,
 			packageName,
@@ -799,6 +813,7 @@ export async function createWebpackConfig({
 				entryPointFilter: (_, entryPoint) => isNonFederatedWebEntryPoint(entryPoint),
 				injectDevtoolsScript,
 				manifest,
+				useRemoteEntryFilename,
 				mode,
 				outputFilename,
 				packageName,
@@ -822,6 +837,7 @@ export async function createWebpackConfig({
 			manifest,
 			mode,
 			outputFilename,
+			useRemoteEntryFilename,
 			packageName,
 			shouldAnalyze,
 			pathPrefix: serverSideRendering ? "client/" : undefined,
