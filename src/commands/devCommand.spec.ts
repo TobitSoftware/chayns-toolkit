@@ -232,6 +232,17 @@ test("shows a hint when react compiler is auto-enabled for compatibility", async
 	expect(mocks.output.hint).toHaveBeenCalledWith(expect.stringContaining("output.reactCompiler"))
 })
 
+test("passes the remote entry filename setting to the webpack config", async () => {
+	const params = createStepParams()
+	params.config.output.useRemoteEntryFilename = false
+
+	await devCommand({})(params)
+
+	expect(mocks.createWebpackConfig).toHaveBeenCalledWith(
+		expect.objectContaining({ useRemoteEntryFilename: false }),
+	)
+})
+
 test("does not start exec command after a failed dev compile", async () => {
 	await devCommand({ exec: "node ./build/node-http-server.js" })(createStepParams())
 

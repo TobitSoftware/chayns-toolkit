@@ -182,6 +182,17 @@ test("shows a hint when react compiler is auto-enabled for compatibility", async
 	expect(mocks.output.hint).toHaveBeenCalledWith(expect.stringContaining("output.reactCompiler"))
 })
 
+test("passes the remote entry filename setting to the webpack config", async () => {
+	const params = createStepParams()
+	params.config.output.useRemoteEntryFilename = false
+
+	await buildCommand({ analyze: false, preview: false, watch: false })(params)
+
+	expect(mocks.createWebpackConfig).toHaveBeenCalledWith(
+		expect.objectContaining({ useRemoteEntryFilename: false }),
+	)
+})
+
 test("starts preview server with development server settings when preview is enabled", async () => {
 	const params = createStepParams()
 	params.config.development.cert = "./cert.pem"

@@ -55,6 +55,7 @@ export function buildCommand({
 			reactCompiler: config.output.reactCompiler,
 			manifest: config.manifest,
 			entryPoints: config.output.entryPoints,
+			useRemoteEntryFilename: config.output.useRemoteEntryFilename,
 		})
 
 		if (typeof config.webpack === "function") {
