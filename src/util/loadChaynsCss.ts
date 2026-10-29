@@ -30,8 +30,8 @@ const loadCss = () => {
 	if (parameters.has("color")) {
 		apiUrl.searchParams.set("color", parameters.get("color") || "")
 	}
-	if (parameters.has("responsiveFontSize")) {
-		apiUrl.searchParams.set("responsiveFontSize", parameters.get("responsiveFontSize") || "")
+	if (parameters.has("responsivefontsize")) {
+		apiUrl.searchParams.set("responsivefontsize", parameters.get("responsivefontsize") || "")
 	}
 
 	const $style = document.createElement("style")
